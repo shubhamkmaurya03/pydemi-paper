@@ -48,7 +48,7 @@ of the 55 informative descriptors the values computed from the predicted
 densities of 605 held-out structures keep a rank correlation of at least 0.95
 with their DFT values, and the critical-point counts are the main exception.
 pydemi computes all descriptors of a 6,059-structure VASP dataset without a
-failure in 8.4 CPU hours, is verified by 342 automated tests, and is used from
+failure in 8.4 CPU hours, is verified by 352 automated tests, and is used from
 Python, the command line or a local graphical interface. Gradient-boosted
 models trained on the descriptors together with compositional features predict
 23 properties of the same dataset. For the bulk, shear and Young's moduli and
@@ -358,7 +358,8 @@ and all-electron densities nearly agree, are not affected.
 \section{Validation}
 \label{sec:validation}
 
-pydemi is tested by 342 automated tests (Table~\ref{tab:validation}). Half of
+pydemi is tested by 352 automated tests (Table~\ref{tab:validation}; each is
+described in Section~S6 of the Supporting Information). Nearly half of
 them, 169, form an invariance harness that is parametrized over the registry:
 every descriptor is computed for a low-symmetry model crystal and for its
 $2\times2\times2$ supercell, a translation of the origin and a rigid rotation,
@@ -367,8 +368,10 @@ checked automatically. The other library tests compare with closed forms for
 Slater and Gaussian densities, exact identities and brute-force references; the
 model tests check that the included ChargE3Net code reproduces the original
 implementation, and the interface tests run the graphical interface end to end
-for both inputs. The continuous-integration workflow runs the suite on Linux,
-macOS and Windows with Python 3.10--3.13.
+for both inputs and the comparison of the two densities. The continuous-integration
+workflow runs the suite on Linux, macOS and Windows with Python 3.10--3.13, with
+and without the optional extras, together with a strict static type check and a
+test of the built package.
 
 \begin{table}[htbp]
 \centering
@@ -385,8 +388,8 @@ Geometry and partitions (18) & nearest-image distances against brute force, incl
 Closed forms and identities (40) & radial moments of Slater densities; percolation of a simple cubic lattice at the midpoint density; known critical points; variance decomposition; Laplacian concentration $=\tfrac12$; Hartree potential of a Gaussian & $10^{-2}$--$10^{-12}$ \\
 Input, batch and tooling (21) & \texttt{CHGCAR} layouts (1, 2, 4 blocks, VASP 4/5), volume scaling; fixed batch schema; no bare NaN; float32 against float64 & exact / reported \\
 Density model (13) & VASP grid rule; neighbour lists against brute force; predictions equal the original ChargE3Net code, independent of chunking, invariant to rotation and permutation; renormalization & $10^{-5}$ of $\rho_{\max}$ \\
-Property models (11) & stored test predictions reproduced; compositional features against matminer by hand; range checks & $10^{-9}$ rel. \\
-Graphical interface (54) & end-to-end runs for both inputs; every descriptor has a figure whose plotted data reproduce its value & exact \\
+Property models (12) & stored test predictions reproduced, also by the 22 distributed models; compositional features against matminer by hand; range checks & $10^{-9}$ rel. \\
+Graphical interface (63) & end-to-end runs for both inputs and the comparison view; every descriptor has a figure whose plotted data reproduce its value & $10^{-7}$ rel. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -718,7 +721,12 @@ the predicted properties with their typical error, the test-set parity plot of
 each model, the most important inputs and, where the structure belongs to the
 dataset, its DFT values. Models with a test $R^2$ below 0.5 (the anisotropy index
 and the ionic and total dielectric constants) are marked as weak, and their
-values are presented as rough indications. Results are exported as CSV or JSON with the run
+values are presented as rough indications. A fifth view compares the two routes for one
+material: for an open \texttt{CHGCAR} it predicts the density of the same structure
+on the same grid and sets the density error, the 56 descriptors and the
+predicted properties from both densities side by side, marking descriptors that
+differ by more than 5\% and properties that differ by more than the typical
+error of their model. Results are exported as CSV or JSON with the run
 metadata.
 
 \begin{figure}[htbp]
@@ -742,7 +750,7 @@ pydemi reduces the one file every VASP calculation writes, the
 chosen so that each is defined on the PAW pseudo-density and converged on
 typical grids: on a coarsened grid 46 of the 55 informative descriptors change
 by at most 1\%. It featurized 6,059 VASP densities without a failure in
-8.4 CPU hours and is verified by 342 tests. The included ChargE3Net model gives
+8.4 CPU hours and is verified by 352 tests. The included ChargE3Net model gives
 the same descriptors from a crystal structure: 44 of the 55 keep a rank
 correlation of at least 0.95 with their DFT values on 605 held-out structures,
 and only the critical-point counts, quantities built on second derivatives in
@@ -764,10 +772,10 @@ anisotropy and the dielectric response --- mark where descriptors of the ground-
 density alone are not enough.
 
 \section*{Code and data availability}
-The source code, the 342 tests, the descriptor reference and the scripts that
+The source code, the 352 tests, the descriptor reference and the scripts that
 train the property models are available at
-\url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, 0.2.0, is archived at
-Zenodo~\cite{pydemi} (\doi{10.5281/zenodo.23664506}). The fine-tuned
+\url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, 0.2.1, is archived at
+Zenodo~\cite{pydemi} (\doi{10.5281/zenodo.23736932}). The fine-tuned
 ChargE3Net checkpoint and the property models are included in the package. The ChargE3Net code included in pydemi is
 taken from \url{https://github.com/AIforGreatGood/charge3net} (MIT licence). The
 DFT dataset of 6,059 charge densities was generated by members of the CMS Lab,

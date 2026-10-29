@@ -292,4 +292,264 @@ file whose density is predicted.}
 \label{fig:si_gui}
 \end{figure}
 
+% ==========================================================================
+\section{Automated tests}
+\label{si:tests}
+
+The test suite of pydemi 0.2.1 consists of 352 tests in 21 files under
+\texttt{tests/} of the repository (Table~\ref{tab:si_tests}). They run with
+\texttt{pytest} after \texttt{pip install "pydemi[gui,ml]"}; on a Linux
+workstation with every optional dependency and the dataset available, all 352
+pass, none skipped, in 4 minutes.
+
+\begin{table}[htbp]
+\centering
+\caption{The 352 tests of pydemi 0.2.1 by file. Optional dependencies: G, the
+\texttt{gui} extra (Streamlit, Plotly, LightGBM); M, the \texttt{ml} extra
+(PyTorch, e3nn, ASE); L, LightGBM; in parentheses, the number of the file's
+tests that need it.}
+\label{tab:si_tests}
+\small
+\begin{tabular}{llrll}
+\toprule
+Group & File & Tests & Needs & Tolerance \\
+\midrule
+Invariance & \texttt{test\_invariance.py} & 169 & -- & $10^{-6}$ rel. \\
+Derivatives & \texttt{test\_derivatives.py} & 16 & -- & $10^{-10}$--$5\times10^{-3}$ \\
+Geometry, partitions & \texttt{test\_geometry.py} & 6 & -- & $10^{-12}$ \\
+ & \texttt{test\_partitions.py} & 12 & -- & $10^{-12}$--$10^{-5}$ \\
+Closed forms & \texttt{test\_tier1.py} & 12 & -- & $10^{-10}$--5\% \\
+ & \texttt{test\_structural.py} & 11 & -- & exact--$10^{-12}$ \\
+ & \texttt{test\_fields.py} & 6 & dataset (1) & $10^{-12}$--$2\times10^{-3}$ \\
+ & \texttt{test\_sites.py} & 6 & -- & $10^{-12}$ \\
+ & \texttt{test\_ellipticity.py} & 5 & -- & $10^{-6}$--$10^{-3}$ \\
+Input and tooling & \texttt{test\_io.py} & 10 & pymatgen (1) & $10^{-10}$ \\
+ & \texttt{test\_tooling.py} & 9 & -- & as stated \\
+ & \texttt{test\_regressions.py} & 2 & -- & $10^{-12}$ \\
+Density model & \texttt{ml/test\_ml.py} & 13 & M (8) & $10^{-5}$ of $\rho_{\max}$ \\
+Property models & \texttt{test\_props.py} & 12 & L (8) & $10^{-9}$ rel. \\
+Interface & \texttt{gui/test\_core.py} & 10 & -- & exact \\
+ & \texttt{gui/test\_plots.py} & 10 & G & $10^{-7}$--$10^{-12}$ \\
+ & \texttt{gui/test\_viewer.py} & 11 & G & $10^{-6}$ \\
+ & \texttt{gui/test\_launch.py} & 7 & POSIX (3) & -- \\
+ & \texttt{gui/test\_predict.py} & 4 & -- & -- \\
+ & \texttt{gui/test\_compare.py} & 5 & G & $10^{-6}$ \\
+ & \texttt{gui/test\_app.py} & 16 & G, M (4) & -- \\
+\midrule
+Total & & 352 & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Reference densities.} Most library tests use densities whose exact
+values are known: superpositions of normalized Gaussians,
+$\rho(r)=N(\alpha/\pi)^{3/2}e^{-\alpha r^2}$, and of 1s Slater functions,
+$\rho(r)=N\zeta^3\pi^{-1}e^{-2\zeta r}$, summed over periodic images and
+evaluated on the grid together with their analytic gradient and Hessian
+(\texttt{pydemi.validate.analytic}). The Gaussians are smooth and band-limited
+on fine grids; the Slater functions have the nuclear cusp of a real density.
+Most test cells are triclinic, so that terms that vanish for orthogonal axes are
+exercised.
+
+\paragraph{Continuous integration.} Every push to the repository runs 14 jobs
+on GitHub Actions: the full suite with the GUI and property extras on Linux,
+macOS and Windows with Python 3.10 and 3.13, and on Linux with 3.11 and 3.12 (8
+jobs); the suite without any extra on Linux, which checks that the library
+needs only NumPy, SciPy and pandas and that \texttt{pydemi gui} and
+\texttt{pydemi predict} then say which extra to install; the density-model,
+interface and property tests with the ML extra (CPU PyTorch) on all three
+systems (3 jobs); a static type check (\texttt{mypy --strict}); and a build of
+the source distribution and wheel, which installs the wheel in a clean
+environment and starts the interface.
+
+\paragraph{Skipped tests.} Tests skip, with the reason, when an optional
+dependency is missing: the interface tests without Streamlit and Plotly, the
+network tests without PyTorch and e3nn, the structure-file tests without ASE,
+the property-model tests without LightGBM, and one input test without pymatgen.
+One test reads a CHGCAR of the dataset (FeNi$_3$) to check that the NCI fields
+stay finite on a real, partly negative PAW pseudo-density; it runs where the
+dataset is available and skips elsewhere. The three tests that send signals to
+the interface server are skipped on Windows.
+
+\paragraph{Invariance harness (169).} A Fe$_2$O crystal in a triclinic cell
+(three Gaussians on a $20\times21\times22$ grid) is featurized as it is, as its
+$2\times2\times2$ supercell, with its origin translated by $(3,7,11)$ voxels and
+rigidly rotated by 37$^\circ$ about $(1,2,0.5)$. Each of the 56 descriptors must
+agree under each of the three transformations to
+$|a-b|\leq10^{-6}\max(|a|,|b|)+10^{-12}$ (168 tests). The tests are generated
+from the descriptor registry, so a descriptor added later is checked without a
+new test. One more test confirms that the transformations do what they claim:
+the supercell has 8 times the atoms, volume and charge, and the rotation
+preserves the volume and the metric tensor.
+
+\paragraph{Derivatives (16).} Spectral (FFT) gradient, Laplacian and Hessian of
+a Gaussian superposition are exact to $10^{-10}$ relative in an orthorhombic and
+a triclinic cell. Finite differences of order 2, 4 and 6 reach their nominal
+convergence order between $32^3$ and $64^3$ grids (observed order at least the
+nominal order minus 0.6) in both cells. The Laplacian built from the diagonal of
+the metric is exact for the orthorhombic cell but more than 5\% wrong for the
+triclinic one, which is why the full metric is used. The Hessian is symmetric,
+its trace equals the Laplacian to $10^{-9}$, its eigenvalues are ascending and
+match the analytic ones ($10^{-9}$ with FFT, $5\times10^{-3}$ with finite
+differences), and computing them in chunks changes nothing. For the cusped
+Slater density, finite differences converge away from the nuclei ($r>0.5$\,\AA:
+errors below $10^{-3}$ for the gradient and $5\times10^{-3}$ for the Laplacian
+on $96^3$, decreasing more than eightfold from $48^3$), while the FFT Laplacian
+rings across the cell and does not converge; this documented limitation is
+tested so that it cannot change unnoticed. One test checks $|\mathbf G|^2$
+against the spectral Laplacian and one that invalid options are rejected.
+
+\paragraph{Geometry and partitions (18).} Nearest-atom distances, owners and
+directions agree with a brute-force search over $\pm5$ periodic images to
+$10^{-12}$\,\AA{}, also in an extremely sheared cell in which a fixed
+$3\times3\times3$ supercell misses the nearest image by more than 0.01\,\AA{};
+the power-diagram assignment agrees with brute force in the same way. A voxel on
+a nucleus gets a zero direction; the core, bond and interstitial shells cover
+every voxel exactly once, and shells scaled by the covalent radii use them; and the
+geometry of a structure is computed once and shared (6 tests). The nearest-atom,
+power and Becke partitions have weights that sum to one at every voxel and
+conserve the charge to $10^{-12}$; two symmetry-equivalent atoms receive equal
+Becke charges to $10^{-5}$ (the products are truncated to the nearest images); the
+two-atom Becke weight satisfies $s(\mu)+s(-\mu)=1$ with $s(0)=\tfrac12$; the site
+descriptors depend on the chosen partition and record it; and the site
+descriptors from the power and Becke partitions are invariant under the three
+transformations of the harness to $10^{-6}$ (12 tests).
+
+\paragraph{Closed forms and identities (40).} \emph{Bonding} (12): for a single
+Slater density ($\zeta=3$\,\AA$^{-1}$, $96^3$ grid, 4\,\AA{} box) the charge
+integrates to 1 ($10^{-4}$), $m_1=3/(2\zeta)$ ($5\times10^{-4}$), $m_2=3/\zeta^2$
+($1.5\times10^{-3}$, limited by nearest-image distances in the small box),
+$\sigma_{r^2}$ within 1\% and the anisotropy $\zeta_\mathrm{anis}<5\times10^{-5}$,
+with both derivative methods; the error of $m_1$ decreases on refining the grid;
+the negative-Laplacian volume fraction equals that of the sphere $r<1/\zeta$
+within 5\% with finite differences, whereas the ringing FFT Laplacian
+overestimates it by more than 10\%; two atoms give a non-zero anisotropy; the
+Laplacian concentration is $\tfrac12$ to $10^{-10}$ for any density because
+$\int\nabla^2\rho\,\mathrm dV=0$ on a periodic grid; a uniform density gives the
+documented constants with their flags and no NaN; names, order, metadata and the
+catalogue are generated from the registry, which refuses extensive quantities;
+and invalid options are rejected. \emph{Structural} (11): the function
+$\cos2\pi x+\cos2\pi y+\cos2\pi z$ with a small periodic tilt has exactly one
+maximum, one minimum and $3+3$ saddles per cell, with Euler characteristic
+consistency 0, on $12^3$, $24^3$ and $48^3$ grids, and the counts are reported
+per volume; a simple-cubic lattice of Gaussians percolates exactly at the
+bond-midpoint density in all three directions ($10^{-12}$, anisotropy 0); the
+percolation threshold does not depend on the cell origin, needs a cluster that
+winds around the cell, and is the highest spanning level; a non-nuclear maximum
+placed between two atoms is counted with its basin charge; a uniform density
+gives zero Shannon entropy, unit disequilibrium and LMC complexity and an
+isotropic anisotropy tensor (flagged); and a layered density gives
+$t_3=1$ and fractional anisotropy 1. \emph{Fields} (6): the Hartree potential of a
+Gaussian in a cubic box matches $kN[\mathrm{erf}(\sqrt\alpha r)/r-2\sqrt{\alpha/\pi}]$
+plus the $r^2$ term of the neutralizing background to $2\times10^{-3}$; the
+potential is referenced to its cell average ($10^{-12}$); the NCI region between
+two distant atoms has fractions between 0 and 1, and a uniform density gives the
+NCI sentinel; the bond-midpoint density of two Gaussians matches its closed form
+to $10^{-6}$; and the NCI fields are finite on a real CHGCAR (above).
+\emph{Site statistics} (6): the within- and between-element variances add up to
+the total variance to $10^{-12}$, for random numbers and for computed site
+values; the site charges add up to the cell charge and the site moments to
+$m_1$ ($10^{-12}$); range, extrema and standard deviation are consistent; the
+within-element variance is NaN (flagged) when no element has two sites and the
+between-element variance is zero (flagged) for one element; and the power
+partition gives a different tiling with the same total charge. \emph{Bond
+ellipticity} (5): the bounded ellipticity $1-\lambda_2/\lambda_1$ is in the
+default output, equals the value from the exact Hessian of an anisotropic
+Gaussian (two shapes) to $10^{-3}$, vanishes for a spherical one ($10^{-6}$) and is the
+monotone map $\epsilon/(1+\epsilon)<1$ of the usual ellipticity.
+
+\paragraph{Input, batch and tooling (21).} \emph{Input} (10): the lattice
+conventions ($\mathbf a_i\cdot\mathbf b_j=\delta_{ij}$, metric, volume; singular
+cells rejected); a density on a different lattice is rejected; a pymatgen
+structure is accepted; a written CHGCAR reads back to $10^{-10}$; the stored
+$\rho V$ is divided by the cell volume; the Fortran order of the values
+(fastest index first) is preserved; spin-polarized (2 blocks) and non-collinear
+(4 blocks) files with augmentation occupancies and magnetic moments give the
+total density from the first block; a VASP~4 file with a negative scale factor
+(the volume), Cartesian coordinates and selective dynamics reads correctly once
+the species are given; and POTCAR-style labels such as \texttt{Fe\_pv} are
+reduced to the element. \emph{Tooling} (9): a batch with a broken file keeps a
+fixed column schema, records the error and continues, with one and with two
+worker processes, or skips or stops on request; the four command-line commands
+(\texttt{featurize}, \texttt{catalogue}, \texttt{batch}, \texttt{sweep}) write
+the expected files; the shell-radius sweep skips invalid pairs and its shell
+fractions add up to 1; the grid-convergence report works (here $m_1$ changes by
+less than $10^{-3}$ on an 80\% grid); the recommended grid spacing, 0.08\,\AA{}
+for 2\%, is derived from the Slater closed forms; single precision agrees with
+double precision (median relative difference below $10^{-5}$, at most 5\% of
+the descriptors above $10^{-3}$); and a uniform density gives no bare NaN in any
+domain. \emph{Regressions} (2): an object reused with other options (metric or
+diagonal Laplacian, finite-difference order 2 or 6) gives the same values as a
+fresh one ($10^{-12}$), because derived fields are cached per option set.
+
+\paragraph{Density model (13).} Without PyTorch: the VASP grid rule (the
+$40^3$ grid of the BeCo CHGCAR of the dataset; even sizes with prime factors 2,
+3, 5 and 7; fewer points at a lower cut-off); the order of the grid points; the
+POTCAR table (valence electrons of the 87 elements of the training set; other
+elements reported); atom--atom and probe--atom neighbour lists in a triclinic
+cell equal to a brute-force search over $\pm3$ images; and the chunk size that
+follows the memory budget (5 tests). With PyTorch and e3nn: the checkpoint loads
+(SHA-256 and 1,909,389 parameters); its prediction for BeCo on an $8^3$ grid
+equals the one stored from the original ChargE3Net code (PyTorch 1.13, e3nn 0.5)
+to $10^{-5}$ of the maximum density; predictions do not depend on the chunk size
+and are invariant to rotating the cell, permuting the atoms and shifting them by
+lattice vectors ($10^{-4}$ relative); the predicted density is rescaled to the
+valence electron count ($10^{-10}$) and records its provenance (raw electron
+count, scale factor, grid); a prediction can be cancelled; and elements outside
+the training set are refused (6 tests). With ASE: CIF and POSCAR files are read,
+and \texttt{pydemi predict} writes a CHGCAR with the right electron count (2 tests).
+
+\paragraph{Property models (12).} A small bundle in the distributed format
+(LightGBM models on 200 random descriptor vectors: a regression, a regression on
+$\log_{10}$, a classification and a regression on descriptors and composition)
+is built for the tests. Predictions reproduce the stored test predictions to
+$10^{-9}$, including the logarithmic transform and the compositional features; a
+model that needs the composition refuses to predict without it; predictions are
+finite, clipped to physical ranges (dielectric constant $\geq1$, probabilities
+in $[0,1]$) and allow NaN descriptors; the compositional features equal
+matminer's fraction-weighted element statistics computed by hand for
+Al$_2$O$_3$, including ties and missing element data; dataset materials are
+recognized from their descriptors and out-of-range inputs flagged; the model
+path, a missing model and a LightGBM that cannot load (macOS without OpenMP) are
+reported clearly; and the tables, figures and texts of the property view are
+built. The distributed bundle of 22 models reproduces the test-set predictions
+made with the untrimmed models when it was built, from the stored descriptors
+and formulas, to $10^{-9}$ (every 30th test material).
+
+\paragraph{Graphical interface (63).} \emph{Input} (10): a CHGCAR reads to the
+same density plain or compressed (gzip, bzip2, xz, zip); unreadable files and
+unknown partitions give clear errors; the summary (formula, lattice, electron
+count) and the result table cover all 56 descriptors; and every descriptor has
+a typeset formula. \emph{Descriptor figures} (10, each with the nearest-atom and
+the Becke partition): every descriptor has a figure, and the plotted data
+reproduce the descriptors --- the radial charge distribution gives the shell
+fractions, the negative-Laplacian fractions, the Laplacian concentration and the
+Fisher information to $10^{-9}$, the histograms are centred on $\zeta$, the
+anisotropy-tensor eigenvalues and the bond ellipticity within one bin, and the
+critical points, NNM charge, site potentials, bond midpoints, percolation
+levels and site statistics give their descriptors to $10^{-7}$--$10^{-12}$; the
+figure data stay below 2\,MB. \emph{Viewer} (11): large grids are subsampled to
+actual grid values; slices pick the nearest lattice plane periodically; slices
+along each axis on linear and logarithmic scales serialize; and atoms on the
+plane are marked at all periodic images. \emph{Launcher} (7): \texttt{pydemi gui}
+serves on the local machine only, ships the descriptor reference, explains how
+to install a missing extra, opens the first URL, and never leaves the server
+running after the launcher receives SIGTERM, SIGHUP or SIGINT, even when the
+server ignores them. \emph{Background predictions} (4): one prediction runs at a
+time with progress, can be cancelled and restarted, reports errors, keeps a few
+finished results and can use a given grid. \emph{Compare view} (5): the relative
+difference, the per-descriptor transfer table, the marking of descriptors that
+differ, are near zero in both densities or are constant, the density error
+(NMAPE), which requires identical grids, and the agreement of properties within
+the typical error of each model. \emph{End to end} (16): the interface is run
+headless (Streamlit AppTest) from upload to export --- the empty state, the
+summary after an upload, the structure view, the descriptor table with search,
+export and partition choice, the figure browser, views that keep their settings,
+the property view with and without a model or LightGBM, unreadable uploads, the
+structure tab without the ML extra or with an unsupported element, a ChargE3Net
+prediction from a CIF followed by its descriptors, and the Compare view, which
+predicts the density on the CHGCAR's own grid and shows both sets of
+descriptors and properties side by side.
+
+
 \end{document}
