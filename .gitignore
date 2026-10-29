@@ -1,0 +1,13 @@
+# Overleaf compiles the PDFs itself
+*.pdf
+!figures/*.pdf
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+# analysis scripts and their data stay local
+analysis/
