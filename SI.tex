@@ -160,22 +160,18 @@ Descriptor & grid 80\% & FD4 & FD2 & power & Becke & $\rho_s$ (ML) & ML error \\
 \label{si:props}
 
 \paragraph{Targets.} The bulk, shear and Young's moduli (Voigt--Reuss--Hill),
-the Poisson ratio, the energy relative to the free atoms ($E_\mathrm{form}$ of
-the benchmark) and its Debye temperature are taken from the property table of the
-cross-model benchmark of S.~K.~Maurya and S.~Bhowmick (manuscript in preparation); Poisson ratios $\geq0.5$
-were removed. All other targets come from the Materials Project, database
-version 2026.04.13, for the same material identifiers. Elastic data were kept
-only where $K$ and $G$ lie between 0 and 1000\,GPa and agree with the benchmark
-table (6,000 materials); $C_{11}$, $C_{12}$, $C_{44}$ and the anisotropy index
-$A^U=5G_V/G_R+K_V/K_R-6$ only where the smallest eigenvalue of the unrounded
-stiffness tensor exceeds 1\,GPa (5,791), with $A^U$ computed from that tensor.
-The direct-gap label is defined only for materials with a gap (1,836).
+the energy relative to the free atoms ($E_\mathrm{form}$ of the benchmark) and
+its Debye temperature are taken from the property table of the cross-model
+benchmark of S.~K.~Maurya and S.~Bhowmick (manuscript in preparation). All
+other targets come from the Materials Project, database version 2026.04.13, for
+the same material identifiers. Elastic data were kept only where $K$ and $G$ lie
+between 0 and 1000\,GPa and agree with the benchmark table (6,000 materials);
+$C_{11}$, $C_{12}$ and $C_{44}$ only where the smallest eigenvalue of the
+unrounded stiffness tensor exceeds 1\,GPa (5,791). The direct-gap label is
+defined only for materials with a gap (1,836).
 
-\paragraph{Training.} Composition: matminer \texttt{Stoichiometry} ($p$-norms
-for $p=0,2,3,5,7,10$) and \texttt{ElementProperty} with the Magpie preset
-(22 elemental properties $\times$ minimum, maximum, range, mean, average
-deviation, mode), 138 features. Descriptors: the 56 of pydemi without the
-constant Laplacian concentration ratio. Ridge and logistic regression: median
+\paragraph{Training.} Inputs: the 56 descriptors of pydemi without the constant
+Laplacian concentration ratio (55). Ridge and logistic regression: median
 imputation, standardization, penalty from $10^{-3}$ to $10^{3}$ (13 values)
 chosen on the validation set. Random forests: 500 trees, $\frac13$ of the
 features per split for regression and $\sqrt{n}$ for classification, median
@@ -185,18 +181,21 @@ minimum leaf size 5--100 (log), feature fraction 0.3--1, bagging fraction
 0.5--1 and $L_1$, $L_2$ penalties $10^{-8}$--10 (log); objective the squared
 error of the (transformed) target or the log-loss; early stopping after 200
 rounds without improvement on the validation set, at most 10,000 rounds.
-$\log_{10}$ was applied to $\varepsilon$, $\varepsilon_\infty$ and $n$,
-$\log(1+x)$ to $\varepsilon_\mathrm{ion}$ and $A^U$. Nine of the 75 LightGBM
-configurations used more than 9,500 rounds on average, so a larger cap could
-improve them slightly. SHAP values are the exact tree contributions of LightGBM
-on the test set, averaged over the seeds.
+$\log_{10}$ was applied to the refractive index. Three of the 38 LightGBM configurations (with the 55 descriptors, the cohesive energy, the Debye temperature and the Cahill conductivity) used more than 9,500 rounds on average, so a larger cap could improve them slightly. SHAP values are the
+exact tree contributions of LightGBM on the test set, averaged over the seeds.
+
+\paragraph{Ten descriptors per property.} For each property, the 55 descriptors
+were ranked by their mean absolute SHAP value in the five LightGBM models on the
+\emph{training} set, averaged over the seeds; the ten highest
+(Table~\ref{tab:si_top10}) were the only inputs of a second set of ridge, random
+forest and LightGBM models, trained and tuned exactly as above
+(Table~\ref{tab:si_full}).
 
 \begin{table}[htbp]
 \centering
-\caption{LightGBM with descriptors and composition: test MAE (mean $\pm$
-standard deviation over five seeds), RMSE, $R^2$ (ROC-AUC for the
-classifications) of the five-seed ensemble, accuracy, and mean number of
-boosting rounds.}
+\caption{LightGBM on the 55 descriptors: test MAE (mean $\pm$ standard
+deviation over five seeds), RMSE, $R^2$ (ROC-AUC for the classifications) of
+the five-seed ensemble, accuracy, and mean number of boosting rounds.}
 \label{tab:si_lgbm}
 \begin{adjustbox}{width=\textwidth}
 \begin{tabular}{llccccr}
@@ -211,16 +210,16 @@ Property & Units & MAE & RMSE & Ensemble $R^2$ / AUC & Accuracy & Rounds \\
 
 \begin{table}[htbp]
 \centering
-\caption{Test $R^2$ (ROC-AUC for the classifications) of every model and
-feature set, mean over five seeds (ridge: one fit). C: composition (138), D:
-pydemi descriptors (55), D+C: both (193).}
+\caption{Test $R^2$ (ROC-AUC for the classifications) of every model, with the
+55 descriptors and with the ten most important descriptors of each property,
+mean over five seeds (ridge: one fit).}
 \label{tab:si_full}
 \begin{adjustbox}{width=\textwidth}
-\begin{tabular}{lccccccccc}
+\begin{tabular}{lcccccc}
 \toprule
- & \multicolumn{3}{c}{Ridge / logistic} & \multicolumn{3}{c}{Random forest} & \multicolumn{3}{c}{LightGBM} \\
-\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
-Property & C & D & D+C & C & D & D+C & C & D & D+C \\
+ & \multicolumn{3}{c}{55 descriptors} & \multicolumn{3}{c}{10 descriptors} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+Property & Ridge / logistic & Random forest & LightGBM & Ridge / logistic & Random forest & LightGBM \\
 \midrule
 \csname @@input\endcsname tables/tab_si_full.tex 
 \bottomrule
@@ -230,29 +229,27 @@ Property & C & D & D+C & C & D & D+C & C & D & D+C \\
 
 \begin{table}[htbp]
 \centering
-\caption{Models distributed for \texttt{pydemi.props}: mean validation loss of
-LightGBM over the seeds for each feature set (RMSE of the transformed target, or
-log-loss), the feature set chosen, and the hyperparameters and number of rounds
-of the seed-0 model.}
-\label{tab:si_selection}
-\begin{adjustbox}{width=\textwidth}
-\begin{tabular}{lccccccccr}
+\caption{The ten most important descriptors of each property, by mean absolute
+SHAP value on the training set, in decreasing order, and their share of the
+total (\%).}
+\label{tab:si_top10}
+\footnotesize
+\begin{tabular}{lr>{\raggedright\arraybackslash}p{0.55\textwidth}}
 \toprule
-Property & val.\ C & val.\ D & val.\ D+C & chosen & learning rate & leaves & min.\ leaf & feature fraction & rounds \\
+Property & Share & Descriptors \\
 \midrule
-\csname @@input\endcsname tables/tab_si_selection.tex 
+\csname @@input\endcsname tables/tab_si_top10.tex 
 \bottomrule
 \end{tabular}
-\end{adjustbox}
 \end{table}
 
 % ==========================================================================
 \section{Properties from predicted densities}
 \label{si:mlprops}
 
-For the 605 test structures of the density model, the distributed property models
-were evaluated with the descriptors of the DFT and of the predicted densities
-(composition unchanged). Agreement: $R^2$ between the two predictions and their
+For the 605 test structures of the density model, the LightGBM models on the 55
+descriptors (seed 0) were evaluated with the descriptors of the DFT and of the
+predicted densities. Agreement: $R^2$ between the two predictions and their
 median relative difference over all 605 (for the classifications, the share of
 structures with the same class). Accuracy: against the target values for the 63
 structures (fewer where the target is missing) that are also in the test set of
@@ -260,16 +257,14 @@ the property models.
 
 \begin{table}[htbp]
 \centering
-\caption{Property predictions from DFT and predicted descriptors. Inputs: C
-composition, D descriptors, D+C both; for the C models the two predictions are
-identical by construction.}
+\caption{Property predictions from DFT and predicted descriptors.}
 \label{tab:si_mlprops}
 \begin{adjustbox}{width=\textwidth}
-\begin{tabular}{llccccccc}
+\begin{tabular}{lccccccc}
 \toprule
- & & \multicolumn{2}{c}{Agreement (605)} & & \multicolumn{2}{c}{$R^2$ / AUC} & \multicolumn{2}{c}{MAE} \\
-\cmidrule(lr){3-4} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-Property & Inputs & $R^2$ & diff.\ (\%) / same class (\%) & $n$ & DFT desc. & ML desc. & DFT desc. & ML desc. \\
+ & \multicolumn{2}{c}{Agreement (605)} & & \multicolumn{2}{c}{$R^2$ / AUC} & \multicolumn{2}{c}{MAE} \\
+\cmidrule(lr){2-3} \cmidrule(lr){5-6} \cmidrule(lr){7-8}
+Property & $R^2$ & diff.\ (\%) / same class (\%) & $n$ & DFT desc. & ML desc. & DFT desc. & ML desc. \\
 \midrule
 \csname @@input\endcsname tables/tab_si_mlprops.tex 
 \bottomrule
@@ -500,15 +495,11 @@ the training set are refused (6 tests). With ASE: CIF and POSCAR files are read,
 and \texttt{pydemi predict} writes a CHGCAR with the right electron count (2 tests).
 
 \paragraph{Property models (12).} A small bundle in the distributed format
-(LightGBM models on 200 random descriptor vectors: a regression, a regression on
-$\log_{10}$, a classification and a regression on descriptors and composition)
-is built for the tests. Predictions reproduce the stored test predictions to
-$10^{-9}$, including the logarithmic transform and the compositional features; a
-model that needs the composition refuses to predict without it; predictions are
-finite, clipped to physical ranges (dielectric constant $\geq1$, probabilities
-in $[0,1]$) and allow NaN descriptors; the compositional features equal
-matminer's fraction-weighted element statistics computed by hand for
-Al$_2$O$_3$, including ties and missing element data; dataset materials are
+(LightGBM models on 200 random descriptor vectors, among them a regression on
+$\log_{10}$ and a classification) is built for the tests. Predictions reproduce
+the stored test predictions to $10^{-9}$, including the logarithmic transform;
+predictions are finite, clipped to physical ranges (dielectric constant
+$\geq1$, probabilities in $[0,1]$) and allow NaN descriptors; dataset materials are
 recognized from their descriptors and out-of-range inputs flagged; the model
 path, a missing model and a LightGBM that cannot load (macOS without OpenMP) are
 reported clearly; and the tables, figures and texts of the property view are

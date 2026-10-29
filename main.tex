@@ -50,17 +50,19 @@ with their DFT values, and the critical-point counts are the main exception.
 pydemi computes all descriptors of a 6,059-structure VASP dataset without a
 failure in 8.4 CPU hours, is verified by 352 automated tests, and is used from
 Python, the command line or a local graphical interface. Gradient-boosted
-models trained on the descriptors together with compositional features predict
-23 properties of the same dataset. For the bulk, shear and Young's moduli and
-the Debye temperature they reach test $R^2$ of 0.961, 0.929, 0.939 and 0.954,
-matching or exceeding graph neural networks and density-grid models trained
-on the same split. The descriptors account for 34--60\% of the importance in
-the models of elastic, thermal, electronic and dielectric properties but only
-11--16\% in those of the formation and cohesive energies, which composition
-alone already predicts. Properties predicted from the descriptors of
-ML-predicted densities agree closely with those from DFT densities (test $R^2$
-for the bulk modulus 0.954 in both cases), so the whole path from a crystal
-structure to the properties runs without a DFT calculation.
+models trained on the descriptors alone predict 17 elastic, thermal,
+energetic, electronic and optical properties of the same dataset, with test
+$R^2$ of 0.85--0.95 for the moduli, elastic constants, thermal properties,
+formation and cohesive energies and band gap, and a ROC-AUC of 0.984 for
+metallicity. For the bulk, shear and Young's moduli ($R^2$ 0.949, 0.908 and
+0.917) they are on par with graph neural networks trained on the same split
+and ahead of every density-based neural network. Ten descriptors per property, chosen by their SHAP values on the training set, retain 92--99\% of the test $R^2$. The mean interstitial
+density and the volume fraction of the non-covalent-interaction region are the
+most important descriptors. Properties predicted from the descriptors of
+ML-predicted densities agree with those from DFT densities (test $R^2$ for the
+bulk modulus 0.958 against 0.956 on structures held out from both models), so
+the whole path from a crystal structure to the properties runs without a DFT
+calculation.
 \end{abstract}
 
 \section{Introduction}
@@ -107,8 +109,8 @@ calculation. Models that predict the density from the atomic
 structure~\cite{chandrasekaran2019,jorgensen2022,koker2024} remove this
 obstacle in principle, provided the descriptors survive the error of the
 prediction. And the question that motivates the descriptors in the first place
---- whether they add information to property models beyond what composition
-already provides --- has to be answered on a common benchmark.
+--- how much of a material's properties they capture, and which of them carry
+the information --- has to be answered on a common benchmark.
 
 Here we describe pydemi, a Python package built around these three points. (i) It
 reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors that are
@@ -117,10 +119,10 @@ and~\ref{sec:descriptors}); the analysis that led to the selection is
 summarized in Section~\ref{sec:numerics}. (ii) It includes a density model, so
 that the same descriptors are obtained from a crystal structure alone, and we
 measure which descriptors transfer from DFT to predicted densities
-(Section~\ref{sec:ml}). (iii) We train property models for 23 properties of the
-6,059 structures with compositional features, the descriptors and both, compare
-them with structure- and density-based neural networks on the same split, and
-measure what the descriptors contribute (Section~\ref{sec:properties}). The
+(Section~\ref{sec:ml}). (iii) We train property models on the descriptors
+alone for 17 properties of the 6,059 structures, compare them with structure-
+and density-based neural networks on the same split, and identify the
+descriptors that carry the information (Section~\ref{sec:properties}). The
 package is used as a Python library, a command-line tool or a graphical
 interface that runs locally (Section~\ref{sec:software}); the code, the tests
 and the scripts that regenerate every number of this paper are released under
@@ -154,8 +156,7 @@ whose density is predicted by the included ChargE3Net model give the same data
 model; derived fields and the geometry pass are computed once per structure and
 cached, and the registered descriptors reduce them. The descriptors are used
 from Python, the command line or the graphical interface, and the property
-models of Section~\ref{sec:properties} take them, together with the
-composition, as input.}
+models of Section~\ref{sec:properties} take them as input.}
 \label{fig:architecture}
 \end{figure}
 
@@ -306,9 +307,7 @@ $\rho$, changed by about 20\% between FFT and fourth-order derivatives and by
 25\% on the coarsened grid. Magnetic
 descriptors need the magnetization blocks, which the predicted densities of
 Section~\ref{sec:ml} do not have, and compositional descriptors do not need the
-density at all. These families are therefore left out of pydemi; the compositional
-features enter the property models of Section~\ref{sec:properties} as a
-separate input.
+density at all. These families are therefore left out of pydemi.
 
 \paragraph{Descriptors not converged on VASP grids.}
 The voxel-averaged ellipticity $\varepsilon=\lambda_1/\lambda_2-1$ diverges as
@@ -388,7 +387,7 @@ Geometry and partitions (18) & nearest-image distances against brute force, incl
 Closed forms and identities (40) & radial moments of Slater densities; percolation of a simple cubic lattice at the midpoint density; known critical points; variance decomposition; Laplacian concentration $=\tfrac12$; Hartree potential of a Gaussian & $10^{-2}$--$10^{-12}$ \\
 Input, batch and tooling (21) & \texttt{CHGCAR} layouts (1, 2, 4 blocks, VASP 4/5), volume scaling; fixed batch schema; no bare NaN; float32 against float64 & exact / reported \\
 Density model (13) & VASP grid rule; neighbour lists against brute force; predictions equal the original ChargE3Net code, independent of chunking, invariant to rotation and permutation; renormalization & $10^{-5}$ of $\rho_{\max}$ \\
-Property models (12) & stored test predictions reproduced, also by the 22 distributed models; compositional features against matminer by hand; range checks & $10^{-9}$ rel. \\
+Property models (12) & stored test predictions reproduced, also by the 22 distributed models; range checks & $10^{-9}$ rel. \\
 Graphical interface (63) & end-to-end runs for both inputs and the comparison view; every descriptor has a figure whose plotted data reproduce its value & $10^{-7}$ rel. \\
 \bottomrule
 \end{tabular}
@@ -500,79 +499,67 @@ on the DFT path.
 
 \subsection{Data and protocol}
 The targets of the 6,059 structures come from two sources. The bulk, shear and
-Young's moduli and the Poisson ratio, and an energy per atom relative to the free
-atoms together with a Debye temperature, are those used in the cross-model
-benchmark of Ref.~\cite{maurya2026}. The other properties were retrieved from the
-Materials Project (database version 2026.04.13) for the same material
+Young's moduli, and an energy per atom relative to the free atoms together with
+a Debye temperature, are those used in the cross-model benchmark of
+Ref.~\cite{maurya2026}. The other properties were retrieved from the Materials
+Project (database version 2026.04.13) for the same material
 identifiers~\cite{jain2013}: the elastic constants $C_{11}$, $C_{12}$ and
-$C_{44}$~\cite{dejong2015} and the universal anisotropy
-index~\cite{ranganathan2008}, kept only where the stiffness tensor is
-Born-stable and the moduli agree with those of the benchmark; the Debye
-temperature, sound velocities and minimum thermal conductivities in the Clarke
-and Cahill models~\cite{clarke2003,cahill1992} derived from the elastic data;
-the formation energy, energy above the hull and cohesive energy; the PBE band
-gap, metallicity and directness of the gap; and the dielectric constants and
-refractive index~\cite{petousis2017}, available for 1,362 materials. Poisson
-ratios $\geq0.5$ were removed. The train/validation/test split is the one of
-the benchmark (4,847/606/606 structures); a material without a value is left
-out for that property only.
+$C_{44}$~\cite{dejong2015}, kept only where the stiffness tensor is Born-stable
+and the moduli agree with those of the benchmark; the Debye temperature, sound
+velocities and minimum thermal conductivities in the Clarke and Cahill
+models~\cite{clarke2003,cahill1992} derived from the elastic data; the formation
+and cohesive energies; the PBE band gap, metallicity and directness of the gap;
+and the refractive index~\cite{petousis2017}, available for 1,362 materials. The
+train/validation/test split is the one of the benchmark (4,847/606/606
+structures); a material without a value is left out for that property only.
 
-Three feature sets were compared: the composition, represented by the
-Magpie element statistics and stoichiometric norms of
-matminer~\cite{ward2016,ward2018} (138 features); the 55 informative pydemi
-descriptors; and both (193). For each target and feature set we trained ridge
-regression (logistic regression for the two classifications), random forests
-with 500 trees~\cite{pedregosa2011} and LightGBM~\cite{ke2017}. The LightGBM
-hyperparameters (learning rate, number of leaves, minimum leaf size, feature
-and bagging fractions, $L_1$ and $L_2$ penalties) were tuned with 50 trials of
-the tree-structured Parzen estimator of Optuna~\cite{akiba2019} on the
-validation loss, with early stopping on the validation set and at most 10,000
-boosting rounds. The heavy-tailed targets (the dielectric constants, the
-refractive index and the anisotropy index) were modelled on a logarithmic
-scale. The random forests and the tuned LightGBM models were refit with five
-seeds; we report the mean and standard deviation of the test metrics over the
-seeds. The test set was used only for the final evaluation. Feature importance
-is the mean absolute SHAP value~\cite{lundberg2020} on the test set.
+The inputs of every model are the 55 informative pydemi descriptors (the
+Laplacian concentration ratio, which is $\tfrac12$ for every structure, is left
+out). For each property we trained ridge regression (logistic regression for the
+two classifications), random forests with 500 trees~\cite{pedregosa2011} and
+LightGBM~\cite{ke2017}. The LightGBM hyperparameters (learning rate, number of
+leaves, minimum leaf size, feature and bagging fractions, $L_1$ and $L_2$
+penalties) were tuned with 50 trials of the tree-structured Parzen estimator of
+Optuna~\cite{akiba2019} on the validation loss, with early stopping on the
+validation set and at most 10,000 boosting rounds. The refractive index, which
+is heavy-tailed, was modelled on a logarithmic scale. The random forests and
+the tuned LightGBM models were refit with five seeds; we report the mean and
+standard deviation of the test metrics over the seeds. The test set was used
+only for the final evaluation. Feature importance is the mean absolute SHAP
+value~\cite{lundberg2020} on the test set. To measure how concentrated the
+information is, every model was also retrained, with the same protocol, on only
+the ten descriptors with the largest mean absolute SHAP value of its LightGBM
+models on the training set, so that the test set plays no part in their choice.
 
 \subsection{Accuracy}
 Table~\ref{tab:properties} and Fig.~\ref{fig:properties}a give the test scores
-of LightGBM, which was the most accurate of the three models for every target
-except the anisotropy index, the energy above the hull and the direct-gap
-classification, where the random forest was better by at most 0.015 (Supporting
-Information, Table~S3). With both feature sets the models reach $R^2\geq0.89$ for
-the moduli, the elastic constants, the thermal properties, the formation and
-cohesive energies and the band gap, and a ROC-AUC of 0.987 for metallicity. The
-seed-to-seed spread is at most 0.003 for these targets. The universal anisotropy
-index ($R^2=0.31$), the dielectric constants (0.32--0.62) and the energy above
-the hull ($<0.1$) are predicted poorly by every feature set; the energy above
-the hull is a small difference of large energies (91\% of the test materials lie
-on the hull, and predicting zero for all of them gives a lower MAE than the
-models), and the dielectric data comprise only 1,362 materials. Computing the
-Poisson ratio from the predicted $K$ and $G$, or the anisotropy index of the
-cubic materials from the predicted elastic constants, is less accurate than
-predicting them directly ($R^2$ 0.53 against 0.66, and $-0.04$ against 0.35).
-For the dielectric properties we added three features of the Penn
-model~\cite{penn1962}, which relates $\varepsilon_\infty$ to the valence plasma
-energy $\hbar\omega_p$ and a gap: $\hbar\omega_p$ from the electron count and
-volume of the \texttt{CHGCAR}, the band gap predicted by the composition model
-(out of fold on the training set), and $1+(\hbar\omega_p/E_g)^2$. They lowered the
-validation loss by at most 2\%, and every change of the test $R^2$ lay within
-its bootstrap 95\% interval over the 123 test materials, so the models without
-them were kept.
+of LightGBM, which was the most accurate of the three models for every property
+(for the direct-gap classification the random forest was better by 0.001;
+Supporting Information, Table~S3). With the descriptors alone, the models reach
+$R^2$ of 0.949, 0.908 and 0.917 for the bulk, shear and Young's moduli,
+0.87--0.92 for the elastic constants, 0.85--0.93 for the Debye temperature,
+the sound velocities and the minimum thermal conductivities, 0.922 and 0.887
+for the formation and cohesive energies and 0.852 for the band gap.
+Metallicity is classified with a ROC-AUC of 0.984 (accuracy 0.940) and the
+directness of the gap, known for only 1,645 materials, with 0.787 (accuracy
+0.795). The refractive index, for which only 1,089 training materials are
+available, reaches $R^2=0.758$. The seed-to-seed standard deviation is at most
+0.005, except for the band gap (0.015) and the refractive index (0.011).
 
 \begin{table}[htbp]
 \centering
-\caption{Test scores of tuned LightGBM models by feature set: $R^2$, or ROC-AUC
-for the two classifications, mean over five seeds; the best feature set in
-bold. MAE: mean absolute error of the combined model. $n$: training and test
-materials.}
+\caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
+or ROC-AUC for the two classifications, mean $\pm$ standard deviation over five
+seeds, with all 55 informative descriptors and with the ten most important
+descriptors of each property. MAE: mean absolute error with the 55
+descriptors. $n$: training and test materials.}
 \label{tab:properties}
 \begin{adjustbox}{width=\textwidth}
-\begin{tabular}{llrrcccr}
+\begin{tabular}{llrrccr}
 \toprule
-Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & Composition & Descriptors & Both & MAE \\
+Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & 55 descriptors & 10 descriptors & MAE \\
 \midrule
-\csname @@input\endcsname tables/tab_properties.tex 
+\csname @@input\endcsname tables/tab_properties.tex
 \bottomrule
 \end{tabular}
 \end{adjustbox}
@@ -581,26 +568,13 @@ Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & Composition & Descri
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_properties.pdf}
-\caption{(a) Test scores of LightGBM with the composition, the pydemi
-descriptors and both as inputs (mean and standard deviation over five seeds;
-ROC-AUC for metallicity and the direct gap). (b) Share of the pydemi
-descriptors in the mean absolute SHAP value of the combined models; the dotted
-line is their share of the inputs, 55 of 193.}
+\caption{(a) Test scores of LightGBM on the 55 pydemi descriptors and on the
+ten most important descriptors of each property (mean and standard deviation
+over five seeds; ROC-AUC for metallicity and the direct gap). (b) Share of the
+mean absolute SHAP value of the 55-descriptor models carried by the eight
+descriptors that are most important over all properties.}
 \label{fig:properties}
 \end{figure}
-
-The descriptors alone are more accurate than the composition alone for the
-bulk, shear and Young's moduli, $C_{11}$ and $C_{44}$, the anisotropy index, the
-direct gap, the ionic and total dielectric constants and the refractive index,
-and less accurate for the energies, the band gap, the Poisson ratio, $C_{12}$,
-$\varepsilon_\infty$ and the thermal properties
-(Table~\ref{tab:properties}). Combining the two improves on the better of them
-for 19 of the 23 targets, by 0.012--0.022 in $R^2$ for the moduli, 0.02--0.03
-for the thermal properties and up to 0.07 for the dielectric properties and the
-refractive index. The exceptions are the formation and
-cohesive energies, for which composition alone already reaches $R^2=0.988$ and
-the descriptors add nothing, the anisotropy index, for which the descriptors
-alone are as good as both, and the energy above the hull.
 
 \subsection{Comparison with neural networks on the same split}
 Ref.~\cite{maurya2026} trained graph neural networks on the crystal structure
@@ -608,28 +582,29 @@ Ref.~\cite{maurya2026} trained graph neural networks on the crystal structure
 MatTen~\cite{wen2024}), a convolutional network on the latent representation of
 the full density grid (LatentMatFusion~\cite{kumar2026}), MatTen with the density
 fused into the structure, and ChargE3Net~\cite{koker2024} adapted to property
-regression, all on the split used here, for five targets. With both feature
-sets, LightGBM matches the best of these models for the bulk modulus ($R^2$ 0.961
-against 0.961 for CGCNN, with an MAE of 7.55\,GPa against 8.14\,GPa for CGCNN
-and 7.56\,GPa for MEGNet) and exceeds
-them for the shear modulus (0.929 against 0.908), Young's modulus (0.939 against
-0.920) and the Debye temperature (0.954 against 0.938;
-Table~\ref{tab:benchmark}). For the energy relative to the free atoms, the
-equivariant MatTen model is slightly better (0.987 against 0.985). For the
-three moduli, the descriptors alone, 55 numbers per structure ($R^2$ 0.949,
-0.908 and 0.917), are on par with the graph networks and ahead of every model in
-Ref.~\cite{maurya2026} that uses the density. The models in Ref.~\cite{maurya2026} were trained once each, and
-for the energy and the Debye temperature the test sets here contain the 592 and
-476 test materials with a value; the comparison is therefore indicative at the
-level of 0.01 in $R^2$.
+regression, all on the split used here, for five targets
+(Table~\ref{tab:benchmark}). For the three moduli, LightGBM on the descriptors,
+55 numbers per structure, is on par with the graph networks ($R^2$ 0.949, 0.908
+and 0.917 against 0.961, 0.908 and 0.920 for CGCNN and 0.953, 0.880 and 0.888
+for MEGNet) and ahead of every model in Ref.~\cite{maurya2026} that uses the
+density (at most 0.940, 0.888 and 0.902). For the Debye temperature of the
+benchmark ($R^2=0.908$) it is behind CGCNN, MEGNet and ChargE3Net
+(0.918--0.938) and ahead of the other three models. For the energy relative to
+the free atoms ($R^2=0.860$) it is behind every model (0.880--0.987): this
+energy depends on the free-atom reference of each element, which the
+descriptors, intensive features of the density, do not identify, whereas every
+neural network of the benchmark knows the elements. With only ten descriptors per property, LightGBM still reaches $R^2$ of 0.937, 0.875 and 0.890 for the three moduli, above two of the three density-based networks for each. The models in
+Ref.~\cite{maurya2026} were trained once each, and for the energy and the Debye
+temperature the test sets here contain the 592 and 476 test materials with a
+value; the comparison is therefore indicative at the level of 0.01 in $R^2$.
 
 \begin{table}[htbp]
 \centering
 \caption{Test $R^2$ and MAE for the five properties of the cross-model benchmark
 of Ref.~\cite{maurya2026} on the same split. MAE in GPa for $K$, $G$, $E$, eV/atom
 for $E_\mathrm{form}$ (energy relative to the free atoms) and K for $\Theta_D$.
-Upper block: this work, mean over five seeds (test materials:
-606, 606, 606, 592 and 476). Lower block: as reported in
+Upper block: this work, LightGBM on the pydemi descriptors, mean over five
+seeds (test materials: 606, 606, 606, 592 and 476). Lower block: as reported in
 Ref.~\cite{maurya2026}. $^\dagger$Equal to the MAE of $G$ in the source; as
 reported.}
 \label{tab:benchmark}
@@ -640,57 +615,60 @@ Model & \multicolumn{2}{c}{$K$} & \multicolumn{2}{c}{$G$} & \multicolumn{2}{c}{$
 \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
  & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
 \midrule
-\csname @@input\endcsname tables/tab_benchmark.tex 
+\csname @@input\endcsname tables/tab_benchmark.tex
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
-\subsection{What the descriptors contribute}
-In the combined models, the descriptors make up 28\% of the inputs but account
-for 49--58\% of the mean absolute SHAP value for the moduli, elastic
-constants and anisotropy index (34\% for the Poisson ratio), 35--43\% for the thermal properties and 50--60\% for the electronic
-and dielectric properties, against 11\% and 16\% for the formation and cohesive
-energies (Fig.~\ref{fig:properties}b). The most important descriptor overall is
-the mean interstitial density, the most important single input for the bulk
-modulus (22\% of its importance), $C_{12}$, $C_{44}$, $\varepsilon_\infty$ and the
-refractive index. The volume fraction of the NCI region is the most important
-input for the band gap (23\%), metallicity (16\%) and the ionic and total
-dielectric constants, and the interstitial
-charge fraction, the radial spread $\sigma_r^2$ and the percolation levels follow.
-The descriptors that carry the information are therefore the simple,
-converged ones that describe how much charge fills the space between the atoms
-and how it connects, which are also among those that transfer best to
-predicted densities (Section~\ref{sec:ml}).
+\subsection{Which descriptors carry the information}
+The most important descriptor overall is the mean interstitial density. It is
+the most important input for the bulk modulus (28\% of the mean absolute SHAP
+value), the shear and Young's moduli, the three elastic constants and the
+refractive index (Fig.~\ref{fig:properties}b). The volume fraction of the NCI
+region has the same role for the electronic properties: it is the most
+important input for the band gap (31\%), metallicity (30\%) and the formation
+energy (19\%). For the Debye temperature, the sound velocities and the minimum
+thermal conductivities, the radial spread $\sigma_r^2$, the interstitial charge
+fraction and the valence Laplacian concentration lead, and the cohesive energy
+draws on the bond-midpoint and interstitial densities. Only the direct-gap
+classification has no dominant descriptor (at most 7\%). The information is concentrated in few descriptors: the ten most important
+descriptors of a property (ranked on the training set; Supporting Information,
+Table~S4) carry 46--69\% of its mean absolute SHAP value, and models trained on
+these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties},
+Fig.~\ref{fig:properties}a), least for the bulk modulus (0.937 against 0.949),
+$C_{12}$ and metallicity, most for the transverse sound velocity (0.782 against
+0.854), the band gap and the cohesive energy. Only 34 of the 55 descriptors
+appear in any of the 17 lists; the mean interstitial density (in 16 lists), the
+radial spread $\sigma_r^2$ (14) and the negative-Laplacian volume fraction (13)
+appear most often. Six to nine (on average 8.4) of the ten descriptors of each
+property transfer to predicted densities with $\rho_s\geq0.95$
+(Section~\ref{sec:ml}), so the information the models use is largely the
+information that survives the density model.
 
 \subsection{From a crystal structure to properties}
-The models distributed for pydemi (\texttt{pydemi.props}) are, for each
-property, the LightGBM model of the feature set with the lowest mean validation
-loss, refit with one seed; the test set plays no part in the choice. It selects
-the composition alone for the formation and cohesive energies and the band gap,
-the descriptors alone for $\varepsilon_\infty$ and the direct gap, and both for
-the other properties (Supporting Information, Table~S4). The energy above the
-hull is left out, so that 22 properties are offered. The compositional features
-are computed inside pydemi from the site counts of the \texttt{CHGCAR} header
-and an element table stored with the models, which reproduces matminer to
-$3\times10^{-16}$ on all 6,059 structures.
-
 For the 605 test structures of the density model we evaluated the property
-models with the descriptors of the predicted densities in place of the DFT ones
-(the composition is unchanged). The predictions agree closely: $R^2$ between the
-two is 0.997 for the bulk modulus, 0.989 for the shear and 0.988 for Young's
-modulus, at least 0.98 for the elastic constants and thermal properties, and
-0.92--0.93 for the dielectric properties; the metallicity class is the same for
-99.8\% of the structures. Sixty-three of these structures are also in the test
-set of the property models, so that neither model saw them in training. On these
-63, the bulk modulus predicted from the ML descriptors has $R^2=0.954$ (MAE
-9.5\,GPa), as from the DFT descriptors (0.954, 9.6\,GPa); for the shear and
-Young's moduli the values are 0.851 and 0.856 against 0.858 and 0.876, and the
-ROC-AUC for metallicity 0.981 against 0.986 (Supporting Information,
-Table~S5). The error of the density model thus costs little accuracy in the
-properties, and the path from a crystal structure to the 22 properties of the
-distributed models runs
-without a DFT calculation.
+models (LightGBM, seed 0) with the descriptors of the predicted densities in
+place of the DFT ones. The two predictions agree: $R^2$ between them is 0.985
+for the bulk modulus, 0.950 and 0.955 for the shear and Young's moduli,
+0.950--0.975 for the elastic constants, 0.930--0.971 for the thermal
+properties, 0.964 and 0.935 for the formation and cohesive energies, 0.956 for
+the band gap and 0.959 for the refractive index; the metallicity class is the
+same for 98.2\% of the structures. Sixty-three of these structures are also in
+the test set of the property models, so that neither model saw them in
+training. On these 63, the bulk modulus predicted from the ML descriptors has
+$R^2=0.958$ (MAE 10.9\,GPa), as from the DFT descriptors (0.956, 11.0\,GPa);
+for Young's modulus and $C_{11}$ the values are 0.846 and 0.930 against 0.844
+and 0.928, for the formation energy and the band gap 0.926 and 0.848 against
+0.942 and 0.857, and the ROC-AUC for metallicity 0.979 against 0.985
+(Supporting Information, Table~S5). The losses are larger for the shear modulus
+(0.789 against 0.809), the Debye temperature (0.653 against 0.751) and the
+transverse sound velocity (0.460 against 0.657), whose models give more weight
+to the bounded ellipticity and the negative-Laplacian volume fraction, two of
+the descriptors that transfer less well (Section~\ref{sec:ml}); on 62 or 63
+structures these differences are only indicative. For most properties, the
+error of the density model thus costs little accuracy, and the path from a
+crystal structure to the properties runs without a DFT calculation.
 
 % ==========================================================================
 \section{Software}
@@ -719,9 +697,8 @@ quantity it reduces, built so that the plotted data reproduce the value (this
 is tested); one such figure per descriptor, stepping through the domains; and
 the predicted properties with their typical error, the test-set parity plot of
 each model, the most important inputs and, where the structure belongs to the
-dataset, its DFT values. Models with a test $R^2$ below 0.5 (the anisotropy index
-and the ionic and total dielectric constants) are marked as weak, and their
-values are presented as rough indications. A fifth view compares the two routes for one
+dataset, its DFT values. Models with a test $R^2$ below 0.5 are marked as weak,
+and their values are presented as rough indications. A fifth view compares the two routes for one
 material: for an open \texttt{CHGCAR} it predicts the density of the same structure
 on the same grid and sets the density error, the 56 descriptors and the
 predicted properties from both densities side by side, marking descriptors that
@@ -733,12 +710,9 @@ metadata.
 \centering
 \includegraphics[width=\textwidth]{figures/fig_gui.pdf}
 \caption{The graphical interface with the DFT \texttt{CHGCAR} of MgO (a
-test-set structure). (a) Descriptor view: the 56 descriptors with the
-interstitial charge fraction selected, its radial charge distribution with the
-shell boundaries and its formula. (b) Property view: the 22 predicted
-properties with their typical errors and the DFT values of the dataset, and for
-the selected bulk modulus the details of the model and its test-set parity
-plot.}
+test-set structure), descriptor view: the 56 descriptors with the interstitial
+charge fraction selected, its radial charge distribution with the shell
+boundaries and its formula.}
 \label{fig:gui}
 \end{figure}
 
@@ -756,20 +730,16 @@ correlation of at least 0.95 with their DFT values on 605 held-out structures,
 and only the critical-point counts, quantities built on second derivatives in
 low-density regions and descriptors with clustered values do not.
 
-As inputs of gradient-boosted models, the descriptors and compositional features
-together predict 23 properties of the dataset and match or exceed graph neural
-networks and density-grid models trained on the same split for the elastic
-moduli and the Debye temperature. The descriptors carry about half of the
-importance for the elastic, thermal, electronic and dielectric properties, led
-by the interstitial density and the NCI volume, but add nothing to the formation
-and cohesive energies, which composition determines. Because the property
-predictions from ML-predicted densities are nearly as accurate as those from
-DFT densities, a structure suffices to obtain both the descriptors and the
-properties, in seconds to minutes instead of a DFT calculation. Models that
-predict the magnetization would extend this path to magnetic descriptors, and
-the poorly predicted properties --- the energy above the hull, the elastic
-anisotropy and the dielectric response --- mark where descriptors of the ground-state
-density alone are not enough.
+As the only inputs of gradient-boosted models, the descriptors predict 17
+properties of the dataset, and for the elastic moduli they are on par with
+graph neural networks trained on the same split and ahead of density-based
+networks. The information is concentrated in a few simple, converged
+descriptors, led by the interstitial density and the NCI volume:
+ten descriptors per property retain 92--99\% of the test $R^2$ of all 55, and most of them transfer to ML-predicted densities. Because the property predictions from ML-predicted densities
+are nearly as accurate as those from DFT densities, a structure suffices to
+obtain both the descriptors and the properties, in seconds to minutes instead
+of a DFT calculation. Models that predict the magnetization would extend this
+path to magnetic descriptors.
 
 \section*{Code and data availability}
 The source code, the 352 tests, the descriptor reference and the scripts that
