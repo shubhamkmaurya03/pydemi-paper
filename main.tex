@@ -274,12 +274,11 @@ $\hat{\mathbf u}_k$ the unit vector from that nucleus to the voxel.
 
 \begin{table}[p]
 \centering
-\caption{The 56 descriptors of pydemi. Sums run over the voxels $k$; $r_k$ is
-the distance to the nearest nucleus, $\hat{\mathbf u}_k$ the unit vector from
-it; core, bond and interstitial shells are $r\le c_1$, $c_1<r\le c_2$ and
-$r>c_2$ ($c_1=0.8$, $c_2=1.5$\,\AA); $\lambda_1\le\lambda_2\le\lambda_3$ are the
-eigenvalues of the Hessian of $\rho$; $s$ is the reduced density gradient; $\tilde\rho=\rho/N_e$. Full definitions:
-Supporting Information, Section~S1.}
+\caption{The 56 descriptors of pydemi, by their names in the package. Shells
+around the nearest nucleus: core within 0.8\,\AA, bond shell 0.8--1.5\,\AA,
+interstitial region beyond 1.5\,\AA{} (defaults); density shape: the density
+divided by the number of electrons. Formulas, ranges, references
+and fallback values: Supporting Information, Section~S1.}
 \label{tab:families}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -288,45 +287,45 @@ Supporting Information, Section~S1.}
 Descriptor & Definition & Units \\
 \midrule
 \multicolumn{3}{@{}l}{\emph{Bonding (19)}} \\
-\texttt{m1} & mean charge--nucleus distance, $m_1=\sum_k\rho_kr_k/\sum_k\rho_k$ & \AA \\
-\texttt{m2} & second radial moment, $m_2=\sum_k\rho_kr_k^2/\sum_k\rho_k$ & \AA$^2$ \\
-\texttt{sigma\_r2} & radial spread of the charge, $\sigma_r^2=m_2-m_1^2$ & \AA$^2$ \\
-\texttt{f\_core}, \texttt{f\_bond}, \texttt{f\_int} & fractions of the charge in the core, bond and interstitial shells & -- \\
-\texttt{zeta} & gradient anisotropy, $\zeta=1-\sum_k|\nabla\rho_k\cdot\hat{\mathbf u}_k|/\sum_k|\nabla\rho_k|$ & -- \\
-\texttt{lnf} & volume fraction where $\nabla^2\rho<0$ (charge concentrated) & -- \\
-\texttt{lnf\_charge\_weighted} & fraction of the charge where $\nabla^2\rho<0$ & -- \\
-\texttt{lap\_concentration} & $\sum_{\nabla^2\rho_k<0}|\nabla^2\rho_k|/\sum_k|\nabla^2\rho_k|$; $\tfrac12$ for every periodic density & -- \\
-\texttt{lap\_concentration\_valence} & the same ratio over the voxels with $r_k>c_1$ & -- \\
-\texttt{ellip\_bond\_bounded\_avg} & bounded ellipticity $1-\lambda_2/\lambda_1$, mean over the bond shell where $\lambda_2<0$ & -- \\
-\texttt{f\_NCI} & volume fraction of the NCI region, $s<0.5$ and $\rho<0.05$\,a.u. & -- \\
-\texttt{NCI\_attractive} & fraction of the NCI region with $\lambda_2<0$ & -- \\
-\texttt{sign\_lambda2\_rho\_mean} & mean of $\mathrm{sign}(\lambda_2)\rho$ over the NCI region & e\,bohr$^{-3}$ \\
-\texttt{V\_spread} & standard deviation of the Hartree potential at the atomic sites & eV \\
-\texttt{V\_int\_min} & lowest Hartree potential in the interstitial shell & eV \\
-\texttt{rho\_mid\_mean}, \texttt{\_std} & mean and standard deviation of $\rho$ at the bond midpoints & e\,\AA$^{-3}$ \\
+\texttt{m1} & mean distance of the charge from its nearest nucleus & \AA \\
+\texttt{m2} & mean squared distance of the charge from its nearest nucleus & \AA$^2$ \\
+\texttt{sigma\_r2} & variance of the distance of the charge from its nearest nucleus & \AA$^2$ \\
+\texttt{f\_core}, \texttt{f\_bond}, \texttt{f\_int} & charge fractions in the core, bond shell and interstitial region & -- \\
+\texttt{zeta} & non-radial share of the density gradient (0 for spherical atoms) & -- \\
+\texttt{lnf} & volume fraction with negative Laplacian (charge concentrated) & -- \\
+\texttt{lnf\_charge\_weighted} & fraction of the charge where the Laplacian is negative & -- \\
+\texttt{lap\_concentration} & share of the absolute Laplacian where it is negative; always $\tfrac12$ & -- \\
+\texttt{lap\_concentration\_valence} & the same share outside the cores & -- \\
+\texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity in the bond shell: 0 cylindrical, 1 flat & -- \\
+\texttt{f\_NCI} & volume fraction of the non-covalent-interaction (NCI) region & -- \\
+\texttt{NCI\_attractive} & fraction of the NCI region that is attractive & -- \\
+\texttt{sign\_lambda2\_rho\_mean} & signed mean density of the NCI region (negative where attractive) & e\,bohr$^{-3}$ \\
+\texttt{V\_spread} & standard deviation of the electronic Hartree potential at the atoms & eV \\
+\texttt{V\_int\_min} & lowest electronic Hartree potential in the interstitial region & eV \\
+\texttt{rho\_mid\_mean}, \texttt{\_std} & mean and standard deviation of the density at bond midpoints & e\,\AA$^{-3}$ \\
 \addlinespace
 \multicolumn{3}{@{}l}{\emph{Structural (19)}} \\
-\texttt{rho\_perc\_a}, \texttt{\_b}, \texttt{\_c} & highest level $c$ at which $\{\rho>c\}$ percolates along $\mathbf a$, $\mathbf b$, $\mathbf c$ & e\,\AA$^{-3}$ \\
-\texttt{perc\_anisotropy} & (maximum $-$ minimum)/mean of the three percolation levels & -- \\
-\texttt{n\_max}, \texttt{n\_min} & local maxima and minima of $\rho$ per volume & \AA$^{-3}$ \\
-\texttt{n\_NNM} & maxima farther than 0.8\,\AA{} from every nucleus, per volume & \AA$^{-3}$ \\
-\texttt{Q\_NNM} & fraction of the charge in the basins of the non-nuclear maxima & -- \\
+\texttt{rho\_perc\_a}, \texttt{\_b}, \texttt{\_c} & highest density level still connected across the cell along $\mathbf a$, $\mathbf b$, $\mathbf c$ & e\,\AA$^{-3}$ \\
+\texttt{perc\_anisotropy} & spread of the three percolation levels relative to their mean & -- \\
+\texttt{n\_max}, \texttt{n\_min} & local maxima and local minima of the density per volume & \AA$^{-3}$ \\
+\texttt{n\_NNM} & density maxima farther than 0.8\,\AA{} from every nucleus, per volume & \AA$^{-3}$ \\
+\texttt{Q\_NNM} & fraction of the charge in the basins of these non-nuclear maxima & -- \\
 \texttt{rho\_min} & lowest density in the cell & e\,\AA$^{-3}$ \\
-\texttt{rho\_min\_ratio} & $\rho_{\min}/\langle\rho\rangle$ & -- \\
-\texttt{rho\_int\_mean} & mean density in the interstitial shell & e\,\AA$^{-3}$ \\
-\texttt{T\_eigenvalues\_t1}, \texttt{\_t2}, \texttt{\_t3} & eigenvalues $t_1\le t_2\le t_3$ of $T_{ab}=\sum_k\partial_a\rho_k\partial_b\rho_k/\sum_k|\nabla\rho_k|^2$ & -- \\
-\texttt{charge\_FA} & fractional anisotropy of $T$; 0 if isotropic, 1 if one direction & -- \\
-\texttt{shannon\_entropy} & $S=-\int\tilde\rho\ln\tilde\rho\,dV-\ln V$; 0 for a uniform density & -- \\
-\texttt{disequilibrium} & $D=V\int\tilde\rho^{\,2}\,dV$; 1 for a uniform density & -- \\
-\texttt{LMC\_complexity} & L\'opez-Ruiz--Mancini--Calbet complexity $C=De^{S}$~\cite{lopezruiz1995} & -- \\
-\texttt{fisher\_information} & $I=\int|\nabla\tilde\rho|^2/\tilde\rho\,dV$ & bohr$^{-2}$ \\
+\texttt{rho\_min\_ratio} & lowest density divided by the mean density & -- \\
+\texttt{rho\_int\_mean} & mean density in the interstitial region & e\,\AA$^{-3}$ \\
+\texttt{T\_eigenvalues\_t1}, \texttt{\_t2}, \texttt{\_t3} & eigenvalues of the tensor of gradient directions; all $\tfrac13$ if isotropic & -- \\
+\texttt{charge\_FA} & fractional anisotropy of that tensor: 0 isotropic, 1 along one axis & -- \\
+\texttt{shannon\_entropy} & Shannon entropy of the density shape; 0 for a uniform density & -- \\
+\texttt{disequilibrium} & mean squared density shape; 1 for a uniform density & -- \\
+\texttt{LMC\_complexity} & statistical complexity of L\'opez-Ruiz, Mancini and Calbet~\cite{lopezruiz1995} & -- \\
+\texttt{fisher\_information} & Fisher information of the density shape; large for steep changes & bohr$^{-2}$ \\
 \addlinespace
-\multicolumn{3}{@{}l}{\emph{Site heterogeneity (18): \texttt{X} = \texttt{m1}, \texttt{f\_bond} or \texttt{zeta}; $X^{(i)}$ its value for atom $i$, from the voxels of its cell}} \\
-\texttt{X\_site\_std} & standard deviation of $X^{(i)}$ over the atoms & as $X$ \\
-\texttt{X\_site\_range} & largest minus smallest $X^{(i)}$ & as $X$ \\
-\texttt{X\_site\_max}, \texttt{X\_site\_min} & largest and smallest $X^{(i)}$ & as $X$ \\
-\texttt{X\_within\_element\_var} & $\sum_ex_e\mathrm{Var}_{i\in e}X^{(i)}$, $x_e$ the site fraction of element $e$ & $X^2$ \\
-\texttt{X\_between\_element\_var} & $\sum_ex_e(\bar X_e-\bar X)^2$; with the above, the variance of $X^{(i)}$ & $X^2$ \\
+\multicolumn{3}{@{}l}{\emph{Site heterogeneity (18): \texttt{X} = \texttt{m1}, \texttt{f\_bond} or \texttt{zeta} of each atom, from its own cell}} \\
+\texttt{X\_site\_std} & standard deviation of \texttt{X} over the atoms & as \texttt{X} \\
+\texttt{X\_site\_range} & largest minus smallest \texttt{X} over the atoms & as \texttt{X} \\
+\texttt{X\_site\_max}, \texttt{X\_site\_min} & largest and smallest \texttt{X} over the atoms & as \texttt{X} \\
+\texttt{X\_within\_element\_var} & part of the variance of \texttt{X} from differences within each element & \texttt{X}$^2$ \\
+\texttt{X\_between\_element\_var} & part of the variance of \texttt{X} from differences between elements & \texttt{X}$^2$ \\
 \bottomrule
 \end{tabular}
 \end{table}
