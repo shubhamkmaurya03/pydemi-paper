@@ -789,34 +789,33 @@ fraction and the valence Laplacian concentration lead, and the cohesive energy
 draws on the bond-midpoint and interstitial densities. Only the direct-gap
 classification has no dominant descriptor (at most 7\%). The information is concentrated in few descriptors: the ten most important
 descriptors of a property (ranked on the training set;
-Table~\ref{tab:top10}, and with their shares in Supporting Information,
-Table~S4) carry 46--69\% of its mean absolute SHAP value, and models trained on
+Fig.~\ref{fig:top10}a, and listed in Supporting Information, Table~S4) carry 46--69\% of its mean absolute SHAP value, and models trained on
 these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties},
 Fig.~\ref{fig:properties}a), least for the bulk modulus (0.937 against 0.949),
 $C_{12}$ and metallicity, most for the transverse sound velocity (0.782 against
 0.854), the band gap and the cohesive energy. Only 34 of the 55 descriptors
-appear in any of the 17 lists; the mean interstitial density (in 16 lists), the
+appear in any of the 17 lists (Fig.~\ref{fig:top10}c): the most important
+descriptor of every property is one of 6, the three most important are among
+16 and the five most important among 23; the mean interstitial density (in 16 lists), the
 radial spread $\sigma_r^2$ (14) and the negative-Laplacian volume fraction (13)
-appear most often. Six to nine (on average 8.4) of the ten descriptors of each
+appear most often (Fig.~\ref{fig:top10}b). Six to nine (on average 8.4) of the ten descriptors of each
 property transfer to predicted densities with $\rho_s\geq0.95$
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.
 
-\begin{table}[htbp]
+\begin{figure}[htbp]
 \centering
-\caption{The ten most important descriptors of each property, in decreasing
-order of their mean absolute SHAP value in the 55-descriptor LightGBM model on
-the training set.}
-\label{tab:top10}
-\footnotesize
-\begin{tabular}{lp{10.3cm}}
-\toprule
-Property & Ten most important descriptors \tabularnewline
-\midrule
-\csname @@input\endcsname tables/tab_top10_matrix.tex
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\textwidth]{figures/fig_top10.pdf}
+\caption{The ten most important descriptors of each property, ranked by their
+mean absolute SHAP value in the 55-descriptor LightGBM model on the training
+set. (a) A dot marks a descriptor that is among the ten of a property; its area
+is the descriptor's share of the mean absolute SHAP value and its colour the
+domain. Only the 34 descriptors that are among the ten for at least one property
+are shown. (b) Number of properties for which each descriptor is among the ten.
+(c) Number of distinct descriptors needed to cover the $k$ most important
+descriptors of all 17 properties.}
+\label{fig:top10}
+\end{figure}
 
 \subsection{From a crystal structure to properties}
 For the 605 test structures of the density model we evaluated the property
