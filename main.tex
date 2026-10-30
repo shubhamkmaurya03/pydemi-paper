@@ -18,6 +18,7 @@
 \title{\textbf{pydemi: Interpretable Charge-Density Descriptors from DFT or Machine-Learned Densities, and What They Add to Materials Property Prediction}}
 
 \author[1]{Shubham Kumar Maurya}
+\author[1]{MD Faiz Akhtar}
 \author[1]{Somnath Bhowmick\thanks{bsomnath@iitk.ac.in}}
 \affil[1]{Department of Materials Science \& Engineering, Indian Institute of Technology Kanpur, Kanpur 208016, India}
 
@@ -161,36 +162,104 @@ models of Section~\ref{sec:properties} take them as input.}
 \end{figure}
 
 \subsection{Numerical core}
-Everything derived from the density is cached on the \texttt{VolumetricData}
-object, keyed by the options it depends on, so that each field is evaluated
-once per structure however many descriptors use it. Gradients, Hessians and
-Laplacians are evaluated with the exact metric tensor of the cell,
-$\nabla f=\sum_a\mathbf{b}_a\,\partial f/\partial u_a$ and
-$\nabla^2 f=\sum_{ab}G_{ab}\,\partial^2 f/\partial u_a\partial u_b$ with
-$G=BB^{\mathsf T}$ and $B$ the reciprocal basis, as exact derivatives of the
-trigonometric interpolant (FFT, the default) or by central differences. The
-Hartree potential follows from one Fourier transform of $\rho$. A single
-geometry pass assigns every voxel its nearest nucleus, distance and direction,
-with a periodic image search that is extended until it provably contains each
-voxel's nearest image and a geometric tie-break for equidistant images. It
-defines the core ($r\leq c_1$), bond ($c_1<r\leq c_2$) and interstitial
-($r>c_2$) shells, with $c_1=0.8$ and $c_2=1.5$\,\AA{} by default or multiples of
-the covalent radii. Three partitions --- nearest atom (the default), a power
-diagram weighted by covalent radii, and Becke's fuzzy cells~\cite{becke1988}
---- share one interface that yields voxel--atom weights, so that every
-site-resolved descriptor works with any of them.
+The numerical core turns the density grid into the fields and the geometry that
+the descriptors are computed from. It does each of these steps once per
+structure, whatever the number of descriptors that use the result.
+
+\paragraph{Caching.} Every derived quantity (a gradient, the Hessian
+eigenvalues, the Hartree potential, the nearest-atom map) is stored on the
+\texttt{VolumetricData} object under a key that lists the options it was
+computed with, such as the derivative method or the shell radii. A descriptor
+asks for the quantity by name: the first request computes it, and later requests,
+by the same or another descriptor, reuse it. Because the options are part of the
+key, a structure featurized again with other settings gets new fields and never
+values left over from the earlier run.
+
+\paragraph{Derivatives.} VASP cells are often not orthogonal, so the derivatives
+are taken in the fractional coordinates $u_a$ of the grid and converted to
+Cartesian ones with the reciprocal basis $B$ (rows $\mathbf b_a$, with
+$\mathbf a_a\cdot\mathbf b_b=\delta_{ab}$):
+\[
+\nabla f=\sum_a\mathbf b_a\,\frac{\partial f}{\partial u_a},\qquad
+\nabla^2 f=\sum_{a,b}G_{ab}\,\frac{\partial^2 f}{\partial u_a\,\partial u_b},\qquad G=BB^{\mathsf T}.
+\]
+The off-diagonal terms of the metric $G$ vanish only for orthogonal axes;
+dropping them, a common shortcut, makes the Laplacian of a triclinic test cell
+more than 5\% wrong. By default the derivatives $\partial/\partial u_a$ are
+spectral: the density is Fourier transformed and each derivative becomes a
+multiplication by $2\pi i m_a$ for the integer frequency $m_a$. A plane-wave
+density is a finite Fourier series, so this is exact up to round-off. Central
+finite differences of order 2 to 8 are available as an alternative, and the two
+are compared in the sensitivity analysis of Section~\ref{sec:numerics}.
+
+\paragraph{Hartree potential.} The electrostatic potential of the electrons is
+obtained from the same Fourier coefficients by solving Poisson's equation,
+$V(\mathbf G)=4\pi k_e\,\rho(\mathbf G)/|\mathbf G|^2$ with
+$k_e=14.40$\,eV\,\AA. The $\mathbf G=0$ term is undefined for a periodic
+system, so the potential is referenced to its cell average.
+
+\paragraph{Geometry pass.} Many descriptors need, for every voxel, its nearest
+nucleus, the distance $r$ to it and the unit vector from it. These three arrays
+are computed once with a $k$-d tree over the atoms and their periodic images. A
+fixed $3\times3\times3$ block of images is not enough in strongly sheared
+cells, where the nearest image can lie farther out; the image range is
+therefore widened until it provably contains the nearest image of every voxel.
+A voxel exactly equidistant from two nuclei, common for atoms on high-symmetry
+grid points, is given to one of them by a geometric rule (the image with the
+lexicographically largest fractional displacement wins) that does not depend on
+the atom order. The same voxel then belongs to the same atom in a cell, its
+supercell, and a translated or rotated copy, which the invariance tests of
+Section~\ref{sec:validation} require.
+
+\paragraph{Shells and partitions.} The distance $r$ divides the cell into a core
+($r\le c_1$), a bond shell ($c_1<r\le c_2$) and an interstitial region
+($r>c_2$), with $c_1=0.8$ and $c_2=1.5$\,\AA{} by default or multiples of the
+covalent radius of each atom. The site-resolved descriptors also need to know
+which voxels belong to which atom. Three partitions are provided: the nearest
+atom (Voronoi cells, the default); a power diagram, in which larger atoms get
+larger cells according to their covalent radii; and Becke's fuzzy
+cells~\cite{becke1988}, which share each voxel between neighbouring atoms with
+smooth weights. All three return the same thing, a list of voxel--atom weights
+that sum to one at every voxel, so every site-resolved descriptor works with any
+of them without change.
 
 \subsection{Descriptor registry}
-Descriptors are plain functions registered with a decorator that records their
-domain, the cached quantities they need, units, admissible range, references
-and the values they return in degenerate cases. Registration enforces
-intensivity: every count is per unit volume and every charge a fraction. A
-degenerate input, such as a uniform density or a crystal in which no element
-occupies two sites, returns a documented value together with a
-\texttt{<name>\_\_flag} column instead of a bare NaN. The same registry
-generates the descriptor catalogue, the reference document shipped with the
-package and the parameter lists of the invariance tests, so that the three
-cannot drift apart.
+In pydemi a descriptor is a Python function that takes the
+\texttt{VolumetricData} object and returns one number. A decorator registers it
+together with a description of what it is:
+
+\begin{verbatim}
+@register(name="m1", domain="bonding", field="rho", requires=["geometry"],
+          units="Angstrom", range=(0.0, inf),
+          sentinel_cases={"zero_density": 0.0})
+def m1(vd):
+    """m1 = sum_k rho_k r_k / sum_k rho_k"""
+    ...
+\end{verbatim}
+
+The record holds the name, the domain (bonding, structural or heterogeneity),
+the cached quantities the function needs, the units, the admissible range, the
+formula (the first line of the documentation string), references, and the
+\emph{sentinel cases}: the inputs for which the descriptor is undefined, each
+with the constant returned instead. A uniform density, for instance, has no
+gradient, so the anisotropy $\zeta=1-\sum|\nabla\rho\cdot\hat u|/\sum|\nabla\rho|$
+is $0/0$; it returns 0 and is flagged. \texttt{featurize} then sets the
+companion column \texttt{<name>\_\_flag} to 1, so a user can find and exclude
+such values. No descriptor returns a bare NaN, with one documented exception:
+the within-element variance of a structure in which no element has two sites,
+where there is nothing to compare.
+
+The registry is the single list from which everything else is built.
+\texttt{featurize} computes the registered descriptors of the requested domains
+in the order of registration, so the feature vector always has the same columns
+in the same order. \texttt{catalogue} returns the registry as a table of names,
+units, ranges, formulas and sentinel cases. The invariance tests
+(Section~\ref{sec:validation}) are generated from the registry, so a descriptor
+added later is tested without writing a new test. Registration refuses a
+quantity that is declared extensive (one that grows with the cell, such as a
+total charge or a number of maxima): it has to be divided by the volume, the
+number of atoms or the total charge first. Whether the registered quantity is
+then really intensive is checked by the supercell test.
 
 % ==========================================================================
 \section{The 56 descriptors}
@@ -357,38 +426,117 @@ and all-electron densities nearly agree, are not affected.
 \section{Validation}
 \label{sec:validation}
 
-pydemi is tested by 352 automated tests (Table~\ref{tab:validation}; each is
-described in Section~S6 of the Supporting Information). Nearly half of
-them, 169, form an invariance harness that is parametrized over the registry:
-every descriptor is computed for a low-symmetry model crystal and for its
-$2\times2\times2$ supercell, a translation of the origin and a rigid rotation,
-and must agree to $10^{-6}$ relative, so that descriptors added later are
-checked automatically. The other library tests compare with closed forms for
-Slater and Gaussian densities, exact identities and brute-force references; the
-model tests check that the included ChargE3Net code reproduces the original
-implementation, and the interface tests run the graphical interface end to end
-for both inputs and the comparison of the two densities. The continuous-integration
-workflow runs the suite on Linux, macOS and Windows with Python 3.10--3.13, with
-and without the optional extras, together with a strict static type check and a
-test of the built package.
+pydemi is checked by 352 automated tests, which run on every push to the repository
+(Table~\ref{tab:validation}; each test is described in Section~S6 of the
+Supporting Information). A test computes a quantity with pydemi and compares it
+with a reference whose correct value is known independently. The tests answer
+three questions.
+
+\paragraph{Does each descriptor compute the quantity it defines?} The library
+is run on model densities whose exact values are known in closed form:
+superpositions of Gaussians, $\rho\propto e^{-\alpha r^2}$, which are smooth,
+and of Slater 1s functions, $\rho\propto e^{-2\zeta r}$, which have the cusp of a
+real atom. The tests compare, for example, the radial moments with
+$m_1=3/(2\zeta)$ and $m_2=3/\zeta^2$, the spectral derivatives with the analytic
+gradient and Hessian, and the Hartree potential of a Gaussian with its
+error-function form. Other tests use exact identities that hold for any density:
+the within- and between-element variances add up to the total variance, the
+three shell fractions add up to one, the Laplacian integrates to zero over the
+cell. Still others compare with brute-force computations, such as nearest-image
+distances found by searching $\pm5$ periodic images.
+
+\paragraph{Does each descriptor have the symmetry it should?} A descriptor of a
+material must not depend on how the crystal is described. The invariance
+harness (169 tests) computes every registered descriptor for a low-symmetry
+model crystal (Fe$_2$O in a triclinic cell) and for three copies of it that
+describe the same material: its $2\times2\times2$ supercell, the crystal with its
+origin shifted, and the crystal rigidly rotated by 37$^\circ$. All
+$56\times3$ pairs must agree. The supercell test checks intensivity, the other
+two that no descriptor depends on the choice of origin or axes.
+
+\paragraph{Do the software components reproduce their references?} These tests
+cover reading \texttt{CHGCAR} files of every layout, batch processing that
+continues past broken files, the density model (whose predictions must equal
+those of the original ChargE3Net code), the property models (whose predictions
+must equal the stored test predictions) and the graphical interface (whose
+figures must plot data that reproduce the descriptor values).
+
+\paragraph{Tolerance.} No two floating-point computations agree to the last
+digit, so each test states how close the result must be to the reference, its
+tolerance. For a single number $a$ compared with a reference $b$, a relative
+tolerance $\epsilon$ means
+\[
+|a-b|\le\epsilon\,\max(|a|,|b|)+10^{-12},
+\]
+where the small absolute term covers values that should be exactly zero. For a
+field on the grid (a gradient, a potential) the largest error is compared with
+the largest value, $\max_k|a_k-b_k|\le\epsilon\,\max_k|b_k|$. The value of
+$\epsilon$ follows from what can make $a$ and $b$ differ:
+\begin{itemize}
+\item $10^{-9}$--$10^{-12}$: only round-off. Double precision carries about 16
+  digits, and sums over $10^4$--$10^5$ voxels and Fourier transforms lose a few
+  of them. A test at this level checks that a computation is mathematically
+  exact, for example spectral derivatives of a band-limited density or the
+  variance decomposition.
+\item $10^{-6}$: the invariance harness. The transformed cells contain the same
+  physical density, but the sums run over voxels in a different order and the
+  Fourier transforms have different sizes, so the results differ by round-off,
+  far below $10^{-6}$. The tolerance leaves room for that while staying far
+  below the changes that a coarser grid causes (Section~\ref{sec:numerics}), so
+  any real dependence on the choice of cell fails the test.
+\item $10^{-4}$ to a few per cent: comparisons with a closed form for a
+  continuous density. The grid itself then causes an error: a finite number of
+  voxels cannot represent the cusp of a Slater function exactly, and periodic
+  images overlap in a finite cell. The tolerance is set from the expected size
+  of this discretization error, and the same tests check that the error
+  decreases when the grid is refined.
+\item $10^{-5}$ of the maximum density for the density model, whose network
+  computes in single precision (about 7 digits).
+\end{itemize}
+``Exact'' in Table~\ref{tab:validation} means equality, used for counts and for
+structural checks such as the columns of a batch output.
+
+The suite runs automatically on Linux, macOS and Windows with Python
+3.10--3.13, with and without the optional extras, together with a strict static
+type check and a test of the built package.
 
 \begin{table}[htbp]
 \centering
-\caption{Checks of the test suite and the accuracy required.}
+\caption{The 352 tests of pydemi by group: what is compared with what, and the
+tolerance (relative unless stated; defined in the text).}
 \label{tab:validation}
 \small
-\begin{tabular}{p{4.0cm}p{8.0cm}r}
+\begin{tabular}{p{3.0cm}p{8.6cm}p{3.1cm}}
 \toprule
-Check (tests) & Content & Tolerance \\
+Group (tests) & Computed value and reference & Tolerance \\
 \midrule
-Invariance harness (169) & every descriptor under a $2\times2\times2$ supercell, a translation and a rotation & $10^{-6}$ rel. \\
-Derivatives (16) & FFT exact for band-limited functions in a triclinic cell; finite-difference convergence order; Hessian trace = Laplacian & $10^{-9}$--$10^{-10}$ \\
-Geometry and partitions (18) & nearest-image distances against brute force, including an extreme shear; partitions of unity; charge conservation & $10^{-12}$ \\
-Closed forms and identities (40) & radial moments of Slater densities; percolation of a simple cubic lattice at the midpoint density; known critical points; variance decomposition; Laplacian concentration $=\tfrac12$; Hartree potential of a Gaussian & $10^{-2}$--$10^{-12}$ \\
-Input, batch and tooling (21) & \texttt{CHGCAR} layouts (1, 2, 4 blocks, VASP 4/5), volume scaling; fixed batch schema; no bare NaN; float32 against float64 & exact / reported \\
-Density model (13) & VASP grid rule; neighbour lists against brute force; predictions equal the original ChargE3Net code, independent of chunking, invariant to rotation and permutation; renormalization & $10^{-5}$ of $\rho_{\max}$ \\
-Property models (12) & stored test predictions reproduced, also by the 22 distributed models; range checks & $10^{-9}$ rel. \\
-Graphical interface (63) & end-to-end runs for both inputs and the comparison view; every descriptor has a figure whose plotted data reproduce its value & $10^{-7}$ rel. \\
+\raggedright Invariance (169) & \raggedright every descriptor of a triclinic Fe$_2$O crystal against the
+same descriptor of its $2\times2\times2$ supercell, an origin-shifted copy and a
+rotated copy & \raggedright $10^{-6}$ \tabularnewline\addlinespace[2pt]
+\raggedright Derivatives (16) & \raggedright FFT gradient, Laplacian and Hessian against the analytic ones
+for Gaussians in an orthorhombic and a triclinic cell; Hessian trace against the
+Laplacian; observed convergence order of finite differences against the nominal
+order & \raggedright $10^{-10}$ (FFT);\newline $5\times10^{-3}$ (finite diff.) \tabularnewline\addlinespace[2pt]
+\raggedright Geometry and partitions (18) & \raggedright nearest-atom distances and owners against a
+brute-force image search, also in an extremely sheared cell; partition weights
+summing to one; charge conservation; equal Becke charges of equivalent atoms &
+$10^{-12}$;\newline $10^{-5}$ (Becke) \tabularnewline\addlinespace[2pt]
+\raggedright Closed forms and identities (40) & \raggedright radial moments of a Slater density; critical
+points of $\cos2\pi x+\cos2\pi y+\cos2\pi z$; percolation of a simple-cubic
+lattice at the bond-midpoint density; Hartree potential of a Gaussian; variance
+decomposition; Laplacian concentration $=\tfrac12$; documented values for
+degenerate inputs & \raggedright exact to 5\%,\newline set per test \tabularnewline\addlinespace[2pt]
+\raggedright Input, batch and tooling (21) & \raggedright \texttt{CHGCAR} layouts (1, 2 and 4 data blocks,
+VASP 4 and 5) written and read back; fixed batch columns when a file fails; no
+bare NaN; single against double precision & \raggedright $10^{-10}$; exact;\newline $10^{-5}$ (single prec., median) \tabularnewline\addlinespace[2pt]
+\raggedright Density model (13) & \raggedright predicted density against the original ChargE3Net code;
+independence of chunking; invariance to rotation and atom permutation; VASP grid
+rule & \raggedright $10^{-5}$ of $\rho_{\max}$;\newline $10^{-4}$ (invariance) \tabularnewline\addlinespace[2pt]
+\raggedright Property models (12) & \raggedright predictions of the distributed models against the stored
+test predictions & \raggedright $10^{-9}$ \tabularnewline\addlinespace[2pt]
+\raggedright Graphical interface (63) & \raggedright end-to-end runs for both inputs and the comparison
+view; the data of every descriptor figure against the descriptor value &
+$10^{-6}$--$10^{-12}$;\newline histograms: 1 bin \tabularnewline\addlinespace[2pt]
 \bottomrule
 \end{tabular}
 \end{table}
@@ -550,13 +698,14 @@ Metallicity is classified with a ROC-AUC of 0.984 (accuracy 0.940) and the
 directness of the gap, known for only 1,645 materials, with 0.787 (accuracy
 0.795). The refractive index, for which only 1,089 training materials are
 available, reaches $R^2=0.758$. The seed-to-seed standard deviation is at most
-0.005, except for the band gap (0.015) and the refractive index (0.011).
+0.005, except for the band gap (0.015), the direct gap (0.017) and the
+refractive index (0.011).
 
 \begin{table}[htbp]
 \centering
 \caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
-or ROC-AUC for the two classifications, mean $\pm$ standard deviation over five
-seeds, with all 55 informative descriptors and with the ten most important
+or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
+standard deviations are given in the text), with all 55 informative descriptors and with the ten most important
 descriptors of each property. MAE: mean absolute error with the 55
 descriptors. $n$: training and test materials.}
 \label{tab:properties}
