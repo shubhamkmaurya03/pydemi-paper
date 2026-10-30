@@ -684,6 +684,14 @@ value~\cite{lundberg2020} on the test set. To measure how concentrated the
 information is, every model was also retrained, with the same protocol, on only
 the ten descriptors with the largest mean absolute SHAP value of its LightGBM
 models on the training set, so that the test set plays no part in their choice.
+To test whether descriptors that duplicate others are needed, the descriptors
+with a Spearman correlation $|\rho_s|\geq0.90$ on the training set were grouped
+(complete linkage, so that every pair in a group has $|\rho_s|\geq0.90$), only the
+member of each group with the largest mean SHAP share over the 17 properties was
+kept, and every model was retrained on the remaining descriptors with the same
+protocol. The uncertainty of a change in test score is the 95\% interval of a
+paired bootstrap (2,000 resamples of the test materials) on the seed-averaged
+predictions.
 
 \subsection{Accuracy}
 Table~\ref{tab:properties} and Fig.~\ref{fig:properties}a give the test scores
@@ -803,6 +811,27 @@ property transfer to predicted densities with $\rho_s\geq0.95$
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.
 
+Several descriptors are closely related, by construction or in these materials:
+the standard deviation, range and between-element variance of the same site
+quantity, the eigenvalues of the anisotropy tensor ($t_1+t_2+t_3=1$) and its
+fractional anisotropy, $m_1$ and $m_2=m_1^2+\sigma_r^2$, or the Shannon entropy
+and the disequilibrium of the density. On the training set, 18 of the 55
+descriptors have $|\rho_s|\geq0.90$ with another one, in 11 groups
+(Supporting Information, Table~S5). The models split the importance between the
+members of a group: the 18 carry 10--24\% of the mean absolute SHAP value of a
+property, and three of them are among the ten most important descriptors of the
+cohesive energy and of the direct gap. Without them, the remaining 37
+descriptors give the same test score, within the bootstrap interval, for 16 of
+the 17 properties (changes $-0.010$ to $+0.008$, with a small gain of 0.003 for
+the bulk modulus); only the band gap loses, $R^2=0.832$ against 0.852
+(interval of the change $-0.037$ to $-0.007$; Supporting Information,
+Table~S6). For these properties, 37 of the 55 descriptors thus carry the information
+the models use, and the rank of a single descriptor in
+Fig.~\ref{fig:top10} depends on which member of its group the model happened
+to use. pydemi computes all 56 descriptors: most of these correlations are
+observed in this dataset rather than fixed by definition, and need not hold for
+other materials or properties.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_top10.pdf}
@@ -832,7 +861,7 @@ $R^2=0.958$ (MAE 10.9\,GPa), as from the DFT descriptors (0.956, 11.0\,GPa);
 for Young's modulus and $C_{11}$ the values are 0.846 and 0.930 against 0.844
 and 0.928, for the formation energy and the band gap 0.926 and 0.848 against
 0.942 and 0.857, and the ROC-AUC for metallicity 0.979 against 0.985
-(Supporting Information, Table~S5). The losses are larger for the shear modulus
+(Supporting Information, Table~S7). The losses are larger for the shear modulus
 (0.789 against 0.809), the Debye temperature (0.653 against 0.751) and the
 transverse sound velocity (0.460 against 0.657), whose models give more weight
 to the bounded ellipticity and the negative-Laplacian volume fraction, two of

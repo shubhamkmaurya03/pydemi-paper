@@ -13,7 +13,8 @@ python paper/analysis/tables.py        # tables/*.tex
 python paper/analysis/gui/shots.py ~/pydemi_check/MgO_225_DFT_CHGCAR.gz paper/analysis/gui/MgO   # needs pydemi gui on :8602
 ```
 
-Inputs: `property_prediction/` (descriptors, targets, study_v1 results), the stored ChargE3Net
+Inputs: `property_prediction/` (descriptors, targets, study_v1 results; the correlated-descriptor
+analysis in `property_prediction/redundancy/`, see its README, gives `results/reasons.json` and `compare.csv`), the stored ChargE3Net
 predictions in `~/charge3net/charge3net/data/test_set_predictions_finetune/cubes`, and the 0.1.0
 stability analyses in `old_project/paper/analysis/out` (valid for 0.2.0: the 56 descriptors are
 identical to the 0.1.0 values on all 6,059 structures, checked in `figures.py`).

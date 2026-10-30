@@ -213,6 +213,18 @@ were ranked by their mean absolute SHAP value in the five LightGBM models on the
 forest and LightGBM models, trained and tuned exactly as above
 (Table~\ref{tab:si_full}).
 
+\paragraph{Correlated descriptors.} On the 4,847 training structures, the
+Spearman correlation $\rho_s$ was computed between all pairs of the 55
+descriptors. Descriptors were clustered by complete linkage on $1-|\rho_s|$ with
+a threshold of 0.10, so that every pair in a cluster has $|\rho_s|\geq0.90$;
+in each of the 11 clusters with more than one member, the descriptor with the
+largest mean SHAP share over the 17 properties (training set) was kept and the
+other 18 were dropped (Table~\ref{tab:si_redundant_groups}). The 17 properties
+were retrained on the remaining 37 descriptors exactly as above. The change in
+test score and its 95\% interval come from a paired bootstrap of the test
+materials (2,000 resamples) on the predictions averaged over the five seeds
+(Table~\ref{tab:si_redundant_scores}).
+
 \begin{table}[htbp]
 \centering
 \caption{LightGBM on the 55 descriptors: test MAE (mean $\pm$ standard
@@ -263,6 +275,43 @@ Property & Share & Descriptors \\
 \csname @@input\endcsname tables/tab_si_top10.tex 
 \bottomrule
 \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{The 18 descriptors that correlate with another one at
+$|\rho_s|\geq0.90$ (training set), the descriptor kept in their group, their
+Spearman correlation with it, and the reason. $m_1$, $m_2$: first and second
+moments of the distance of the charge from its nearest nucleus; $t_i$:
+eigenvalues of the anisotropy tensor $T$; FA: its fractional anisotropy; $\zeta$:
+ellipticity (definitions in Section~\ref{si:defs}).}
+\label{tab:si_redundant_groups}
+\footnotesize
+\begin{tabular}{>{\raggedright}p{3.6cm}>{\raggedright}p{2.6cm}>{\raggedright}p{1.3cm}>{\raggedright\arraybackslash}p{6.6cm}}
+\toprule
+Dropped & Kept & $\rho_s$ & Reason \\
+\midrule
+\csname @@input\endcsname tables/tab_si_redundant_groups.tex 
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Test $R^2$ (ROC-AUC for the classifications) of LightGBM with the 55
+descriptors and with the 37 left after removing the 18 of
+Table~\ref{tab:si_redundant_groups}, mean over five seeds; change and its 95\%
+paired-bootstrap interval. $^\ast$: the interval excludes zero.}
+\label{tab:si_redundant_scores}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lcccc}
+\toprule
+Property & 55 descriptors & 37 descriptors & Change & 95\% interval \\
+\midrule
+\csname @@input\endcsname tables/tab_si_redundant_scores.tex 
+\bottomrule
+\end{tabular}
+\end{adjustbox}
 \end{table}
 
 % ==========================================================================
