@@ -155,6 +155,27 @@ Descriptor & grid 80\% & FD4 & FD2 & power & Becke & $\rho_s$ (ML) & ML error \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_si_ml_parity_1.pdf}
+\caption{Descriptors of the predicted (ChargE3Net) against the DFT densities for
+the 605 test structures of the density model, first 28 of the 55 informative
+descriptors in the order of the pydemi catalogue (title colour: blue bonding, green
+structural, purple heterogeneity). Red: structures containing lanthanides or
+actinides. In each panel: Spearman correlation $\rho_s$ and median relative
+error $|a-b|/\max(|a|,|b|)$ over the structures (0\% where both values are zero
+for most structures, as for the non-nuclear maxima). Logarithmic axes where the
+values span two to six decades.}
+\label{fig:si_ml_parity_1}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_si_ml_parity_2.pdf}
+\caption{As Fig.~\ref{fig:si_ml_parity_1}, for the remaining 27 descriptors.}
+\label{fig:si_ml_parity_2}
+\end{figure}
+
 % ==========================================================================
 \section{Property models}
 \label{si:props}

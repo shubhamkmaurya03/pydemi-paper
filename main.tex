@@ -457,13 +457,19 @@ predicted densities integrate to the nominal electron count within 0.13\%
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_ml.pdf}
-\caption{Descriptors of predicted densities (605 test structures of the density
-model). (a) Rank disagreement $1-\rho_s$ between the descriptors of the DFT and
-the predicted densities for the 55 informative descriptors; dotted lines mark
-$\rho_s=0.99$ and 0.95. (b) Median relative error per structure over the 44
-descriptors with $\rho_s\geq0.95$ against the density error. (c--f) Predicted
-against DFT values for three descriptors that transfer and one that does not;
-red: structures containing lanthanides or actinides.}
+\caption{Descriptors and properties from predicted densities (605 test
+structures of the density model). (a) Spearman correlation $\rho_s$ between the
+values of each descriptor from the DFT and from the predicted densities, grouped
+by domain; the axis is logarithmic in $1-\rho_s$, and the dotted lines mark
+$\rho_s=0.95$ and 0.99. (b) Median relative error per structure over the 44
+descriptors with $\rho_s\geq0.95$ against the error of the density; red:
+structures containing lanthanides or actinides. (c) Properties predicted by the
+LightGBM models (55 descriptors, seed 0) from the descriptors of the DFT density
+($x$) and of the predicted density ($y$); blue: the 63 structures that are also
+in the test set of the property models. $R^2$: agreement of the two predictions;
+for metallicity and the direct gap, predicted probabilities and the share of
+structures assigned to the same class. The values of all 55 descriptors are
+compared in Figs.~S1 and S2 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
@@ -474,10 +480,10 @@ the median relative error is 0.66\%. The descriptors that transfer include all
 18 heterogeneity descriptors, 16 of the 18 informative bonding descriptors (the
 moments and shell fractions, $\zeta$, the NCI and potential descriptors and the
 bond-midpoint densities), and the percolation levels, density floor and
-information measures (Fig.~\ref{fig:ml}c--e). The 11 that do not fall into
+information measures (Supporting Information, Figs.~S1 and S2). The 11 that do not fall into
 three groups. The counts of maxima and minima ($\rho_s=0.77$ and 0.57, median
 errors 35\% and 38\%) respond to shallow spurious extrema in flat, low-density
-regions (Fig.~\ref{fig:ml}f); the non-nuclear maxima and their charge
+regions (Supporting Information, Fig.~S1); the non-nuclear maxima and their charge
 ($\rho_s=0.90$ and 0.94) are zero in both densities for 61\% of the structures,
 so their ranks are dominated by ties. The bounded ellipticity and the
 negative-Laplacian volume fraction (median errors 13\% and 6\%) involve second
@@ -649,7 +655,7 @@ information that survives the density model.
 \subsection{From a crystal structure to properties}
 For the 605 test structures of the density model we evaluated the property
 models (LightGBM, seed 0) with the descriptors of the predicted densities in
-place of the DFT ones. The two predictions agree: $R^2$ between them is 0.985
+place of the DFT ones. The two predictions agree (Fig.~\ref{fig:ml}c): $R^2$ between them is 0.985
 for the bulk modulus, 0.950 and 0.955 for the shear and Young's moduli,
 0.950--0.975 for the elastic constants, 0.930--0.971 for the thermal
 properties, 0.964 and 0.935 for the formation and cohesive energies, 0.956 for
