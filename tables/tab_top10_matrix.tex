@@ -1,41 +1,23 @@
-\multicolumn{1}{l}{} & \multicolumn{3}{c}{\emph{Moduli}} & \multicolumn{3}{c}{\emph{$C_{ij}$}} & \multicolumn{5}{c}{\emph{Thermal}} & \multicolumn{2}{c}{\emph{Energy}} & \multicolumn{3}{c}{\emph{Electr.}} & \multicolumn{1}{c}{\emph{Opt.}} & \\
-\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-12} \cmidrule(lr){13-14} \cmidrule(lr){15-17} \cmidrule(lr){18-18}
-Descriptor & \rotatebox{90}{$K$} & \rotatebox{90}{$G$} & \rotatebox{90}{$E$} & \rotatebox{90}{$C_{11}$} & \rotatebox{90}{$C_{12}$} & \rotatebox{90}{$C_{44}$} & \rotatebox{90}{$\Theta_D$} & \rotatebox{90}{$v_t$} & \rotatebox{90}{$v_l$} & \rotatebox{90}{$\kappa_\mathrm{Clarke}$} & \rotatebox{90}{$\kappa_\mathrm{Cahill}$} & \rotatebox{90}{$E_f$} & \rotatebox{90}{$E_\mathrm{coh}$} & \rotatebox{90}{$E_g$} & \rotatebox{90}{metal} & \rotatebox{90}{direct gap} & \rotatebox{90}{$n$} & \rotatebox{90}{lists} \\
-\midrule
-\multicolumn{19}{l}{\emph{Bonding}} \\
-\texttt{sigma\_r2} & \cellcolor{blue!7}10 & \cellcolor{blue!40}2 & \cellcolor{blue!40}3 & \cellcolor{blue!20}6 &  & \cellcolor{blue!20}5 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!40}2 & \cellcolor{blue!40}2 & \cellcolor{blue!20}5 &  & \cellcolor{blue!20}4 & \cellcolor{blue!7}7 &  & \cellcolor{blue!20}5 & 14 \\
-\texttt{lnf} & \cellcolor{blue!7}9 & \cellcolor{blue!40}3 & \cellcolor{blue!7}7 & \cellcolor{blue!7}8 & \cellcolor{blue!7}10 & \cellcolor{blue!40}2 & \cellcolor{blue!20}6 & \cellcolor{blue!20}5 & \cellcolor{blue!7}8 & \cellcolor{blue!7}8 & \cellcolor{blue!7}8 &  &  & \cellcolor{blue!20}5 &  &  & \cellcolor{blue!40}3 & 13 \\
-\texttt{f\_int} & \cellcolor{blue!20}5 & \cellcolor{blue!20}6 & \cellcolor{blue!20}4 & \cellcolor{blue!7}10 & \cellcolor{blue!20}5 & \cellcolor{blue!20}4 & \cellcolor{blue!40}2 & \cellcolor{blue!7}7 & \cellcolor{blue!40}3 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 &  &  &  &  &  &  & 11 \\
-\texttt{f\_NCI} &  &  &  &  & \cellcolor{blue!20}6 & \cellcolor{blue!7}10 & \cellcolor{blue!7}8 & \cellcolor{blue!7}9 & \cellcolor{blue!7}10 & \cellcolor{blue!7}9 & \cellcolor{blue!7}9 & \cellcolor{blue!40}1 &  & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 &  & \cellcolor{blue!40}2 & 11 \\
-\texttt{rho\_mid\_mean} & \cellcolor{blue!40}3 & \cellcolor{blue!20}5 & \cellcolor{blue!40}2 & \cellcolor{blue!40}3 & \cellcolor{blue!40}2 & \cellcolor{blue!20}6 &  & \cellcolor{blue!7}8 &  &  &  &  & \cellcolor{blue!40}1 & \cellcolor{blue!7}9 & \cellcolor{blue!7}8 &  &  & 10 \\
-\texttt{ellip\_bond\_bounded\_avg} &  & \cellcolor{blue!7}7 & \cellcolor{blue!7}10 &  & \cellcolor{blue!7}8 &  & \cellcolor{blue!20}5 & \cellcolor{blue!40}3 & \cellcolor{blue!20}4 & \cellcolor{blue!20}5 & \cellcolor{blue!20}5 & \cellcolor{blue!40}2 &  &  & \cellcolor{blue!7}10 &  &  & 10 \\
-\texttt{sign\_lambda2\_rho\_mean} & \cellcolor{blue!7}7 & \cellcolor{blue!7}9 & \cellcolor{blue!7}8 & \cellcolor{blue!20}5 &  & \cellcolor{blue!7}7 &  &  &  &  &  &  &  & \cellcolor{blue!7}7 & \cellcolor{blue!20}5 & \cellcolor{blue!40}3 &  & 8 \\
-\texttt{lap\_concentration\_valence} &  & \cellcolor{blue!7}10 &  & \cellcolor{blue!7}9 &  &  & \cellcolor{blue!40}3 & \cellcolor{blue!40}2 & \cellcolor{blue!40}2 & \cellcolor{blue!40}3 & \cellcolor{blue!40}3 &  &  &  &  &  &  & 7 \\
-\texttt{lnf\_charge\_weighted} & \cellcolor{blue!7}8 &  &  & \cellcolor{blue!7}7 &  & \cellcolor{blue!7}8 &  &  &  & \cellcolor{blue!7}10 & \cellcolor{blue!7}10 & \cellcolor{blue!20}6 &  &  &  & \cellcolor{blue!20}4 &  & 7 \\
-\texttt{zeta} &  &  &  &  &  &  & \cellcolor{blue!20}4 & \cellcolor{blue!20}4 & \cellcolor{blue!20}6 & \cellcolor{blue!20}4 & \cellcolor{blue!20}4 &  &  &  &  &  &  & 5 \\
-\texttt{V\_spread} &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}9 &  &  &  & \cellcolor{blue!7}9 & 2 \\
-\texttt{V\_int\_min} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!20}6 &  & 1 \\
-\texttt{m2} &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}10 &  &  &  & 1 \\
-\multicolumn{19}{l}{\emph{Structural}} \\
-\texttt{rho\_int\_mean} & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!40}1 & \cellcolor{blue!7}10 &  & \cellcolor{blue!7}7 & \cellcolor{blue!7}7 & \cellcolor{blue!7}7 & \cellcolor{blue!20}4 & \cellcolor{blue!40}2 & \cellcolor{blue!40}2 & \cellcolor{blue!40}2 & \cellcolor{blue!7}10 & \cellcolor{blue!40}1 & 16 \\
-\texttt{shannon\_entropy} & \cellcolor{blue!20}6 & \cellcolor{blue!20}4 & \cellcolor{blue!20}6 & \cellcolor{blue!20}4 & \cellcolor{blue!20}4 & \cellcolor{blue!7}9 & \cellcolor{blue!7}7 & \cellcolor{blue!20}6 & \cellcolor{blue!20}5 & \cellcolor{blue!20}6 & \cellcolor{blue!20}6 &  &  &  &  &  &  & 11 \\
-\texttt{rho\_perc\_b} & \cellcolor{blue!20}4 & \cellcolor{blue!7}8 & \cellcolor{blue!20}5 & \cellcolor{blue!40}2 & \cellcolor{blue!40}3 &  &  &  &  &  &  &  & \cellcolor{blue!40}3 &  &  &  & \cellcolor{blue!7}8 & 7 \\
-\texttt{rho\_perc\_c} & \cellcolor{blue!40}2 &  & \cellcolor{blue!7}9 &  & \cellcolor{blue!7}7 & \cellcolor{blue!40}3 &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}10 & 5 \\
-\texttt{rho\_min} &  &  &  &  &  &  &  &  & \cellcolor{blue!7}9 &  &  & \cellcolor{blue!7}7 & \cellcolor{blue!7}10 & \cellcolor{blue!7}8 & \cellcolor{blue!40}3 &  &  & 5 \\
-\texttt{rho\_min\_ratio} &  &  &  &  & \cellcolor{blue!7}9 &  &  &  &  &  &  & \cellcolor{blue!7}8 & \cellcolor{blue!20}6 &  & \cellcolor{blue!20}4 &  &  & 4 \\
-\texttt{perc\_anisotropy} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!40}1 &  & 1 \\
-\texttt{charge\_FA} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!40}2 &  & 1 \\
-\texttt{n\_max} &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!20}4 &  &  &  &  & 1 \\
-\texttt{T\_eigenvalues\_t3} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!20}5 &  & 1 \\
-\texttt{disequilibrium} &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!20}5 &  &  &  &  & 1 \\
-\texttt{rho\_perc\_a} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}7 & 1 \\
-\texttt{T\_eigenvalues\_t1} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}7 &  & 1 \\
-\texttt{fisher\_information} &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}10 &  &  &  &  &  & 1 \\
-\multicolumn{19}{l}{\emph{Heterogeneity}} \\
-\texttt{zeta\_site\_min} &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!40}3 &  & \cellcolor{blue!20}6 &  & \cellcolor{blue!7}8 & \cellcolor{blue!20}4 & 4 \\
-\texttt{m1\_site\_min} &  &  &  &  &  &  & \cellcolor{blue!7}9 & \cellcolor{blue!7}10 &  &  &  & \cellcolor{blue!7}9 &  &  &  &  & \cellcolor{blue!20}6 & 4 \\
-\texttt{zeta\_site\_range} &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!40}3 & \cellcolor{blue!20}6 &  &  & 2 \\
-\texttt{f\_bond\_site\_min} &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}7 &  &  &  &  & 1 \\
-\texttt{f\_bond\_site\_max} &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}8 &  &  &  &  & 1 \\
-\texttt{f\_bond\_within\_element\_var} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}9 &  & 1 \\
-\texttt{zeta\_site\_max} &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \cellcolor{blue!7}9 &  &  & 1 \\
+\multicolumn{2}{l}{\emph{Elastic}} \tabularnewline
+Bulk modulus $K$ & \raggedright \texttt{rho\_int\_mean}, \texttt{rho\_perc\_c}, \texttt{rho\_mid\_mean}, \texttt{rho\_perc\_b}, \texttt{f\_int}, \texttt{shannon\_entropy}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{lnf\_charge\_weighted}, \texttt{lnf}, \texttt{sigma\_r2} \tabularnewline
+Shear modulus $G$ & \raggedright \texttt{rho\_int\_mean}, \texttt{sigma\_r2}, \texttt{lnf}, \texttt{shannon\_entropy}, \texttt{rho\_mid\_mean}, \texttt{f\_int}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{rho\_perc\_b}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{lap\_concentration\_valence} \tabularnewline
+Young's modulus $E$ & \raggedright \texttt{rho\_int\_mean}, \texttt{rho\_mid\_mean}, \texttt{sigma\_r2}, \texttt{f\_int}, \texttt{rho\_perc\_b}, \texttt{shannon\_entropy}, \texttt{lnf}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{rho\_perc\_c}, \texttt{ellip\_bond\_bounded\_avg} \tabularnewline
+\multicolumn{2}{l}{\emph{Elastic tensor}} \tabularnewline
+$C_{11}$ & \raggedright \texttt{rho\_int\_mean}, \texttt{rho\_perc\_b}, \texttt{rho\_mid\_mean}, \texttt{shannon\_entropy}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{sigma\_r2}, \texttt{lnf\_charge\_weighted}, \texttt{lnf}, \texttt{lap\_concentration\_valence}, \texttt{f\_int} \tabularnewline
+$C_{12}$ & \raggedright \texttt{rho\_int\_mean}, \texttt{rho\_mid\_mean}, \texttt{rho\_perc\_b}, \texttt{shannon\_entropy}, \texttt{f\_int}, \texttt{f\_NCI}, \texttt{rho\_perc\_c}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{rho\_min\_ratio}, \texttt{lnf} \tabularnewline
+$C_{44}$ & \raggedright \texttt{rho\_int\_mean}, \texttt{lnf}, \texttt{rho\_perc\_c}, \texttt{f\_int}, \texttt{sigma\_r2}, \texttt{rho\_mid\_mean}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{lnf\_charge\_weighted}, \texttt{shannon\_entropy}, \texttt{f\_NCI} \tabularnewline
+\multicolumn{2}{l}{\emph{Thermal}} \tabularnewline
+Debye temperature $\Theta_D$ & \raggedright \texttt{sigma\_r2}, \texttt{f\_int}, \texttt{lap\_concentration\_valence}, \texttt{zeta}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{lnf}, \texttt{shannon\_entropy}, \texttt{f\_NCI}, \texttt{m1\_site\_min}, \texttt{rho\_int\_mean} \tabularnewline
+Transverse sound velocity $v_t$ & \raggedright \texttt{sigma\_r2}, \texttt{lap\_concentration\_valence}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{zeta}, \texttt{lnf}, \texttt{shannon\_entropy}, \texttt{f\_int}, \texttt{rho\_mid\_mean}, \texttt{f\_NCI}, \texttt{m1\_site\_min} \tabularnewline
+Longitudinal sound velocity $v_l$ & \raggedright \texttt{sigma\_r2}, \texttt{lap\_concentration\_valence}, \texttt{f\_int}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{shannon\_entropy}, \texttt{zeta}, \texttt{rho\_int\_mean}, \texttt{lnf}, \texttt{rho\_min}, \texttt{f\_NCI} \tabularnewline
+Min.\ thermal conductivity $\kappa_\mathrm{Clarke}$ & \raggedright \texttt{f\_int}, \texttt{sigma\_r2}, \texttt{lap\_concentration\_valence}, \texttt{zeta}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{shannon\_entropy}, \texttt{rho\_int\_mean}, \texttt{lnf}, \texttt{f\_NCI}, \texttt{lnf\_charge\_weighted} \tabularnewline
+Min.\ thermal conductivity $\kappa_\mathrm{Cahill}$ & \raggedright \texttt{f\_int}, \texttt{sigma\_r2}, \texttt{lap\_concentration\_valence}, \texttt{zeta}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{shannon\_entropy}, \texttt{rho\_int\_mean}, \texttt{lnf}, \texttt{f\_NCI}, \texttt{lnf\_charge\_weighted} \tabularnewline
+\multicolumn{2}{l}{\emph{Energetics}} \tabularnewline
+Formation energy $E_f$ & \raggedright \texttt{f\_NCI}, \texttt{ellip\_bond\_bounded\_avg}, \texttt{zeta\_site\_min}, \texttt{rho\_int\_mean}, \texttt{sigma\_r2}, \texttt{lnf\_charge\_weighted}, \texttt{rho\_min}, \texttt{rho\_min\_ratio}, \texttt{m1\_site\_min}, \texttt{fisher\_information} \tabularnewline
+Cohesive energy $E_\mathrm{coh}$ & \raggedright \texttt{rho\_mid\_mean}, \texttt{rho\_int\_mean}, \texttt{rho\_perc\_b}, \texttt{n\_max}, \texttt{disequilibrium}, \texttt{rho\_min\_ratio}, \texttt{f\_bond\_site\_min}, \texttt{f\_bond\_site\_max}, \texttt{V\_spread}, \texttt{rho\_min} \tabularnewline
+\multicolumn{2}{l}{\emph{Electronic}} \tabularnewline
+Band gap $E_g$ (PBE) & \raggedright \texttt{f\_NCI}, \texttt{rho\_int\_mean}, \texttt{zeta\_site\_range}, \texttt{sigma\_r2}, \texttt{lnf}, \texttt{zeta\_site\_min}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{rho\_min}, \texttt{rho\_mid\_mean}, \texttt{m2} \tabularnewline
+Metal (classification) & \raggedright \texttt{f\_NCI}, \texttt{rho\_int\_mean}, \texttt{rho\_min}, \texttt{rho\_min\_ratio}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{zeta\_site\_range}, \texttt{sigma\_r2}, \texttt{rho\_mid\_mean}, \texttt{zeta\_site\_max}, \texttt{ellip\_bond\_bounded\_avg} \tabularnewline
+Direct gap (classification) & \raggedright \texttt{perc\_anisotropy}, \texttt{charge\_FA}, \texttt{sign\_lambda2\_rho\_mean}, \texttt{lnf\_charge\_weighted}, \texttt{T\_eigenvalues\_t3}, \texttt{V\_int\_min}, \texttt{T\_eigenvalues\_t1}, \texttt{zeta\_site\_min}, \texttt{f\_bond\_within\_element\_var}, \texttt{rho\_int\_mean} \tabularnewline
+\multicolumn{2}{l}{\emph{Optical}} \tabularnewline
+Refractive index $n$ & \raggedright \texttt{rho\_int\_mean}, \texttt{f\_NCI}, \texttt{lnf}, \texttt{zeta\_site\_min}, \texttt{sigma\_r2}, \texttt{m1\_site\_min}, \texttt{rho\_perc\_a}, \texttt{rho\_perc\_b}, \texttt{V\_spread}, \texttt{rho\_perc\_c} \tabularnewline
