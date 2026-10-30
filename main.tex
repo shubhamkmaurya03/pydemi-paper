@@ -788,7 +788,8 @@ thermal conductivities, the radial spread $\sigma_r^2$, the interstitial charge
 fraction and the valence Laplacian concentration lead, and the cohesive energy
 draws on the bond-midpoint and interstitial densities. Only the direct-gap
 classification has no dominant descriptor (at most 7\%). The information is concentrated in few descriptors: the ten most important
-descriptors of a property (ranked on the training set; Supporting Information,
+descriptors of a property (ranked on the training set;
+Table~\ref{tab:top10}, and with their shares in Supporting Information,
 Table~S4) carry 46--69\% of its mean absolute SHAP value, and models trained on
 these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties},
 Fig.~\ref{fig:properties}a), least for the bulk modulus (0.937 against 0.949),
@@ -800,6 +801,24 @@ appear most often. Six to nine (on average 8.4) of the ten descriptors of each
 property transfer to predicted densities with $\rho_s\geq0.95$
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.
+
+\begin{table}[htbp]
+\centering
+\caption{The ten most important descriptors of each property: rank by mean
+absolute SHAP value of the 55-descriptor LightGBM model on the training set
+(1: most important; shading: ranks 1--3, 4--6 and 7--10; empty: not among the
+ten). Only the 34 descriptors that are among the ten for at least one property
+are listed, by domain and by the number of properties for which they are among
+the ten (last column).}
+\label{tab:top10}
+\footnotesize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{l*{17}{c}r}
+\toprule
+\csname @@input\endcsname tables/tab_top10_matrix.tex
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{From a crystal structure to properties}
 For the 605 test structures of the density model we evaluated the property
