@@ -39,17 +39,18 @@ features, and the interpretable quantities of density analysis are computed one
 structure at a time. We present pydemi, an open-source Python package that
 reduces a VASP \texttt{CHGCAR}, and nothing else, to 56 fixed-length,
 intensive and physically interpretable descriptors in three domains: bonding
-(19), structural (19) and site heterogeneity (18). Every descriptor that would
-need information a \texttt{CHGCAR} does not contain, or that is not converged on
-typical VASP grids, has been left out, and each of the 56 is registered with its
-formula, units, range and documented fallback values. When no DFT calculation
-is available, pydemi predicts the density from the crystal structure with a
-ChargE3Net model fine-tuned on our dataset, on the grid VASP would use; for 44
-of the 55 informative descriptors the values computed from the predicted
-densities of 605 held-out structures keep a rank correlation of at least 0.95
-with their DFT values, and the critical-point counts are the main exception.
-pydemi computes all descriptors of a 6,059-structure VASP dataset without a
-failure in 8.4 CPU hours, is verified by 352 automated tests, and is used from
+(19), structural (19) and site heterogeneity (18). Each descriptor is defined
+on the PAW pseudo-density that a \texttt{CHGCAR} holds, is converged on typical
+VASP grids, and is registered with its formula, units, range and documented
+fallback values. When no DFT calculation is available, pydemi predicts the
+density from the crystal structure with a ChargE3Net model fine-tuned on our
+dataset, on the grid VASP would use. Computed from the predicted densities of
+605 held-out structures, 44 of the 55 descriptors that vary between materials
+keep a rank correlation of at least 0.95 with their DFT values; the exceptions
+are four critical-point descriptors, two quantities built on second derivatives and
+five anisotropy measures whose values cluster. pydemi computes all descriptors
+of a 6,059-structure VASP dataset without a failure, in a median of 3.3\,s per
+structure on one CPU core, is verified by 352 automated tests, and is used from
 Python, the command line or a local graphical interface. Gradient-boosted
 models trained on the descriptors alone predict 17 elastic, thermal,
 energetic, electronic and optical properties of the same dataset, with test
@@ -586,7 +587,7 @@ automatic $k$-mesh. The cells contain 1--152 atoms (median 6) on grids of
 $1.8\times10^5$ to $1.7\times10^6$ points (5th--95th percentile).
 
 pydemi computed the 56 descriptors of every structure without a failure, in
-37 minutes on 16 worker processes (8.4 CPU hours in total). The median cost is 3.3\,s per
+37 minutes on 16 worker processes. The median cost is 3.3\,s per
 structure (95th percentile 15\,s); it follows the number of grid points
 (Spearman 0.96) more closely than the number of atoms (0.77). On one core a
 6\,MB \texttt{CHGCAR} on a $56^3$ grid takes 0.7\,s and 0.25\,GB, and a
@@ -953,8 +954,8 @@ pydemi reduces the one file every VASP calculation writes, the
 \texttt{CHGCAR}, to 56 intensive and individually interpretable descriptors,
 chosen so that each is defined on the PAW pseudo-density and converged on
 typical grids: on a coarsened grid 46 of the 55 informative descriptors change
-by at most 1\%. It featurized 6,059 VASP densities without a failure in
-8.4 CPU hours and is verified by 352 tests. The included ChargE3Net model gives
+by at most 1\%. It featurized 6,059 VASP densities without a failure,
+at a median of 3.3\,s per structure on one CPU core, and is verified by 352 tests. The included ChargE3Net model gives
 the same descriptors from a crystal structure: 44 of the 55 keep a rank
 correlation of at least 0.95 with their DFT values on 605 held-out structures,
 and only the critical-point counts, quantities built on second derivatives in
