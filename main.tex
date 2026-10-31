@@ -117,8 +117,8 @@ the information --- has to be answered on a common benchmark.
 Here we describe pydemi, a Python package built around these three points. (i) It
 reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors that are
 defined and numerically stable on it (Sections~\ref{sec:design}
-and~\ref{sec:descriptors}); the analysis that led to the selection is
-summarized in Section~\ref{sec:numerics}. (ii) It includes a density model, so
+and~\ref{sec:descriptors}), and Section~\ref{sec:numerics} shows what a
+\texttt{CHGCAR} supports and how stable the descriptors are. (ii) It includes a density model, so
 that the same descriptors are obtained from a crystal structure alone, and we
 measure which descriptors transfer from DFT to predicted densities
 (Section~\ref{sec:ml}). (iii) We train property models on the descriptors
@@ -368,12 +368,10 @@ below, which therefore use 55 informative descriptors.
 \section{What a CHGCAR supports}
 \label{sec:numerics}
 
-The 56 descriptors were selected from 220 candidates, which also covered
-compositional, magnetic, electron-localization and energy-density quantities,
-by evaluating every candidate on the dataset of Section~\ref{sec:dataset}. For
-the 56 retained descriptors, the values in that evaluation agree with those of
-the released package to a relative $10^{-8}$ for all 6,059 structures. Figure~\ref{fig:stability} collects the
-sensitivity of each descriptor to the grid, the derivative scheme, the
+This section explains why the descriptors are the ones a \texttt{CHGCAR}
+supports: which fields it does not provide, which quantities are not converged
+on VASP grids, and how stable the 56 are. Figure~\ref{fig:stability} collects
+the sensitivity of each descriptor to the grid, the derivative scheme, the
 partition and, for Section~\ref{sec:ml}, the prediction of the density by ML.
 
 \begin{figure}[htbp]
