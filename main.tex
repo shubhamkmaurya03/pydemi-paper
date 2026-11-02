@@ -492,37 +492,32 @@ and 2.6\,GB of memory, well within the memory of an ordinary laptop.
 \label{sec:ml}
 
 \subsection{The density model}
-pydemi includes ChargE3Net~\cite{koker2024}, an E(3)-equivariant network that
-predicts the density at arbitrary points from the atomic structure, adapted to
-predict one structure at a time on any device, with the published architecture
-unchanged (three interaction layers, $l_{\max}=4$, 4\,\AA{} cutoff;
-1.9 million parameters). The checkpoint shipped with the package (8\,MB) was
-fine-tuned for 50,000 steps from the published Materials Project checkpoint on
-the VASP densities of the dataset, with 5,152 structures for training, 302 for
-validation and 605 for testing. The published checkpoint itself is not usable on
-this dataset, because several of its PAW datasets, and hence its valence counts,
-differ from ours. A prediction stands for a \texttt{CHGCAR} computed with the
-settings of the dataset. Its grid is the one VASP would use: along each
-lattice vector $\mathbf a_i$ the wavefunction grid is the smallest even size
-with prime factors 2, 3, 5 and 7 that is at least $\mathrm{nint}(2w\,x_i)$,
-with $x_i=|\mathbf a_i|\sqrt{E_{\mathrm{cut}}/\mathrm{Ry}}/2\pi$ in atomic units
-and $w=2$ for accurate precision, and the density grid is twice that; for
-$E_{\mathrm{cut}}=500$\,eV the rule reproduces the grids of all 6,059
-calculations. The predicted density is rescaled to the valence electron count
-of the PAW datasets of the training data (87 elements), and the model, the
-checkpoint hash and the scale factor are recorded with the result. The
-included code reproduces the predictions of the original implementation to
-$6\times10^{-7}$ of the peak density for the structures we checked, and its cost
-grows with the number of atom--grid-point pairs within the cutoff, about
-0.35\,ms per pair on one CPU core; a GPU is used when one is available.
+pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
+electron density of a crystal from its atomic structure alone. We kept its
+published architecture and retrained the published Materials Project model on
+the densities of our dataset, with 5,152 structures for training, 302 for
+validation and 605 for testing. The published model cannot be used directly,
+because it was trained with different PAW potentials, and hence different
+numbers of valence electrons, for several elements. A prediction therefore
+stands for a \texttt{CHGCAR} computed with the settings of our dataset
+(Section~\ref{sec:dataset}). pydemi places it on the grid that VASP would use
+for these settings, scales it to the right number of valence electrons and
+records how it was obtained, and then computes every descriptor from it
+exactly as from a \texttt{CHGCAR}. The model covers the 87 elements of the
+dataset and refuses structures with other elements. The included code
+reproduces the predictions of the original implementation; its cost grows with
+the number of atoms and grid points, and a GPU is used when one is available.
+Technical details are given in Section~S2 of the Supporting Information.
 
 \subsection{Transfer of the descriptors}
-On the full DFT grids of the 605 test structures the predictions have a
-normalized mean absolute percentage error (NMAPE) of 0.72\% on average (median
-0.58\%); structures with lanthanides or actinides are predicted less
-accurately, and the worst case, YbPrZn$_2$, has 10.4\%. Before rescaling, the
-predicted densities integrate to the nominal electron count within 0.13\%
-(median; largest deviation 1.5\%). All 605 were featurized without error.
+The predicted densities are close to the DFT ones: over the 605 test
+structures, the typical difference is about 0.6\% of the density (median),
+somewhat larger for crystals with lanthanides or actinides. The question for
+pydemi is whether such small differences change the descriptors. A descriptor
+helps a property model when it puts materials in the right order, so we
+measured, for each descriptor, whether its values from the DFT and from the
+predicted densities rank the 605 test materials in the same order (Spearman
+rank correlation $\rho_s$, which is 1 for the same order).
 
 \begin{figure}[htbp]
 \centering
@@ -540,31 +535,38 @@ descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
-For 44 of the 55 informative descriptors the rank correlation between the
-values from the DFT and the predicted densities across the test structures is
-at least 0.95, and for 37 it is at least 0.99 (Fig.~\ref{fig:ml}a); over all 55
-the median relative error is 0.66\%. The descriptors that transfer include all
-18 heterogeneity descriptors, 16 of the 18 informative bonding descriptors (the
-moments and shell fractions, $\zeta$, the NCI and potential descriptors and the
-bond-midpoint densities), and the percolation levels, density floor and
-information measures (Supporting Information, Figs.~S2 and S3). The 11 that do not fall into
-three groups. The counts of maxima and minima ($\rho_s=0.77$ and 0.57, median
-errors 35\% and 38\%) respond to shallow spurious extrema in flat, low-density
-regions (Supporting Information, Fig.~S2); the non-nuclear maxima and their charge
-($\rho_s=0.90$ and 0.94) are zero in both densities for 61\% of the structures,
-so their ranks are dominated by ties. The bounded ellipticity and the
-negative-Laplacian volume fraction (median errors 13\% and 6\%) involve second
-derivatives in low-density regions, which amplify the short-wavelength error of
-the prediction. The eigenvalues of the anisotropy tensor, its fractional
-anisotropy and the percolation anisotropy are predicted accurately
-($R^2\geq0.987$; median error of the eigenvalues at most 0.07\%), but their
-values cluster, for instance at $\tfrac13$ for every cubic cell, so that small
-errors reorder them. Per structure, the median error over the 44 transferable
-descriptors is 0.53\% (90th percentile 1.2\%) and follows the density error
-(Spearman 0.49; Supporting Information, Fig.~S4); it exceeds 5\% only for Ba$_3$N, Li,
-TiH$_2$, Yb$_2$MgIn and YbPrZn$_2$. One limitation remains: the model predicts the
-total density only, so pydemi offers no magnetic descriptors on this path, as
-on the DFT path.
+For 44 of the 55 descriptors that vary between materials, $\rho_s$ is at least
+0.95, and for 37 of them at least 0.99 (Fig.~\ref{fig:ml}a); the typical value
+of a descriptor changes by less than 1\%. These 44 include all 18
+heterogeneity descriptors, 16 of the 18 bonding descriptors, and the
+percolation levels, the density floor and the information measures. The other
+11 fall into three groups, each with a clear reason:
+\begin{itemize}
+\item \emph{Counts of maxima and minima of the density.} The prediction adds or
+  removes tiny bumps in flat regions far from the atoms, which change the
+  counts without changing the density noticeably. The number and charge of
+  non-nuclear maxima are zero in both densities for most structures, so their
+  ranking is decided by a few materials.
+\item \emph{Two quantities built on second derivatives}, the bounded bond
+  ellipticity and the volume fraction of negative Laplacian. They use
+  derivatives of the density in low-density regions, and derivatives magnify
+  the small errors of the prediction.
+\item \emph{Five anisotropy measures}, the three eigenvalues and the fractional
+  anisotropy of the anisotropy tensor, and the percolation anisotropy. Their
+  values are predicted accurately, but many materials share almost the same
+  value (every cubic crystal, for instance, is isotropic), so tiny differences
+  reorder them. Because several of these values are close to zero, their
+  relative error in Fig.~\ref{fig:ml}b looks large although the absolute
+  difference is small.
+\end{itemize}
+When the density is predicted, the 44 transferable descriptors can therefore be
+used as they are, and the other 11 with care. The Compare view of the graphical
+interface (Section~\ref{sec:software}) shows, for a given \texttt{CHGCAR}, the
+descriptors of the DFT and of the predicted density side by side, together with
+the transfer of each descriptor. Only five of the 605 test structures have a
+typical descriptor error above 5\% (Supporting Information, Fig.~S4). Like the
+DFT path, which uses the total density of a \texttt{CHGCAR}, the model predicts
+the total density only, so neither path provides magnetic descriptors.
 
 % ==========================================================================
 \section{Property prediction}

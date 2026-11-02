@@ -222,6 +222,46 @@ Descriptor & grid 80\% & FD4 & FD2 & power & Becke & $\rho_s$ (ML) & ML error \\
 \end{tabular}
 \end{table}
 
+\paragraph{Density model.} The ChargE3Net architecture is used unchanged
+(three interaction layers, $l_{\max}=4$, 4\,\AA{} cutoff; 1.9 million
+parameters). The checkpoint shipped with pydemi (8\,MB) was fine-tuned for
+50,000 steps from the published Materials Project checkpoint on the densities of
+the dataset (5,152 training, 302 validation and 605 test structures). The
+prediction grid is the one VASP would use: along each lattice vector
+$\mathbf a_i$ the wavefunction grid is the smallest even size with prime factors
+2, 3, 5 and 7 that is at least $\mathrm{nint}(2w\,x_i)$, with
+$x_i=|\mathbf a_i|\sqrt{E_{\mathrm{cut}}/\mathrm{Ry}}/2\pi$ in atomic units and
+$w=2$ for accurate precision, and the density grid is twice that; for
+$E_{\mathrm{cut}}=500$\,eV the rule reproduces the grids of all 6,059
+calculations. The predicted density is rescaled to the valence electron count of
+the PAW datasets of the training data (87 elements), and the model, the
+checkpoint hash and the scale factor are recorded with the result. The included
+code reproduces the predictions of the original implementation to
+$6\times10^{-7}$ of the peak density for the structures checked. Its cost grows
+with the number of atom--grid-point pairs within the cutoff, about 0.35\,ms per
+pair on one CPU core.
+
+\paragraph{Accuracy of the predicted densities.} On the full DFT grids of the
+605 test structures, the normalized mean absolute percentage error (NMAPE) of
+the predictions is 0.72\% on average (median 0.58\%); crystals with lanthanides
+or actinides are predicted less accurately, and the worst case, YbPrZn$_2$, has
+10.4\%. Before rescaling, the predicted densities integrate to the nominal
+electron count within 0.13\% (median; largest deviation 1.5\%). All 605 were
+featurized without error. Over the 55 informative descriptors the median
+relative error is 0.66\%. Per structure, the median error over the 44
+transferable descriptors is 0.53\% (90th percentile 1.2\%) and follows the
+density error (Spearman 0.49; Fig.~\ref{fig:si_ml_structure}); it exceeds 5\%
+only for Ba$_3$N, Li, TiH$_2$, Yb$_2$MgIn and YbPrZn$_2$.
+
+\paragraph{The 11 descriptors with $\rho_s<0.95$.} The counts of maxima and
+minima have $\rho_s=0.77$ and 0.57 and median errors of 35\% and 38\%; the
+number and charge of non-nuclear maxima have $\rho_s=0.90$ and 0.94 and are zero
+in both densities for 61\% of the structures. The bounded ellipticity and the
+negative-Laplacian volume fraction have median errors of 13\% and 6\%. The
+anisotropy-tensor eigenvalues, the fractional anisotropy and the percolation
+anisotropy have $R^2\geq0.987$ between the two densities, and the median error
+of the eigenvalues is at most 0.07\%.
+
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_si_ml_parity_1.pdf}
