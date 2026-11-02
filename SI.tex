@@ -42,6 +42,10 @@ result files of the study; none is typed by hand.
 \section{Descriptor definitions}
 \label{si:defs}
 
+Each entry below gives the descriptive name of a descriptor, as in Tables~1
+and~2 of the main text, its name in pydemi in parentheses, its units in square
+brackets where it has units, and its definition.
+
 \paragraph{Notation.} The cell of volume $V$ is divided into $N_v$ voxels $k$ of
 volume $\Delta V=V/N_v$; $\rho_k$ is the density in e\,\AA$^{-3}$ (the
 \texttt{CHGCAR} value divided by $V$), $Q_\mathrm{tot}=\sum_k\rho_k\Delta V$ and
@@ -56,62 +60,62 @@ bohr. A descriptor that is undefined for a special input returns a documented
 constant and sets a flag.
 
 \subsection{Bonding (19)}
-\begin{description}
-\item[\dn{m1}, \dn{m2}, \dn{sigma_r2}] [\AA, \AA$^2$, \AA$^2$]
+\begin{description}\sloppy
+\item[Mean charge distance, mean squared charge distance, charge-distance variance] (\dn{m1}, \dn{m2}, \dn{sigma_r2}) [\AA, \AA$^2$, \AA$^2$]
 $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$, $\sigma_r^2=m_2-m_1^2$: mean distance of
 the charge from its nearest nucleus, second moment and radial spread.
-\item[\dn{f_core}, \dn{f_bond}, \dn{f_int}] fraction of the charge in the core,
+\item[Core, bond-shell and interstitial charge fractions] (\dn{f_core}, \dn{f_bond}, \dn{f_int}) fraction of the charge in the core,
 bond and interstitial shells; they sum to one.
-\item[\dn{zeta}] [0--1] $\zeta=1-\sum_k|\nabla\rho_k\cdot\hat{\mathbf u}_k|/\sum_k|\nabla\rho_k|$:
+\item[Non-radial gradient share] (\dn{zeta}) [0--1] $\zeta=1-\sum_k|\nabla\rho_k\cdot\hat{\mathbf u}_k|/\sum_k|\nabla\rho_k|$:
 zero for spherical, non-overlapping atoms.
-\item[\dn{lnf}] $N_v^{-1}\sum_k\mathbf 1[\nabla^2\rho_k<0]$: volume fraction where
+\item[Negative-Laplacian volume fraction] (\dn{lnf}) $N_v^{-1}\sum_k\mathbf 1[\nabla^2\rho_k<0]$: volume fraction where
 charge is concentrated.
-\item[\dn{lnf_charge_weighted}] $\sum_{\nabla^2\rho_k<0}\rho_k/\sum_k\rho_k$: the
+\item[Negative-Laplacian charge fraction] (\dn{lnf_charge_weighted}) $\sum_{\nabla^2\rho_k<0}\rho_k/\sum_k\rho_k$: the
 same as a charge fraction.
-\item[\dn{lap_concentration}] $\sum_{\nabla^2\rho_k<0}|\nabla^2\rho_k|/\sum_k|\nabla^2\rho_k|$;
+\item[Laplacian concentration] (\dn{lap_concentration}) $\sum_{\nabla^2\rho_k<0}|\nabla^2\rho_k|/\sum_k|\nabla^2\rho_k|$;
 identically $\tfrac12$ on a periodic grid, kept for completeness.
-\item[\dn{lap_concentration_valence}] the same ratio over the voxels with
+\item[Valence Laplacian concentration] (\dn{lap_concentration_valence}) the same ratio over the voxels with
 $r_k>c_1$.
-\item[\dn{ellip_bond_bounded_avg}] [0--1) mean of $1-\lambda_2/\lambda_1=\varepsilon/(1+\varepsilon)$
+\item[Mean bond ellipticity] (\dn{ellip_bond_bounded_avg}) [0--1) mean of $1-\lambda_2/\lambda_1=\varepsilon/(1+\varepsilon)$
 over the bond-shell voxels with $\lambda_2<0$: zero for cylindrical charge.
-\item[\dn{f_NCI}] volume fraction of the NCI region
+\item[NCI volume fraction] (\dn{f_NCI}) volume fraction of the NCI region
 $\{s_k<0.5,\ \rho_k<0.05$ a.u.$\}$, with
 $s=|\nabla\rho|/\big(2(3\pi^2)^{1/3}\rho^{4/3}\big)$.
-\item[\dn{NCI_attractive}] fraction of the NCI voxels with $\lambda_2<0$.
-\item[\dn{sign_lambda2_rho_mean}] [e\,bohr$^{-3}$] mean of
+\item[Attractive NCI fraction] (\dn{NCI_attractive}) fraction of the NCI voxels with $\lambda_2<0$.
+\item[Signed NCI density] (\dn{sign_lambda2_rho_mean}) [e\,bohr$^{-3}$] mean of
 $\mathrm{sign}(\lambda_2)\rho$ over the NCI region.
-\item[\dn{V_spread}, \dn{V_int_min}] [eV] standard deviation of the Hartree
+\item[Site potential spread, interstitial potential minimum] (\dn{V_spread}, \dn{V_int_min}) [eV] standard deviation of the Hartree
 potential energy $V(\mathbf G)=4\pi k_e\rho(\mathbf G)/|\mathbf G|^2$ (cell
 average zero) over the atomic sites; its minimum in the interstitial shell.
-\item[\dn{rho_mid_mean}, \dn{rho_mid_std}] [e\,\AA$^{-3}$] mean and standard
+\item[Mean bond-midpoint density, bond-midpoint density spread] (\dn{rho_mid_mean}, \dn{rho_mid_std}) [e\,\AA$^{-3}$] mean and standard
 deviation of $\rho$, by Fourier interpolation, at the midpoints of the
 first-shell bonds ($|\mathbf R_{ij}|\le1.1\,d_i$, $d_i$ the nearest-neighbour
 distance of atom $i$).
 \end{description}
 
 \subsection{Structural (19)}
-\begin{description}
-\item[\dn{rho_perc_a}, \dn{rho_perc_b}, \dn{rho_perc_c}] [e\,\AA$^{-3}$]
+\begin{description}\sloppy
+\item[Percolation densities] (\dn{rho_perc_a}, \dn{rho_perc_b}, \dn{rho_perc_c}) [e\,\AA$^{-3}$]
 $\max\{c:\{\rho>c\}$ contains a cluster that winds around the cell along
 $\mathbf a_\alpha\}$: density at the bottleneck of the best connecting path.
-\item[\dn{perc_anisotropy}] $(\max_\alpha-\min_\alpha)\rho_{\mathrm{perc},\alpha}/\mathrm{mean}_\alpha\rho_{\mathrm{perc},\alpha}$.
-\item[\dn{n_max}, \dn{n_min}] [\AA$^{-3}$] voxels higher (lower) than all 26
+\item[Percolation anisotropy] (\dn{perc_anisotropy}) $(\max_\alpha-\min_\alpha)\rho_{\mathrm{perc},\alpha}/\mathrm{mean}_\alpha\rho_{\mathrm{perc},\alpha}$.
+\item[Density maxima and minima per volume] (\dn{n_max}, \dn{n_min}) [\AA$^{-3}$] voxels higher (lower) than all 26
 neighbours, per volume.
-\item[\dn{n_NNM}, \dn{Q_NNM}] maxima farther than 0.8\,\AA{} from every nucleus,
+\item[Non-nuclear maxima per volume, non-nuclear-maximum charge] (\dn{n_NNM}, \dn{Q_NNM}) maxima farther than 0.8\,\AA{} from every nucleus,
 per volume [\AA$^{-3}$]; charge in their steepest-ascent basins over
 $Q_\mathrm{tot}$.
-\item[\dn{rho_min}, \dn{rho_min_ratio}, \dn{rho_int_mean}] $\min_k\rho_k$
+\item[Minimum density, relative minimum density, mean interstitial density] (\dn{rho_min}, \dn{rho_min_ratio}, \dn{rho_int_mean}) $\min_k\rho_k$
 [e\,\AA$^{-3}$]; $\rho_{\min}/\langle\rho\rangle$; mean $\rho$ over the
 interstitial shell [e\,\AA$^{-3}$].
-\item[\dn{T_eigenvalues_t1}, \dn{_t2}, \dn{_t3}] sorted eigenvalues of
+\item[Gradient-direction eigenvalues] (\dn{T_eigenvalues_t1}, \dn{_t2}, \dn{_t3}) sorted eigenvalues of
 $T_{ab}=\sum_k\partial_a\rho_k\partial_b\rho_k/\sum_k|\nabla\rho_k|^2$ (trace 1;
 all $\tfrac13$ for a cubic crystal).
-\item[\dn{charge_FA}] [0--1] $\sqrt{3/2}\,\lVert T-\tfrac13I\rVert_F/\lVert T\rVert_F$.
-\item[\dn{shannon_entropy}] $S=-\int\tilde\rho\ln\tilde\rho\,dV-\ln V$ with
+\item[Gradient fractional anisotropy] (\dn{charge_FA}) [0--1] $\sqrt{3/2}\,\lVert T-\tfrac13I\rVert_F/\lVert T\rVert_F$.
+\item[Shannon entropy] (\dn{shannon_entropy}) $S=-\int\tilde\rho\ln\tilde\rho\,dV-\ln V$ with
 $\tilde\rho=\rho/N_e$; zero for a uniform density.
-\item[\dn{disequilibrium}] $D=V\int\tilde\rho^{\,2}\,dV$; one for a uniform density.
-\item[\dn{LMC_complexity}] $C=De^{S}$.
-\item[\dn{fisher_information}] [bohr$^{-2}$] $I=\int|\nabla\tilde\rho|^2/\tilde\rho\,dV$.
+\item[Disequilibrium] (\dn{disequilibrium}) $D=V\int\tilde\rho^{\,2}\,dV$; one for a uniform density.
+\item[LMC complexity] (\dn{LMC_complexity}) $C=De^{S}$.
+\item[Fisher information] (\dn{fisher_information}) [bohr$^{-2}$] $I=\int|\nabla\tilde\rho|^2/\tilde\rho\,dV$.
 \end{description}
 
 \subsection{Site heterogeneity (18)}
@@ -124,10 +128,11 @@ f_\mathrm{bond}^{(i)}=\frac{\sum_{c_1<r_{ik}\le c_2}w_i(k)\rho_k}{\sum_k w_i(k)\
 \zeta^{(i)}=1-\frac{\sum_k w_i(k)|\nabla\rho_k\cdot\hat{\mathbf u}_{ik}|}{\sum_k w_i(k)|\nabla\rho_k|}.
 \end{equation}
 For each $X\in\{m_1,f_\mathrm{bond},\zeta\}$ the descriptors are
-\dn{X_site_std} ($\mathrm{std}_iX^{(i)}$), \dn{X_site_range}, \dn{X_site_max},
-\dn{X_site_min}, \dn{X_within_element_var}
-($\sum_e x_e\mathrm{Var}_{i\in e}X^{(i)}$) and \dn{X_between_element_var}
-($\sum_e x_e(\bar X_e-\bar X)^2$), with $x_e$ the site fraction of element $e$;
+the site spread \dn{X_site_std} ($\mathrm{std}_iX^{(i)}$), the site range
+\dn{X_site_range}, the site maximum and minimum \dn{X_site_max} and
+\dn{X_site_min}, the within-element variance \dn{X_within_element_var}
+($\sum_e x_e\mathrm{Var}_{i\in e}X^{(i)}$) and the between-element variance
+\dn{X_between_element_var} ($\sum_e x_e(\bar X_e-\bar X)^2$), with $x_e$ the site fraction of element $e$;
 the last two add up to $\mathrm{Var}_iX^{(i)}$. The within-element variance is NaN
 (flagged) when no element has two or more sites, and the between-element
 variance is zero (flagged) for an elemental crystal.
