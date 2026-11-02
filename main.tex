@@ -415,120 +415,48 @@ and what the PAW pseudo-density~\cite{blochl1994,kresse1999} stored in a
 \section{Validation}
 \label{sec:validation}
 
-pydemi is checked by 352 automated tests, which run on every push to the repository
-(Table~\ref{tab:validation}; each test is described in Section~S6 of the
-Supporting Information). A test computes a quantity with pydemi and compares it
-with a reference whose correct value is known independently. The tests answer
-three questions.
+A descriptor library is only useful if its numbers are right. pydemi is
+therefore checked by 352 automated tests that run every time the code changes.
+Each test computes something with pydemi and compares it with an answer that is
+known independently. Together, the tests answer three questions.
 
-\paragraph{Does each descriptor compute the quantity it defines?} The library
-is run on model densities whose exact values are known in closed form:
-superpositions of Gaussians, $\rho\propto e^{-\alpha r^2}$, which are smooth,
-and of Slater 1s functions, $\rho\propto e^{-2\zeta r}$, which have the cusp of a
-real atom. The tests compare, for example, the radial moments with
-$m_1=3/(2\zeta)$ and $m_2=3/\zeta^2$, the spectral derivatives with the analytic
-gradient and Hessian, and the Hartree potential of a Gaussian with its
-error-function form. Other tests use exact identities that hold for any density:
-the within- and between-element variances add up to the total variance, the
-three shell fractions add up to one, the Laplacian integrates to zero over the
-cell. Still others compare with brute-force computations, such as nearest-image
-distances found by searching $\pm5$ periodic images.
+\paragraph{Does each descriptor compute what it claims?} The tests run pydemi on
+artificial densities for which the right answer is known exactly from a
+formula. Two kinds are used: smooth Gaussian atoms, and Slater-type atoms, which
+have the sharp peak at the nucleus that real atoms have. For example, the
+average distance of the charge from its nucleus must equal the textbook value
+for a Slater atom, and the derivatives and the electrostatic potential that
+pydemi computes must equal the exact ones. Other tests use rules that hold for
+any density: the charge fractions of the core, bond and interstitial regions
+must add up to one, and the parts of a variance must add up to the whole.
+Where no formula exists, pydemi is compared with a slow but simple calculation,
+such as finding the nearest atom by searching all neighbouring cells.
 
-\paragraph{Does each descriptor have the symmetry it should?} A descriptor of a
-material must not depend on how the crystal is described. The invariance
-harness (169 tests) computes every registered descriptor for a low-symmetry
-model crystal (Fe$_2$O in a triclinic cell) and for three copies of it that
-describe the same material: its $2\times2\times2$ supercell, the crystal with its
-origin shifted, and the crystal rigidly rotated by 37$^\circ$. All
-$56\times3$ pairs must agree. The supercell test checks intensivity, the other
-two that no descriptor depends on the choice of origin or axes.
+\paragraph{Does each descriptor stay the same when the crystal is described
+differently?} The same material can be written down in many ways, and a
+descriptor must not depend on the choice. For a low-symmetry test crystal,
+every descriptor is computed four times: for the original cell, for a cell
+eight times larger, for the cell with its origin moved, and for the cell
+rotated in space. All four must give the same value. These symmetry tests are
+generated automatically from the list of descriptors, so a descriptor added in
+the future is checked without writing a new test.
 
-\paragraph{Do the software components reproduce their references?} These tests
-cover reading \texttt{CHGCAR} files of every layout, batch processing that
-continues past broken files, the density model (whose predictions must equal
-those of the original ChargE3Net code), the property models (whose predictions
-must equal the stored test predictions) and the graphical interface (whose
-figures must plot data that reproduce the descriptor values).
+\paragraph{Do the other parts of the software work as intended?} Further tests
+check that \texttt{CHGCAR} files of every VASP format are read correctly; that
+a batch run continues past a broken file; that the included density model gives
+the same predictions as the original ChargE3Net code; that the property models
+reproduce their stored predictions; and that every figure of the graphical
+interface shows data that reproduce the descriptor values.
 
-\paragraph{Tolerance.} No two floating-point computations agree to the last
-digit, so each test states how close the result must be to the reference, its
-tolerance. For a single number $a$ compared with a reference $b$, a relative
-tolerance $\epsilon$ means
-\[
-|a-b|\le\epsilon\,\max(|a|,|b|)+10^{-12},
-\]
-where the small absolute term covers values that should be exactly zero. For a
-field on the grid (a gradient, a potential) the largest error is compared with
-the largest value, $\max_k|a_k-b_k|\le\epsilon\,\max_k|b_k|$. The value of
-$\epsilon$ follows from what can make $a$ and $b$ differ:
-\begin{itemize}
-\item $10^{-9}$--$10^{-12}$: only round-off. Double precision carries about 16
-  digits, and sums over $10^4$--$10^5$ voxels and Fourier transforms lose a few
-  of them. A test at this level checks that a computation is mathematically
-  exact, for example spectral derivatives of a band-limited density or the
-  variance decomposition.
-\item $10^{-6}$: the invariance harness. The transformed cells contain the same
-  physical density, but the sums run over voxels in a different order and the
-  Fourier transforms have different sizes, so the results differ by round-off,
-  far below $10^{-6}$. The tolerance leaves room for that while staying far
-  below the changes that a coarser grid causes (Section~\ref{sec:numerics}), so
-  any real dependence on the choice of cell fails the test.
-\item $10^{-4}$ to a few per cent: comparisons with a closed form for a
-  continuous density. The grid itself then causes an error: a finite number of
-  voxels cannot represent the cusp of a Slater function exactly, and periodic
-  images overlap in a finite cell. The tolerance is set from the expected size
-  of this discretization error, and the same tests check that the error
-  decreases when the grid is refined.
-\item $10^{-5}$ of the maximum density for the density model, whose network
-  computes in single precision (about 7 digits).
-\end{itemize}
-``Exact'' in Table~\ref{tab:validation} means equality, used for counts and for
-structural checks such as the columns of a batch output.
-
-The suite runs automatically on Linux, macOS and Windows with Python
-3.10--3.13, with and without the optional extras, together with a strict static
-type check and a test of the built package.
-
-\begin{table}[htbp]
-\centering
-\caption{The 352 tests of pydemi by group: what is compared with what, and the
-tolerance (relative unless stated; defined in the text).}
-\label{tab:validation}
-\small
-\begin{tabular}{p{3.0cm}p{8.6cm}p{3.1cm}}
-\toprule
-Group (tests) & Computed value and reference & Tolerance \\
-\midrule
-\raggedright Invariance (169) & \raggedright every descriptor of a triclinic Fe$_2$O crystal against the
-same descriptor of its $2\times2\times2$ supercell, an origin-shifted copy and a
-rotated copy & \raggedright $10^{-6}$ \tabularnewline\addlinespace[2pt]
-\raggedright Derivatives (16) & \raggedright FFT gradient, Laplacian and Hessian against the analytic ones
-for Gaussians in an orthorhombic and a triclinic cell; Hessian trace against the
-Laplacian; observed convergence order of finite differences against the nominal
-order & \raggedright $10^{-10}$ (FFT);\newline $5\times10^{-3}$ (finite diff.) \tabularnewline\addlinespace[2pt]
-\raggedright Geometry and partitions (18) & \raggedright nearest-atom distances and owners against a
-brute-force image search, also in an extremely sheared cell; partition weights
-summing to one; charge conservation; equal Becke charges of equivalent atoms &
-$10^{-12}$;\newline $10^{-5}$ (Becke) \tabularnewline\addlinespace[2pt]
-\raggedright Closed forms and identities (40) & \raggedright radial moments of a Slater density; critical
-points of $\cos2\pi x+\cos2\pi y+\cos2\pi z$; percolation of a simple-cubic
-lattice at the bond-midpoint density; Hartree potential of a Gaussian; variance
-decomposition; Laplacian concentration $=\tfrac12$; documented values for
-degenerate inputs & \raggedright exact to 5\%,\newline set per test \tabularnewline\addlinespace[2pt]
-\raggedright Input, batch and tooling (21) & \raggedright \texttt{CHGCAR} layouts (1, 2 and 4 data blocks,
-VASP 4 and 5) written and read back; fixed batch columns when a file fails; no
-bare NaN; single against double precision & \raggedright $10^{-10}$; exact;\newline $10^{-5}$ (single prec., median) \tabularnewline\addlinespace[2pt]
-\raggedright Density model (13) & \raggedright predicted density against the original ChargE3Net code;
-independence of chunking; invariance to rotation and atom permutation; VASP grid
-rule & \raggedright $10^{-5}$ of $\rho_{\max}$;\newline $10^{-4}$ (invariance) \tabularnewline\addlinespace[2pt]
-\raggedright Property models (12) & \raggedright predictions of the distributed models against the stored
-test predictions & \raggedright $10^{-9}$ \tabularnewline\addlinespace[2pt]
-\raggedright Graphical interface (63) & \raggedright end-to-end runs for both inputs and the comparison
-view; the data of every descriptor figure against the descriptor value &
-$10^{-6}$--$10^{-12}$;\newline histograms: 1 bin \tabularnewline\addlinespace[2pt]
-\bottomrule
-\end{tabular}
-\end{table}
+No two computer calculations agree to the last digit, so each test allows a
+small difference, chosen from what can cause it. Where only rounding can cause
+it, the allowed difference is one part in a billion or less; where the grid
+cannot represent a sharp atomic peak exactly, it is larger and set from the
+known size of this grid error, and the tests also check that the error shrinks
+when the grid is refined. The tests run
+automatically on Linux, macOS and Windows with every supported Python version.
+Each test, its reference and its allowed difference are listed in Section~S6 of
+the Supporting Information.
 
 % ==========================================================================
 \section{Application to a 6,059-structure DFT dataset}

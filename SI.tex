@@ -526,6 +526,38 @@ Total & & 352 & & \\
 \end{tabular}
 \end{table}
 
+\paragraph{Tolerances.} No two floating-point computations agree to the last
+digit, so each test states how close the result must be to the reference. For a
+single number $a$ compared with a reference $b$, a relative tolerance $\epsilon$
+means $|a-b|\le\epsilon\,\max(|a|,|b|)+10^{-12}$, where the small absolute term
+covers values that should be exactly zero. For a field on the grid (a gradient,
+a potential) the largest error is compared with the largest value,
+$\max_k|a_k-b_k|\le\epsilon\,\max_k|b_k|$. The value of $\epsilon$ follows from
+what can make $a$ and $b$ differ:
+\begin{itemize}
+\item $10^{-9}$--$10^{-12}$: only round-off. Double precision carries about 16
+  digits, and sums over $10^4$--$10^5$ voxels and Fourier transforms lose a few
+  of them. A test at this level checks that a computation is mathematically
+  exact, for example spectral derivatives of a band-limited density or the
+  variance decomposition.
+\item $10^{-6}$: the invariance harness. The transformed cells contain the same
+  physical density, but the sums run over voxels in a different order and the
+  Fourier transforms have different sizes, so the results differ by round-off,
+  far below $10^{-6}$. The tolerance leaves room for that while staying far
+  below the changes that a coarser grid causes (Section~4 of the main text), so
+  any real dependence on the choice of cell fails the test.
+\item $10^{-4}$ to a few per cent: comparisons with a closed form for a
+  continuous density. The grid itself then causes an error: a finite number of
+  voxels cannot represent the cusp of a Slater function exactly, and periodic
+  images overlap in a finite cell. The tolerance is set from the expected size
+  of this discretization error, and the same tests check that the error
+  decreases when the grid is refined.
+\item $10^{-5}$ of the maximum density for the density model, whose network
+  computes in single precision (about 7 digits).
+\end{itemize}
+``Exact'' means equality, used for counts and for structural checks such as the
+columns of a batch output.
+
 \paragraph{Reference densities.} Most library tests use densities whose exact
 values are known: superpositions of normalized Gaussians,
 $\rho(r)=N(\alpha/\pi)^{3/2}e^{-\alpha r^2}$, and of 1s Slater functions,
