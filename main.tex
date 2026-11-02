@@ -154,16 +154,17 @@ came from, which is written into the metadata of every output row.
 \centering
 \includegraphics[width=\textwidth]{figures/fig_architecture.pdf}
 \caption{Architecture of pydemi, drawn for MgO. A DFT \texttt{CHGCAR} (left,
-top) and a crystal structure whose density is predicted by the included
-ChargE3Net model (left, bottom) give the same density grid $\rho(\mathbf{r})$,
-shown as the $1.5$~e\,\AA$^{-3}$ isosurface around O, the Mg atoms and the
-density on one face of the cell. Derived fields and the geometry pass are
-computed once per structure and cached, and the registered descriptors reduce
-them. The bars give the percentile of each of the 56 descriptors of MgO within
-the dataset, coloured by domain (blue bonding, green structural, purple
-heterogeneity). The descriptors are used from Python, the command line or the
-graphical interface, and the property models of Section~\ref{sec:properties}
-take them as input (right, bottom: bulk modulus).}
+top) and a crystal structure (CIF, POSCAR or any format ASE reads) whose density
+is predicted by the included ChargE3Net model (left, bottom) give the same
+density grid $\rho(\mathbf{r})$, shown as the $1.5$~e\,\AA$^{-3}$ isosurface
+around O, the Mg atoms and the density on one face of the cell. Inside pydemi
+(centre box), derived fields and the geometry pass are computed once per
+structure and cached, and the registered descriptors reduce them. The radial
+bars give the percentile of each of the 56 descriptors of MgO within the
+dataset, grouped by domain. The descriptors are used from Python, the command
+line or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}),
+and the property models of Section~\ref{sec:properties} take them as input
+(right, bottom: test predictions of the bulk modulus).}
 \label{fig:architecture}
 \end{figure}
 
