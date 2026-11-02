@@ -129,24 +129,24 @@ and the scripts that train the property models are released under the MIT
 licence.
 
 % ==========================================================================
-\section{Design}
+\section{Methodology}
 \label{sec:design}
 
-\subsection{One input file}
-pydemi reads the VASP \texttt{CHGCAR} (or \texttt{CHG}), plain or compressed:
-the structure from its header and the total density from the first data block,
-divided by the cell volume to give $\rho$ in e\,\AA$^{-3}$. Spin-polarized and
-non-collinear files are accepted, and their magnetization blocks are ignored.
-No \texttt{POTCAR}, \texttt{OUTCAR}, \texttt{AECCAR}, \texttt{ELFCAR} or
-\texttt{LOCPOT} is needed. The restriction is deliberate: every VASP run writes
-a \texttt{CHGCAR}, so any collection of calculations can be featurized without
-returning to the original runs, and no descriptor depends on a file that is
-present for some structures and missing for others. The shells and the power
-partition use covalent radii tabulated in the package, and no descriptor needs
-the valence electron count of the PAW datasets. Both input paths produce one
-data model (Fig.~\ref{fig:architecture}): a \texttt{VolumetricData} object
-that holds the structure, the density grid and a record of where the density
-came from, which is written into the metadata of every output row.
+pydemi needs one file, the VASP \texttt{CHGCAR} (or \texttt{CHG}), plain or
+compressed. The structure is read from its header and the total density from
+the first data block, which is divided by the cell volume to give $\rho$ in
+e\,\AA$^{-3}$. Spin-polarized and non-collinear files are accepted, and their
+magnetization blocks are ignored. No other VASP file (\texttt{POTCAR},
+\texttt{OUTCAR}, \texttt{AECCAR}, \texttt{ELFCAR}, \texttt{LOCPOT}) is needed,
+and the atomic radii used for the shells and the partitions are tabulated in the
+package. This is a deliberate choice: every VASP run writes a \texttt{CHGCAR}, so
+any collection of calculations can be featurized without going back to the
+original runs, and no descriptor depends on a file that some structures have and
+others do not. The density can also come from a crystal structure through the
+included ChargE3Net model (Section~\ref{sec:ml}). Both routes give the same
+object (Fig.~\ref{fig:architecture}), a \texttt{VolumetricData} that holds the
+structure, the density grid and a note of where the density came from; this note
+is written into the metadata of every output row.
 
 \begin{figure}[htbp]
 \centering
@@ -168,105 +168,76 @@ and the property models of Section~\ref{sec:properties} take them as input
 \label{fig:architecture}
 \end{figure}
 
-\subsection{Numerical core}
-The numerical core turns the density grid into the fields and the geometry that
-the descriptors are computed from. It does each of these steps once per
-structure, whatever the number of descriptors that use the result.
+From the density grid, pydemi first computes the fields and the geometry that
+the descriptors need, and it computes each of them only once per structure. A
+derived quantity, such as the gradient, the Hartree potential or the map from
+each grid point to its nearest atom, is stored on the \texttt{VolumetricData}
+object the first time a descriptor asks for it, and every later descriptor that
+needs it reuses the stored copy. The settings it was computed with (for example
+the derivative method or the shell radii) are stored with it, so a structure
+featurized again with other settings gets new fields and never stale ones.
 
-\paragraph{Caching.} Every derived quantity (a gradient, the Hessian
-eigenvalues, the Hartree potential, the nearest-atom map) is stored on the
-\texttt{VolumetricData} object under a key that lists the options it was
-computed with, such as the derivative method or the shell radii. A descriptor
-asks for the quantity by name: the first request computes it, and later requests,
-by the same or another descriptor, reuse it. Because the options are part of the
-key, a structure featurized again with other settings gets new fields and never
-values left over from the earlier run.
-
-\paragraph{Derivatives.} VASP cells are often not orthogonal, so the derivatives
-are taken in the fractional coordinates $u_a$ of the grid and converted to
-Cartesian ones with the reciprocal basis $B$ (rows $\mathbf b_a$, with
-$\mathbf a_a\cdot\mathbf b_b=\delta_{ab}$):
+VASP cells are often not orthogonal, so the derivatives are taken along the axes
+of the grid and then converted to Cartesian ones. For the Laplacian this
+conversion has cross terms between the grid axes,
 \[
-\nabla f=\sum_a\mathbf b_a\,\frac{\partial f}{\partial u_a},\qquad
-\nabla^2 f=\sum_{a,b}G_{ab}\,\frac{\partial^2 f}{\partial u_a\,\partial u_b},\qquad G=BB^{\mathsf T}.
+\nabla^2 f=\sum_{a,b}G_{ab}\,\frac{\partial^2 f}{\partial u_a\,\partial u_b},
 \]
-The off-diagonal terms of the metric $G$ vanish only for orthogonal axes;
-dropping them, a common shortcut, makes the Laplacian of a triclinic test cell
-more than 5\% wrong. By default the derivatives $\partial/\partial u_a$ are
-spectral: the density is Fourier transformed and each derivative becomes a
-multiplication by $2\pi i m_a$ for the integer frequency $m_a$. A plane-wave
-density is a finite Fourier series, so this is exact up to round-off. Central
-finite differences of order 2 to 8 are available as an alternative, and the two
-are compared in the sensitivity analysis of Section~\ref{sec:numerics}.
+where $u_a$ are the fractional coordinates and $G=BB^{\mathsf T}$ is built from
+the reciprocal lattice vectors (the rows of $B$). The cross terms vanish only
+for orthogonal axes; leaving them out, a common shortcut, makes the Laplacian of
+a triclinic test cell more than 5\% wrong. By default the derivatives are
+computed in Fourier space, where each one becomes a multiplication. A plane-wave
+density is a finite Fourier series, so this is exact up to round-off; finite
+differences are available as an alternative and are compared in
+Section~\ref{sec:numerics}. The Hartree potential of the electrons comes from
+the same Fourier coefficients by solving Poisson's equation, and since its
+average is undefined for a periodic system, it is measured from its cell
+average.
 
-\paragraph{Hartree potential.} The electrostatic potential of the electrons is
-obtained from the same Fourier coefficients by solving Poisson's equation,
-$V(\mathbf G)=4\pi k_e\,\rho(\mathbf G)/|\mathbf G|^2$ with
-$k_e=14.40$\,eV\,\AA. The $\mathbf G=0$ term is undefined for a periodic
-system, so the potential is referenced to its cell average.
+Many descriptors need to know, for every grid point, which nucleus is nearest,
+how far away it is and in which direction. These are computed once with a
+$k$-d tree over the atoms and their periodic images. In strongly sheared cells
+the nearest image can lie beyond the usual $3\times3\times3$ block of cells, so
+the search is widened until it is guaranteed to contain it. A grid point at
+exactly the same distance from two nuclei, which is common when atoms sit on
+high-symmetry grid points, is given to one of them by a fixed geometric rule
+that does not depend on the order in which the atoms are listed. The same point
+then belongs to the same atom in a cell, in its supercell and in a translated or
+rotated copy, which the invariance tests of Section~\ref{sec:validation}
+require. The distance to the nearest nucleus also divides the cell into a core,
+a bond shell and an interstitial region, with boundaries at 0.8 and 1.5\,\AA{}
+by default or at multiples of the covalent radius of each atom. The descriptors
+that are resolved per atom need to know which grid points belong to which atom,
+and three ways of dividing the cell are offered: nearest-atom (Voronoi) cells,
+the default; a power diagram, which gives larger atoms larger cells; and the
+fuzzy cells of Becke~\cite{becke1988}, which share each point between
+neighbouring atoms with smooth weights. All three return weights that sum to one
+at every point, so every per-atom descriptor works with any of them unchanged.
 
-\paragraph{Geometry pass.} Many descriptors need, for every voxel, its nearest
-nucleus, the distance $r$ to it and the unit vector from it. These three arrays
-are computed once with a $k$-d tree over the atoms and their periodic images. A
-fixed $3\times3\times3$ block of images is not enough in strongly sheared
-cells, where the nearest image can lie farther out; the image range is
-therefore widened until it provably contains the nearest image of every voxel.
-A voxel exactly equidistant from two nuclei, common for atoms on high-symmetry
-grid points, is given to one of them by a geometric rule (the image with the
-lexicographically largest fractional displacement wins) that does not depend on
-the atom order. The same voxel then belongs to the same atom in a cell, its
-supercell, and a translated or rotated copy, which the invariance tests of
-Section~\ref{sec:validation} require.
+Each descriptor is a short Python function that takes the
+\texttt{VolumetricData} object and returns one number. When the function is
+registered, it is given a record that describes it: its name, its domain
+(bonding, structural or heterogeneity), the cached quantities it needs, its
+units, the range of values it can take, its formula and references, and the
+cases in which it is undefined, each with the constant returned instead. A
+uniform density, for instance, has no gradient, so the anisotropy of the
+gradient is zero divided by zero; the descriptor returns 0 and is flagged, and
+the output then carries a companion flag column set to 1, so a user can find and
+exclude such values. No descriptor returns a bare NaN, with one documented
+exception: the variance between sites of the same element in a structure where
+no element has two sites, where there is nothing to compare.
 
-\paragraph{Shells and partitions.} The distance $r$ divides the cell into a core
-($r\le c_1$), a bond shell ($c_1<r\le c_2$) and an interstitial region
-($r>c_2$), with $c_1=0.8$ and $c_2=1.5$\,\AA{} by default or multiples of the
-covalent radius of each atom. The site-resolved descriptors also need to know
-which voxels belong to which atom. Three partitions are provided: the nearest
-atom (Voronoi cells, the default); a power diagram, in which larger atoms get
-larger cells according to their covalent radii; and Becke's fuzzy
-cells~\cite{becke1988}, which share each voxel between neighbouring atoms with
-smooth weights. All three return the same thing, a list of voxel--atom weights
-that sum to one at every voxel, so every site-resolved descriptor works with any
-of them without change.
-
-\subsection{Descriptor registry}
-In pydemi a descriptor is a Python function that takes the
-\texttt{VolumetricData} object and returns one number. A decorator registers it
-together with a description of what it is:
-
-\begin{verbatim}
-@register(name="m1", domain="bonding", field="rho", requires=["geometry"],
-          units="Angstrom", range=(0.0, inf),
-          sentinel_cases={"zero_density": 0.0})
-def m1(vd):
-    """m1 = sum_k rho_k r_k / sum_k rho_k"""
-    ...
-\end{verbatim}
-
-The record holds the name, the domain (bonding, structural or heterogeneity),
-the cached quantities the function needs, the units, the admissible range, the
-formula (the first line of the documentation string), references, and the
-\emph{sentinel cases}: the inputs for which the descriptor is undefined, each
-with the constant returned instead. A uniform density, for instance, has no
-gradient, so the anisotropy $\zeta=1-\sum|\nabla\rho\cdot\hat u|/\sum|\nabla\rho|$
-is $0/0$; it returns 0 and is flagged. \texttt{featurize} then sets the
-companion column \texttt{<name>\_\_flag} to 1, so a user can find and exclude
-such values. No descriptor returns a bare NaN, with one documented exception:
-the within-element variance of a structure in which no element has two sites,
-where there is nothing to compare.
-
-The registry is the single list from which everything else is built.
-\texttt{featurize} computes the registered descriptors of the requested domains
-in the order of registration, so the feature vector always has the same columns
-in the same order. \texttt{catalogue} returns the registry as a table of names,
-units, ranges, formulas and sentinel cases. The invariance tests
-(Section~\ref{sec:validation}) are generated from the registry, so a descriptor
-added later is tested without writing a new test. Registration refuses a
-quantity that is declared extensive (one that grows with the cell, such as a
-total charge or a number of maxima): it has to be divided by the volume, the
-number of atoms or the total charge first. Whether the registered quantity is
-then really intensive is checked by the supercell test.
+This registry is the single list from which everything else is built. The
+feature vector always has the registered descriptors in the order of
+registration, so its columns never change between runs. The catalogue of names,
+units, ranges, formulas and undefined cases is read from it, and so are the
+invariance tests of Section~\ref{sec:validation}, so a descriptor added later is
+tested without writing a new test. Registration refuses a quantity that grows
+with the size of the cell, such as a total charge or a number of density maxima;
+it has to be divided by the volume, the number of atoms or the total charge
+first, and the supercell test then checks that the result really does not
+change with the cell size.
 
 % ==========================================================================
 \section{The descriptors}
