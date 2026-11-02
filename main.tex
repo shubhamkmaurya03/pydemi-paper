@@ -491,7 +491,6 @@ and 2.6\,GB of memory, well within the memory of an ordinary laptop.
 \section{Descriptors without a DFT calculation}
 \label{sec:ml}
 
-\subsection{Predicting the density from the structure}
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
 electron density of a crystal from its atomic structure alone. We kept its
 published architecture and retrained the published Materials Project model on
@@ -509,16 +508,6 @@ reproduces the predictions of the original implementation; its cost grows with
 the number of atoms and grid points, and a GPU is used when one is available.
 Technical details are given in Section~S2 of the Supporting Information.
 
-\subsection{Do the descriptors survive the prediction?}
-The predicted densities are close to the DFT ones: over the 605 test
-structures, the typical difference is about 0.6\% of the density (median),
-somewhat larger for crystals with lanthanides or actinides. The question for
-pydemi is whether such small differences change the descriptors. A descriptor
-helps a property model when it puts materials in the right order, so we
-measured, for each descriptor, whether its values from the DFT and from the
-predicted densities rank the 605 test materials in the same order (Spearman
-rank correlation $\rho_s$, which is 1 for the same order).
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_ml.pdf}
@@ -535,32 +524,34 @@ descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
-For 44 of the 55 descriptors that vary between materials, $\rho_s$ is at least
-0.95, and for 37 of them at least 0.99 (Fig.~\ref{fig:ml}a); the typical value
-of a descriptor changes by less than 1\%. These 44 include all 18
-heterogeneity descriptors, 16 of the 18 bonding descriptors, and the
-percolation levels, the density floor and the information measures. The other
-11 fall into three groups, each with a clear reason:
-\begin{itemize}
-\item \emph{Counts of maxima and minima of the density.} The prediction adds or
-  removes tiny bumps in flat regions far from the atoms, which change the
-  counts without changing the density noticeably. The number and charge of
-  non-nuclear maxima are zero in both densities for most structures, so their
-  ranking is decided by a few materials.
-\item \emph{Two quantities built on second derivatives}, the bounded bond
-  ellipticity and the volume fraction of negative Laplacian. They use
-  derivatives of the density in low-density regions, and derivatives magnify
-  the small errors of the prediction.
-\item \emph{Five anisotropy measures}, the three eigenvalues and the fractional
-  anisotropy of the anisotropy tensor, and the percolation anisotropy. Their
-  values are predicted accurately, but many materials share almost the same
-  value (every cubic crystal, for instance, is isotropic), so tiny differences
-  reorder them. Because several of these values are close to zero, their
-  relative error in Fig.~\ref{fig:ml}b looks large although the absolute
-  difference is small.
-\end{itemize}
-When the density is predicted, the 44 transferable descriptors can therefore be
-used as they are, and the other 11 with care. The Compare view of the graphical
+The predicted densities are close to the DFT ones: over the 605 test
+structures, the typical difference is about 0.6\% of the density (median),
+somewhat larger for crystals with lanthanides or actinides. The question for
+pydemi is whether such small differences change the descriptors. A descriptor
+helps a property model when it puts materials in the right order, so we
+measured, for each descriptor, whether its values from the DFT and from the
+predicted densities rank the 605 test materials in the same order (Spearman
+rank correlation $\rho_s$, which is 1 for the same order). For 44 of the 55
+descriptors that vary between materials, $\rho_s$ is at least 0.95, and for 37
+of them at least 0.99 (Fig.~\ref{fig:ml}a); the typical value of a descriptor
+changes by less than 1\%. These 44 include all 18 heterogeneity descriptors, 16
+of the 18 bonding descriptors, and the percolation levels, the density floor
+and the information measures. The other 11 fall into three groups, each with a
+clear reason. The counts of maxima and minima of the density change because the
+prediction adds or removes tiny bumps in flat regions far from the atoms,
+without changing the density noticeably; the number and charge of non-nuclear
+maxima are zero in both densities for most structures, so their ranking is
+decided by a few materials. The bounded bond ellipticity and the volume
+fraction of negative Laplacian use second derivatives of the density in
+low-density regions, and derivatives magnify the small errors of the
+prediction. Five anisotropy measures, the three eigenvalues and the fractional
+anisotropy of the anisotropy tensor and the percolation anisotropy, are
+predicted accurately, but many materials share almost the same value (every
+cubic crystal, for instance, is isotropic), so tiny differences reorder them;
+because several of these values are close to zero, their relative error in
+Fig.~\ref{fig:ml}b looks large although the absolute difference is small. When
+the density is predicted, the 44 transferable descriptors can therefore be used
+as they are, and the other 11 with care. The Compare view of the graphical
 interface (Section~\ref{sec:software}) shows, for a given \texttt{CHGCAR}, the
 descriptors of the DFT and of the predicted density side by side, together with
 the transfer of each descriptor. Only five of the 605 test structures have a
