@@ -109,9 +109,8 @@ the information --- has to be answered on a large, well-defined dataset.
 
 Here we describe pydemi, a Python package built around these three points. (i) It
 reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors that are
-defined on it (Sections~\ref{sec:design} and~\ref{sec:descriptors}), and
-Section~\ref{sec:numerics} shows that their values are set by the material and
-not by the grid or the numerical method. (ii) It includes a density model, so
+defined on it and whose values are set by the material, not by the grid or the numerical
+method (Sections~\ref{sec:design} and~\ref{sec:descriptors}). (ii) It includes a density model, so
 that the same descriptors are obtained from a crystal structure alone, and we
 measure which descriptors transfer from DFT to predicted densities
 (Section~\ref{sec:ml}). (iii) We train property models on the descriptors
@@ -185,7 +184,7 @@ a triclinic test cell more than 5\% wrong. By default the derivatives are
 computed in Fourier space, where each one becomes a multiplication. A plane-wave
 density is a finite Fourier series, so this is exact up to round-off; finite
 differences are available as an alternative and are compared in
-Section~\ref{sec:numerics}. The Hartree potential of the electrons comes from
+Section~\ref{sec:descriptors}. The Hartree potential of the electrons comes from
 the same Fourier coefficients by solving Poisson's equation, and since its
 average is undefined for a periodic system, it is measured from its cell
 average.
@@ -346,10 +345,6 @@ with the original specification, and the same ratio restricted to the valence
 region ($r_k>c_1$) carries the information. It is excluded from the analyses
 below, which therefore use 55 informative descriptors.
 
-% ==========================================================================
-\section{Numerical stability of the descriptors}
-\label{sec:numerics}
-
 A descriptor should describe the material, not the way it was computed. Two
 things in a pydemi calculation are not set by the material. The first is the
 density grid: VASP chooses it from the plane-wave cutoff, so two calculations
@@ -393,11 +388,11 @@ and what the PAW pseudo-density~\cite{blochl1994,kresse1999} stored in a
 A descriptor library is only useful if its numbers are right. pydemi is
 therefore checked by 352 automated tests that run every time the code changes.
 Each test computes something with pydemi and compares it with an answer that is
-known independently. Together, the tests answer three questions.
+known independently. The tests are of three kinds.
 
-\paragraph{Does each descriptor compute what it claims?} The tests run pydemi on
-artificial densities for which the right answer is known exactly from a
-formula. Two kinds are used: smooth Gaussian atoms, and Slater-type atoms, which
+The first kind checks that each descriptor computes what it claims. These tests
+run pydemi on artificial densities for which the right answer is known exactly from a
+formula. Two model atoms are used: smooth Gaussian atoms, and Slater-type atoms, which
 have the sharp peak at the nucleus that real atoms have. For example, the
 average distance of the charge from its nucleus must equal the textbook value
 for a Slater atom, and the derivatives and the electrostatic potential that
@@ -407,17 +402,17 @@ must add up to one, and the parts of a variance must add up to the whole.
 Where no formula exists, pydemi is compared with a slow but simple calculation,
 such as finding the nearest atom by searching all neighbouring cells.
 
-\paragraph{Does each descriptor stay the same when the crystal is described
-differently?} The same material can be written down in many ways, and a
-descriptor must not depend on the choice. For a low-symmetry test crystal,
+The second kind checks that a descriptor stays the same when the crystal is
+described differently. The same material can be written down in many ways, and
+a descriptor must not depend on the choice. For a low-symmetry test crystal,
 every descriptor is computed four times: for the original cell, for a cell
 eight times larger, for the cell with its origin moved, and for the cell
 rotated in space. All four must give the same value. These symmetry tests are
 generated automatically from the list of descriptors, so a descriptor added in
 the future is checked without writing a new test.
 
-\paragraph{Do the other parts of the software work as intended?} Further tests
-check that \texttt{CHGCAR} files of every VASP format are read correctly; that
+The third kind checks that the other parts of the software work as intended:
+that \texttt{CHGCAR} files of every VASP format are read correctly; that
 a batch run continues past a broken file; that the included density model gives
 the same predictions as the original ChargE3Net code; that the property models
 reproduce their stored predictions; and that every figure of the graphical
