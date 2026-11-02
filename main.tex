@@ -65,62 +65,109 @@ learning; materials property prediction; interpretability; Python
 \section{Introduction}
 \label{sec:intro}
 The electronic charge density $\rho(\mathbf{r})$ is the central quantity of
-density-functional theory: it determines the ground state and all of its
-properties~\cite{hohenberg1964}, and it shows directly where electrons
-accumulate between atoms, how much charge they transfer and how localized
-they are. Every plane-wave DFT calculation produces it on a real-space grid,
-and the Materials Project distributes such densities for a large and
-continuously updated set of materials~\cite{jain2013,shen2022}. Most
-machine-learning (ML) models of materials properties nevertheless do not use
-them. Compositional featurizers compute statistics of elemental
-properties~\cite{ward2016,ward2018}, and graph neural networks learn from the
-atomic structure~\cite{xie2018,chen2019,choudhary2021,wen2024}; the bonding that
-the density records is learned only implicitly.
+density-functional theory (DFT): it determines the ground state and all of its
+properties~\cite{hohenberg1964}. It is also the most direct picture of chemical
+bonding that a calculation gives. It shows where electrons accumulate between
+atoms, how much charge passes from one atom to another and how localized the
+electrons are. The density can also be measured by X-ray diffraction, so the
+analysis methods developed for calculated densities are applied to experimental
+ones as well~\cite{bader1990,abramov1997,tsirelson2002}. Every plane-wave DFT
+calculation produces the density on a real-space grid, and the Materials
+Project distributes such densities for a large and continuously updated set of
+materials~\cite{jain2013,shen2022}. Large collections of charge densities
+therefore already exist, and more are computed every day.
+
+Over the past decade, machine learning (ML) has become a standard tool for
+predicting materials properties from such databases~\cite{butler2018,schmidt2019}.
+How accurate a model is, and what can be learned from it, depends largely on how
+each material is represented, that is, on its descriptors~\cite{ghiringhelli2015}.
+Compositional featurizers compute statistics of elemental
+properties~\cite{ward2016,ward2018}. Structural representations encode the
+positions of the atoms, either as fixed vectors such as the Coulomb
+matrix~\cite{rupp2012} and the smooth overlap of atomic
+positions~\cite{bartok2013}, or as graphs from which neural networks learn their
+own features~\cite{xie2018,chen2019,choudhary2021,wen2024}. All of these start
+from the atoms, not from the electrons. The bonding that the density records is
+learned only indirectly, from the composition and the geometry, and the most
+accurate models are often the hardest to read. In materials science this
+matters. A model whose inputs have a physical meaning can be checked against
+what is known about a material, and it can point to the mechanism behind a
+trend, not only to the trend itself~\cite{rudin2019}. Methods such as SHAP
+values~\cite{lundberg2020} explain the predictions of any model, but an
+explanation in terms of learned features or atom embeddings is still hard to
+relate to physics.
 
 Where the density has been used as a model input, it has mostly been as a
 learned representation. Three-dimensional convolutional networks read the
 density on a voxel grid~\cite{kajita2017,zhao2020} or its compressed latent
 representation~\cite{kumar2026}, and persistent homology reduces it to Betti
 curves over density thresholds~\cite{szymanski2025}. These representations
-predict properties well, but their features have no individual physical
-meaning, and the models must process the full grid of every structure. The
-interpretable quantities of density analysis, on the other hand --- atoms and
-critical points of the quantum theory of atoms in molecules~\cite{bader1990},
-Bader charges~\cite{henkelman2006}, non-covalent interaction
-regions~\cite{johnson2010} --- are computed by programs such as
-critic2~\cite{oterodelaroza2014} and the Bader code~\cite{henkelman2006} that
-are built to analyse one structure in depth. Their output is a list whose
-length varies from structure to structure, not a fixed-length vector, and the
-numerical choices behind it are left to the user.
+predict properties well, which shows that the density carries the information
+a property model needs. Their features, however, have no individual physical
+meaning. Such models therefore share the difficulty of the graph networks: they
+show how well a property can be predicted, but not which feature of the bonding
+sets it. They also have to process the full grid of every structure, which makes
+training and prediction costly.
+
+Density analysis itself, on the other hand, has a long tradition of
+interpretable quantities. The quantum theory of atoms in molecules divides the
+density into atomic basins and describes each bond by the critical point between
+two atoms~\cite{bader1990}. Hirshfeld partitioning shares the density between
+atoms in proportion to the densities of the free atoms~\cite{hirshfeld1977}.
+The electron localization function~\cite{becke1990} shows where electrons are
+paired, and the non-covalent interaction index~\cite{johnson2010} shows where
+weak interactions occur. Each of these quantities has a clear meaning, and
+together they describe ionic, covalent and metallic bonding in terms that
+chemists and physicists share. They are computed by programs such as
+critic2~\cite{oterodelaroza2014} and the Bader code~\cite{henkelman2006}, which
+are built to analyse one structure in depth. Their output is a list whose length
+varies from structure to structure, with one entry per atom, bond or critical
+point, and not a fixed-length vector that a property model can take. The
+numerical choices behind the output, such as the grid, the interpolation and the
+integration method, are left to the user. Applying these programs to thousands
+of structures, in a way that gives the same answer for the same material, is
+not what they were designed for.
 
 Turning the density into fixed-length descriptors for many structures raises
-three problems. The first is the input and its numerics: the file that every
-VASP calculation writes, the \texttt{CHGCAR}, does not support every quantity of
-density analysis (the electron localization function and the energy densities,
-for example, need more than the density), and a quantity computed on a grid can
-depend on the grid and on the numerical method as much as on the material.
-A second obstacle is cost: a descriptor that needs a DFT density needs a DFT
-calculation. Models that predict the density from the atomic
-structure~\cite{chandrasekaran2019,jorgensen2022,koker2024} remove this
-obstacle in principle, provided the descriptors survive the error of the
-prediction. And the question that motivates the descriptors in the first place
---- how much of a material's properties they capture, and which of them carry
-the information --- has to be answered on a large, well-defined dataset.
+three problems. The first is the input and its numerics. The file that every
+VASP calculation writes, the \texttt{CHGCAR}, holds the density on a grid but
+not the wavefunctions, so it does not support every quantity of density
+analysis. The electron localization function and the energy densities, for
+example, need the kinetic energy density, which the density alone gives only
+approximately~\cite{abramov1997,tsirelson2002}. A quantity computed on a grid
+can also depend on the grid spacing, on the numerical derivatives and on the way
+the cell is written down as much as on the material, and a descriptor of this
+kind adds noise that no model can remove. The second problem is cost. A
+descriptor that needs a DFT density needs a DFT calculation, which limits it to
+materials that have already been computed. Models that predict the density from
+the atomic structure~\cite{chandrasekaran2019,grisafi2019,jorgensen2022,koker2024}
+remove this limit in principle, provided the descriptors survive the error of
+the prediction. This is not guaranteed: descriptors built from derivatives of
+the density, such as the curvature of a bond, enlarge small errors of the
+density. The third problem is the question that motivates the descriptors in the
+first place: how much of a material's properties they capture, and which of
+them carry the information. A few chosen examples cannot answer it. It has to be
+answered on a large, well-defined dataset and for many properties at once.
 
-Here we describe pydemi, a Python package built around these three points. (i) It
-reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors that are
-defined on it and whose values are set by the material, not by the grid or the numerical
-method (Sections~\ref{sec:design} and~\ref{sec:descriptors}). (ii) It includes a density model, so
-that the same descriptors are obtained from a crystal structure alone, and we
-measure which descriptors transfer from DFT to predicted densities
-(Section~\ref{sec:ml}). (iii) We train property models on the descriptors
-alone for 17 properties of a large DFT dataset, compare them with the models
-reported earlier for the same structures, and identify the
-descriptors that carry the information (Section~\ref{sec:properties}). The
-package is used as a Python library, a command-line tool or a graphical
-interface that runs locally (Section~\ref{sec:software}); the code, the tests
-and the scripts that train the property models are released under the MIT
-licence.
+Here we describe pydemi, a Python package built around these three problems.
+(i) It reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors
+that are defined on it and whose values are set by the material, not by the
+grid or the numerical method (Sections~\ref{sec:design}
+and~\ref{sec:descriptors}). The descriptors describe how the charge is
+distributed around each nucleus and between the atoms, the shape of the density
+over the whole cell, and how much the atoms of a crystal differ from one
+another. Each has a short physical definition, and each is checked by automated
+tests against densities with known answers and against different descriptions of
+the same crystal (Section~\ref{sec:validation}). (ii) It includes a density
+model, so that the same descriptors are obtained from a crystal structure alone,
+and we measure which descriptors transfer from DFT to predicted densities
+(Section~\ref{sec:ml}). (iii) We train property models on the descriptors alone
+for 17 properties of a large DFT dataset, compare them with the models reported
+earlier for the same structures, and identify the descriptors that carry the
+information (Section~\ref{sec:properties}). The package is used as a Python
+library, a command-line tool or a graphical interface that runs locally
+(Section~\ref{sec:software}); the code, the tests and the scripts that train the
+property models are released under the MIT licence.
 
 % ==========================================================================
 \section{Methodology}
