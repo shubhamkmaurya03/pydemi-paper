@@ -764,5 +764,54 @@ prediction from a CIF followed by its descriptors, and the Compare view, which
 predicts the density on the CHGCAR's own grid and shows both sets of
 descriptors and properties side by side.
 
+% ==========================================================================
+\section{Dataset and cost of the run}
+\label{si:dataset}
+
+\paragraph{Structures.} The dataset of Kumar et al.\ (J.\ Chem.\ Inf.\ Model.\ 66, 7113, 2026)
+contains 6,059 VASP charge densities of 87 elements, named
+\texttt{<formula>\_<space group>}. Classes are assigned by the anions present,
+first match: 86 elemental solids, 3,195 intermetallics, 354 borides and
+carbides, 80 hydrides, 653 pnictides, 548 chalcogenides, 607 oxides and 536
+halides. The cells contain 1--152 atoms (median 6) on grids of
+$1.8\times10^5$ to $1.7\times10^6$ points (5th--95th percentile).
+
+\paragraph{DFT calculations.} The structures were taken from the Materials
+Project and relaxed (ionic positions, cell shape and volume, conjugate
+gradient, residual forces below $10^{-3}$\,eV\,\AA$^{-1}$) with VASP, the PBE
+functional and PAW potentials, a plane-wave cutoff of 500\,eV and a $k$-point
+spacing of 0.1\,\AA$^{-1}$, as described in the original study. Each run folder
+holds the \texttt{CHGCAR}; 4,901 also hold the \texttt{OUTCAR}, which records a
+spin-polarized single-point calculation on the relaxed structure with one PAW
+dataset per element. In 221 of these 4,901 runs (4.5\%, 133 of them
+intermetallics) the self-consistency loop stopped at its limit of 200
+iterations before reaching the energy criterion; these densities are kept. The
+1,158 runs without an \texttt{OUTCAR} are assumed to follow the same protocol.
+
+\paragraph{Cost.} The descriptors of all 6,059 structures were computed in one
+batch run without a failure, on an Intel Xeon Gold 6338N workstation with 16
+worker processes. The time per structure has a median of
+3.3\,s and a 95th percentile of 15\,s; added up over the structures, the run
+took 8.4 CPU-hours. The time follows the number of grid points (Spearman
+correlation 0.96) more closely than the number of atoms (0.77). On one core,
+including the data for the figures of the graphical interface:
+
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\toprule
+\texttt{CHGCAR} & grid & time & peak memory \\
+\midrule
+FeNi$_3$, 6\,MB & $56^3$ & 0.7\,s & 0.25\,GB \\
+Al$_2$Te$_5$, 31\,MB & $64\times108\times128$ & 4.1\,s & 0.45\,GB \\
+SnBi$_2$Te$_4$, 350\,MB & $216^3$ & 54\,s & 2.6\,GB \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Undefined values.} In 421 structures every element occupies a
+single site, so a spread of site values within an element does not exist. For
+these structures the three within-element variances are returned as NaN with a
+flag, as documented in the descriptor reference.
 
 \end{document}

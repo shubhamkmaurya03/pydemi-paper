@@ -459,28 +459,31 @@ Each test, its reference and its allowed difference are listed in Section~S6 of
 the Supporting Information.
 
 % ==========================================================================
-\section{Application to a 6,059-structure DFT dataset}
+\section{Running pydemi on a 6,059-structure dataset}
 \label{sec:dataset}
 
-The dataset, introduced in Ref.~\cite{kumar2026}, comprises 6,059 VASP charge
-densities of 87 elements, computed for relaxed structures from the Materials
-Project: 86 elemental solids, 3,195 intermetallics and 2,778 compounds with
-electronegative elements. The 4,901 runs that include their \texttt{OUTCAR}
-share one protocol: single-point VASP~\cite{kresse1996} calculations with the
-PBE functional~\cite{perdew1996} and one PAW dataset~\cite{kresse1999} per
-element, a 500\,eV plane-wave cutoff, collinear spin polarization and an
-automatic $k$-mesh. The cells contain 1--152 atoms (median 6) on grids of
-$1.8\times10^5$ to $1.7\times10^6$ points (5th--95th percentile).
+We applied pydemi to the charge densities of 6,059 inorganic crystals of 87
+elements, computed in our group for an earlier study~\cite{kumar2026}. The
+structures come from the Materials Project and were relaxed before the density
+was computed. They are 86 elemental solids, 3,195 intermetallic compounds and
+2,778 compounds with a non-metal (borides and carbides, hydrides, pnictides,
+chalcogenides, oxides and halides). The densities were computed with
+VASP~\cite{kresse1996}, the PBE functional~\cite{perdew1996} and PAW
+potentials~\cite{kresse1999}, a plane-wave cutoff of 500\,eV, a $k$-point
+spacing of 0.1\,\AA$^{-1}$ and spin polarization~\cite{kumar2026}. In 221 of
+the 4,901 calculations whose output files are available (4.5\%), the
+self-consistency loop stopped at its iteration limit before reaching the energy
+criterion; these densities are kept. Details are given in Section~S7 of the
+Supporting Information.
 
-pydemi computed the 56 descriptors of every structure without a failure, in
-37 minutes on 16 worker processes. The median cost is 3.3\,s per
-structure (95th percentile 15\,s); it follows the number of grid points
-(Spearman 0.96) more closely than the number of atoms (0.77). On one core a
-6\,MB \texttt{CHGCAR} on a $56^3$ grid takes 0.7\,s and 0.25\,GB, and a
-350\,MB one on a $216^3$ grid 54\,s and 2.6\,GB, including the data for the
-figures of the graphical interface. For 421 structures no element
-occupies two sites, and their within-element variances return the documented
-NaN with a flag.
+pydemi computed all 56 descriptors of every structure without a single failure.
+On one core of an Intel Xeon Gold 6338N processor, a typical structure takes
+3.3\,s (median), and 95\% of the structures take less than 15\,s. The whole
+dataset took 8.4 CPU-hours, that is, the computing times of all structures on a
+single core added up; run on 16 cores in parallel, this is about half an hour.
+The cost grows with the size of the density grid rather than with the number of
+atoms. Even the largest \texttt{CHGCAR} we tried, 350\,MB, takes under a minute
+and 2.6\,GB of memory, well within the memory of an ordinary laptop.
 
 % ==========================================================================
 \section{Descriptors from the crystal structure alone}
