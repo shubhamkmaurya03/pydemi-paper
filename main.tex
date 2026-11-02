@@ -99,13 +99,11 @@ length varies from structure to structure, not a fixed-length vector, and the
 numerical choices behind it are left to the user.
 
 Turning the density into fixed-length descriptors for many structures raises
-three problems. The first is the input: the file that every VASP calculation
-writes, the \texttt{CHGCAR}, does not support every quantity of density
-analysis, and some it supports only with care: the
-electron localization function and the local energy densities can be estimated
-from a \texttt{CHGCAR} only through a density-only approximation of the kinetic
-energy, several topological counts are not converged on typical grids, and the
-PAW pseudo-density that a \texttt{CHGCAR} holds requires dedicated definitions.
+three problems. The first is the input and its numerics: the file that every
+VASP calculation writes, the \texttt{CHGCAR}, does not support every quantity of
+density analysis (the electron localization function and the energy densities,
+for example, need more than the density), and a quantity computed on a grid can
+depend on the grid and on the numerical method as much as on the material.
 A second obstacle is cost: a descriptor that needs a DFT density needs a DFT
 calculation. Models that predict the density from the atomic
 structure~\cite{chandrasekaran2019,jorgensen2022,koker2024} remove this
@@ -116,9 +114,9 @@ the information --- has to be answered on a common benchmark.
 
 Here we describe pydemi, a Python package built around these three points. (i) It
 reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors that are
-defined and numerically stable on it (Sections~\ref{sec:design}
-and~\ref{sec:descriptors}), and Section~\ref{sec:numerics} shows what a
-\texttt{CHGCAR} supports and how stable the descriptors are. (ii) It includes a density model, so
+defined on it (Sections~\ref{sec:design} and~\ref{sec:descriptors}), and
+Section~\ref{sec:numerics} shows that their values are set by the material and
+not by the grid or the numerical method. (ii) It includes a density model, so
 that the same descriptors are obtained from a crystal structure alone, and we
 measure which descriptors transfer from DFT to predicted densities
 (Section~\ref{sec:ml}). (iii) We train property models on the descriptors
@@ -373,83 +371,74 @@ region ($r_k>c_1$) carries the information. It is excluded from the analyses
 below, which therefore use 55 informative descriptors.
 
 % ==========================================================================
-\section{What a CHGCAR supports}
+\section{Numerical stability of the descriptors}
 \label{sec:numerics}
 
-This section states which quantities of density analysis a \texttt{CHGCAR}
-does not support, how stable the 56 descriptors are on it, and what its PAW
-pseudo-density means for them. Figure~\ref{fig:stability} collects
-the sensitivity of each descriptor to the grid, the derivative scheme, the
-partition and, for Section~\ref{sec:ml}, the prediction of the density by ML.
+A descriptor is useful only if its value is set by the material. Every value
+that pydemi returns, however, also depends on numerical choices that have
+nothing to do with the material: the density grid, which VASP sets from the
+plane-wave cutoff and which differs between two calculations of the same
+compound; the way derivatives of $\rho$ are taken; and, for the site
+descriptors, the way voxels are assigned to atoms. A descriptor that moved
+noticeably with these choices would give different values for the same
+material, and a property model trained on it would learn the noise. We
+therefore changed each choice on structures of the dataset of
+Section~\ref{sec:dataset} and measured how much each descriptor moved
+(Fig.~\ref{fig:stability}).
+
+\paragraph{Tests.} For the grid, each density was Fourier-interpolated to 80\%
+of its points along each axis, about half the number of voxels, which mimics a
+calculation at a lower cutoff (30 structures). For the derivatives, the FFT
+default was replaced by fourth- and by second-order central differences (200
+structures). The change of a descriptor is the median over the structures of
+$|a-b|/\max(|a|,|b|)$, where $a$ and $b$ are its values with the default and the
+changed choice.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_stability.pdf}
-\caption{Sensitivity of the 56 descriptors (labels coloured by domain): median
-relative change $|a-b|/\max(|a|,|b|)$ when the grid is Fourier-coarsened to
-80\% of its points per axis (30 structures), when the FFT derivatives are
-replaced by fourth- or second-order central differences (200 structures; 60 for
-the site statistics of $\zeta$; 48 for the bounded ellipticity), when the
-nearest-atom partition is replaced by the power diagram or Becke cells (300
-structures), and when the descriptors are computed from the ChargE3Net
-prediction instead of the DFT density (605 test structures,
-Section~\ref{sec:ml}). Dots mark choices a descriptor does not depend on. The
-Laplacian concentration ratio is constant (Section~\ref{sec:descriptors}). The
-large values of the within-element variances on the coarsened grid and of the
-percolation anisotropy reflect a near-zero reference value; those of the
-heterogeneity descriptors under other partitions reflect a change of
-definition.}
+\caption{Numerical stability of the descriptors. (a) Number of descriptors in
+each band of the median relative change $|a-b|/\max(|a|,|b|)$ over the
+structures, when the grid is coarsened to 80\% of its points per axis (the 55
+informative descriptors, 30 structures) and when the FFT derivatives are
+replaced by fourth- or second-order central differences (the 16 descriptors
+that use derivatives, 200 structures; 48 for the bounded ellipticity, 60 for the
+site statistics of $\zeta$). (b) The same change for each descriptor (labels
+coloured by domain); values of $10^{-6}$ or less, including exact agreement, are
+drawn at $10^{-6}$. $\dagger$: descriptors whose value is close to zero, so that
+a small absolute change is a large relative one (see text). The Laplacian
+concentration ratio is constant and not shown. All choices, including the
+atomic partition, are given per descriptor in Supporting Information, Fig.~S1
+and Table~S1.}
 \label{fig:stability}
 \end{figure}
 
-\paragraph{Scope.}
-Some standard quantities of density analysis cannot be computed reliably from a
-\texttt{CHGCAR}, and pydemi does not offer them. The electron localization
-function and the kinetic, potential and total energy densities need the
-kinetic-energy density, which a \texttt{CHGCAR} does not contain; a gradient
-expansion of the kinetic energy~\cite{abramov1997,tsirelson2002} gives only an
-approximation, whose third-derivative terms changed by 20--25\% with the
-derivative scheme or the grid. The voxel-averaged bond ellipticity
-$\varepsilon=\lambda_1/\lambda_2-1$ diverges where $\lambda_2\to0^-$ (median
-changes of 22\% in its mean and 67\% in its spread between derivative schemes);
-pydemi uses the bounded form $\varepsilon/(1+\varepsilon)=1-\lambda_2/\lambda_1$,
-which changes by at most 1.2\%. The numbers of saddle points of $\rho$ changed
-by 17--20\% on a coarsened grid, and the grid census of critical points
-satisfied the Morse relation of a periodic cell for only 9.1\% of the
-structures, so only maxima and minima are counted. Magnetization densities are
-not used, because the predicted densities of Section~\ref{sec:ml} have none.
+\paragraph{Results.} On the coarser grid, 46 of the 55 informative descriptors
+change by at most 1\% and 21 by at most 0.1\% (Fig.~\ref{fig:stability}a). Of
+the five that change by more than 5\%, four have values close to zero, where a
+relative change has little meaning: the percolation anisotropy (40\%), which is
+near zero for every cubic cell, and the three within-element variances
+(63--75\%), which are numerical noise of order $10^{-9}$\,\AA$^2$ in structures
+whose sites of each element are all equivalent. The fifth, the number of
+non-nuclear maxima (6\%), is a small integer that changes in a few structures.
+For the 16 descriptors that use derivatives, fourth-order differences agree with
+the FFT result to a median of $1.6\times10^{-4}$ and at most
+$6\times10^{-3}$, so the FFT result is converged on these grids; second-order
+differences, a common shortcut, shift them by up to 16\% (the fractional
+anisotropy of $T$), which is why they are not the default.
 
-\paragraph{Stability of the 56.}
-Of the 55 informative descriptors, 46 change by at most 1\% (median) and 21 by
-at most 0.1\% on the coarsened grid (Fig.~\ref{fig:stability}). Larger changes
-occur for the percolation anisotropy (40\%), whose value is near zero for
-every cubic cell, the non-nuclear maxima (6\%), and the within-element
-variances (63--75\%), which are numerical noise of order
-$10^{-9}$\,\AA$^2$ for the structures whose sites of each element are all
-equivalent. For the 16 descriptors that use derivatives, fourth-order
-differences agree with the FFT result to a median of $1.6\times10^{-4}$ and at
-most $6\times10^{-3}$, so the FFT backend is the converged limit on these grids;
-second-order differences shift them by up to 16\% (the fractional anisotropy of
-$T$). The whole-cell descriptors do not depend on the partition. The 18 site
-descriptors do, by definition: Becke cells, which like the nearest-atom
-partition ignore atomic size, preserve the ranking of the structures by the
-site standard deviations (Spearman $\rho_s=0.97$--0.99), whereas the power
-diagram, which gives larger atoms larger cells, reorders them ($\rho_s$ down to
-0.34). The partition is a setting of the interface and is recorded with every
-result.
-
-\paragraph{PAW pseudo-densities.}
-A \texttt{CHGCAR} holds the pseudo-valence density plus the compensation charge
-of the PAW method~\cite{blochl1994,kresse1999}, which is pseudized inside each
-augmentation sphere. The density is negative somewhere in 61\% of the
-structures, so $\rho_{\min}$ mostly reflects the pseudization, and pseudized
-atoms can lack a maximum at the nucleus: 37\% of the structures have
-non-nuclear maxima by the fixed 0.8\,\AA{} criterion, against 6\% when maxima
-inside the augmentation spheres are excluded. pydemi keeps the fixed
-criterion, because the augmentation radii are not part of a \texttt{CHGCAR},
-and the reference document says so; the interstitial density and the
-percolation levels, whose bottlenecks lie near the sphere radius where pseudo
-and all-electron densities nearly agree, are not affected.
+The 18 site descriptors also depend on the atomic partition, but by definition
+and not as a numerical error: they describe per-atom regions, and a different
+partition defines different regions. The partition is therefore a setting,
+recorded with every result, and its effect is given in Section~S2 of the
+Supporting Information. The same section explains why some standard quantities
+of density analysis are not offered, because a \texttt{CHGCAR} does not support
+them reliably (the electron localization function and the energy densities need
+the kinetic-energy density, which can only be approximated from
+$\rho$~\cite{abramov1997,tsirelson2002}; the raw bond ellipticity and the
+saddle-point counts are not converged on VASP grids), and what the PAW
+pseudo-density~\cite{blochl1994,kresse1999} of a \texttt{CHGCAR} means for the
+descriptors.
 
 % ==========================================================================
 \section{Validation}
@@ -643,7 +632,7 @@ $|a-b|/\max(|a|,|b|)$ over the structures (logarithmic axis; 0 where both values
 are zero for most structures, as for the non-nuclear maxima). Colours: green
 $\rho_s\geq0.99$, orange $0.95\leq\rho_s<0.99$, red $\rho_s<0.95$. The Laplacian
 concentration ratio is $\tfrac12$ in both densities. Parity plots of every
-descriptor are given in Figs.~S1 and S2 of the Supporting Information.}
+descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
@@ -654,10 +643,10 @@ the median relative error is 0.66\%. The descriptors that transfer include all
 18 heterogeneity descriptors, 16 of the 18 informative bonding descriptors (the
 moments and shell fractions, $\zeta$, the NCI and potential descriptors and the
 bond-midpoint densities), and the percolation levels, density floor and
-information measures (Supporting Information, Figs.~S1 and S2). The 11 that do not fall into
+information measures (Supporting Information, Figs.~S2 and S3). The 11 that do not fall into
 three groups. The counts of maxima and minima ($\rho_s=0.77$ and 0.57, median
 errors 35\% and 38\%) respond to shallow spurious extrema in flat, low-density
-regions (Supporting Information, Fig.~S1); the non-nuclear maxima and their charge
+regions (Supporting Information, Fig.~S2); the non-nuclear maxima and their charge
 ($\rho_s=0.90$ and 0.94) are zero in both densities for 61\% of the structures,
 so their ranks are dominated by ties. The bounded ellipticity and the
 negative-Laplacian volume fraction (median errors 13\% and 6\%) involve second
@@ -668,7 +657,7 @@ anisotropy and the percolation anisotropy are predicted accurately
 values cluster, for instance at $\tfrac13$ for every cubic cell, so that small
 errors reorder them. Per structure, the median error over the 44 transferable
 descriptors is 0.53\% (90th percentile 1.2\%) and follows the density error
-(Spearman 0.49; Supporting Information, Fig.~S3); it exceeds 5\% only for Ba$_3$N, Li,
+(Spearman 0.49; Supporting Information, Fig.~S4); it exceeds 5\% only for Ba$_3$N, Li,
 TiH$_2$, Yb$_2$MgIn and YbPrZn$_2$. One limitation remains: the model predicts the
 total density only, so pydemi offers no magnetic descriptors on this path, as
 on the DFT path.
@@ -789,7 +778,7 @@ value; the comparison is therefore indicative at the level of 0.01 in $R^2$.
 The most important descriptor overall is the mean interstitial density. It is
 the most important input for the bulk modulus (28\% of the mean absolute SHAP
 value), the shear and Young's moduli, the three elastic constants and the
-refractive index (Supporting Information, Fig.~S4). The volume fraction of the NCI
+refractive index (Supporting Information, Fig.~S5). The volume fraction of the NCI
 region has the same role for the electronic properties: it is the most
 important input for the band gap (31\%), metallicity (30\%) and the formation
 energy (19\%). For the Debye temperature, the sound velocities and the minimum
@@ -806,7 +795,7 @@ appear in any of the 17 lists: the most important
 descriptor of every property is one of 6, the three most important are among
 16 and the five most important among 23; the mean interstitial density (in 16 lists), the
 radial spread $\sigma_r^2$ (14) and the negative-Laplacian volume fraction (13)
-appear most often (Supporting Information, Fig.~S5). Six to nine (on average 8.4) of the ten descriptors of each
+appear most often (Supporting Information, Fig.~S6). Six to nine (on average 8.4) of the ten descriptors of each
 property transfer to predicted densities with $\rho_s\geq0.95$
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.

@@ -136,12 +136,78 @@ variance is zero (flagged) for an elemental crystal.
 \section{Sensitivity and transfer per descriptor}
 \label{si:stability}
 
+This section supports Section~4 of the main text: the sensitivity of every
+descriptor to every numerical choice (Fig.~\ref{fig:si_stability},
+Table~\ref{tab:si_stability}), the effect of the atomic partition, the
+quantities of density analysis that pydemi does not offer and why, and what the
+PAW pseudo-density of a \texttt{CHGCAR} means for the descriptors. The last part
+of the section gives the transfer of each descriptor to predicted densities
+(Section~7 of the main text).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_si_stability.pdf}
+\caption{Sensitivity of the 56 descriptors to every choice (labels coloured by
+domain): median relative change $|a-b|/\max(|a|,|b|)$ when the grid is
+Fourier-coarsened to 80\% of its points per axis (30 structures), when the FFT
+derivatives are replaced by fourth- or second-order central differences (200
+structures; 60 for the site statistics of $\zeta$; 48 for the bounded
+ellipticity), when the nearest-atom partition is replaced by the power diagram
+or Becke cells (300 structures), and when the descriptors are computed from the
+ChargE3Net prediction instead of the DFT density (605 test structures, Section~7
+of the main text). Dots mark choices a descriptor does not depend on. The
+Laplacian concentration ratio is constant. The large values of the
+within-element variances on the coarsened grid and of the percolation
+anisotropy reflect a near-zero reference value; those of the heterogeneity
+descriptors under other partitions reflect a change of definition.}
+\label{fig:si_stability}
+\end{figure}
+
+\paragraph{Atomic partition.} The whole-cell descriptors do not depend on the
+partition. The 18 site descriptors do, by definition, because each partition
+defines different per-atom regions (300 structures). Becke cells, which like
+the nearest-atom partition ignore atomic size, preserve the ranking of the
+structures by the site standard deviations (Spearman $\rho_s=0.97$--0.99),
+whereas the power diagram, which gives larger atoms larger cells, reorders them
+($\rho_s$ down to 0.34). The partition is a setting of the interface and is
+recorded with every result.
+
+\paragraph{Quantities pydemi does not offer.} Some standard quantities of
+density analysis cannot be computed reliably from a \texttt{CHGCAR}. The
+electron localization function and the kinetic, potential and total energy
+densities need the kinetic-energy density, which a \texttt{CHGCAR} does not
+contain; a gradient expansion of the kinetic energy (references in Section~4
+of the main text) gives only an approximation, whose third-derivative terms
+changed by 20--25\% with the derivative scheme or the grid. The voxel-averaged
+bond ellipticity $\varepsilon=\lambda_1/\lambda_2-1$ diverges where
+$\lambda_2\to0^-$ (median changes of 22\% in its mean and 67\% in its spread
+between derivative schemes); pydemi uses the bounded form
+$\varepsilon/(1+\varepsilon)=1-\lambda_2/\lambda_1$, which changes by 0.21\% on
+the coarsened grid, 0.18\% with fourth-order and 1.2\% with second-order
+differences. The numbers of saddle points of $\rho$ changed by 17--20\% on the
+coarsened grid, and the grid census of critical points satisfied the Morse
+relation of a periodic cell for only 9.1\% of the structures, so only maxima and
+minima are counted. Magnetization densities are not used, because the predicted
+densities of Section~7 of the main text have none.
+
+\paragraph{PAW pseudo-densities.} A \texttt{CHGCAR} holds the pseudo-valence
+density plus the compensation charge of the PAW method, which is pseudized
+inside each augmentation sphere. The density is negative somewhere in 61\% of
+the structures, so $\rho_{\min}$ mostly reflects the pseudization, and pseudized
+atoms can lack a maximum at the nucleus: 37\% of the structures have non-nuclear
+maxima by the fixed 0.8\,\AA{} criterion, against 6\% when maxima inside the
+augmentation spheres are excluded. pydemi keeps the fixed criterion, because the
+augmentation radii are not part of a \texttt{CHGCAR}, and the reference document
+says so; the interstitial density and the percolation levels, whose bottlenecks
+lie near the sphere radius where pseudo and all-electron densities nearly
+agree, are not affected.
+
 \begin{table}[htbp]
 \centering
 \caption{Median relative change (\%) of each descriptor when the grid is
 coarsened to 80\% per axis, the FFT derivatives are replaced by fourth- or
 second-order differences, and the nearest-atom partition by the power diagram
-or Becke cells (sample sizes as in Fig.~2 of the main text; -- = does not depend
+or Becke cells (sample sizes as in Fig.~\ref{fig:si_stability}; -- = does not depend
 on the choice), and the Spearman correlation $\rho_s$ and median relative error
 (\%) between the descriptors of the DFT and ChargE3Net-predicted densities of the
 605 test structures. Relative change: $|a-b|/\max(|a|,|b|)$.}
