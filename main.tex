@@ -416,7 +416,7 @@ takes exact derivatives from the Fourier transform of the density, by the
 simpler finite differences.
 
 The descriptors pass both tests. On the coarser grid, almost all of them (46 of
-the 55 that vary between materials) change by less than 1\%. The few that change
+the 55) change by less than 1\%. The few that change
 more have values close to zero for many materials, for example the anisotropy of
 a cubic crystal, or the spread between atoms of an element that are all
 equivalent by symmetry; for such values, a tiny absolute change is a large
@@ -559,8 +559,7 @@ index~\cite{petousis2017}. The structures were split once at random into 4,847
 for training, 606 for validation and 606 for testing; a material without a
 value for a property is left out for that property only.
 
-For each property we trained three kinds of models on the descriptors that
-vary between materials: a linear model, a random forest~\cite{pedregosa2011}
+For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
 were tuned automatically on the validation set~\cite{akiba2019}, and the test
 set was used only once, for the final scores. Each model was trained five times
@@ -679,9 +678,8 @@ temperature and the cohesive energy. The losses follow how much each model
 relies on the 11 descriptors that transfer less well to predicted densities
 (Section~\ref{sec:ml}). These descriptors carry 7\% of the importance in the
 bulk-modulus model but about a fifth in the models of the sound velocities and
-the Debye temperature. They also cause 30 to 50\% of the difference between
-the two predictions, mostly through the bond ellipticity and the counts of
-density maxima and minima. Two properties are weak by either route: whether a
+the Debye temperature. They also cause 29 to 50\% of the difference between
+the two predictions, mostly through the bond ellipticity. Two properties are weak by either route: whether a
 gap is direct, and the refractive index, whose $R^2$ on these structures is set
 by three materials with unusually large DFT values. All values are given in
 Section~S4 and Table~S7 of the Supporting Information.
