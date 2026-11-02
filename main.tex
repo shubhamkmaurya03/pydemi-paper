@@ -603,29 +603,16 @@ member of each group with the largest mean SHAP share over the 17 properties was
 kept, and every model was retrained on the remaining descriptors with the same
 protocol. The uncertainty of a change in test score is the 95\% interval of a
 paired bootstrap (2,000 resamples of the test materials) on the seed-averaged
-predictions.
-
-\subsection{Accuracy}
-Table~\ref{tab:properties} and Fig.~\ref{fig:properties} give the test scores
-of LightGBM, which was the most accurate of the three models for every property
-(for the direct-gap classification the random forest was better by 0.001;
-Supporting Information, Table~S3). With the descriptors alone, the models reach
-$R^2$ of 0.949, 0.908 and 0.917 for the bulk, shear and Young's moduli,
-0.87--0.92 for the elastic constants, 0.85--0.93 for the Debye temperature,
-the sound velocities and the minimum thermal conductivities, 0.922 and 0.887
-for the formation and cohesive energies and 0.852 for the band gap.
-Metallicity is classified with a ROC-AUC of 0.984 (accuracy 0.940) and the
-directness of the gap, known for only 1,645 materials, with 0.787 (accuracy
-0.795). The refractive index, for which only 1,089 training materials are
-available, reaches $R^2=0.758$. The seed-to-seed standard deviation is at most
-0.005, except for the band gap (0.015), the direct gap (0.017) and the
-refractive index (0.011).
+predictions. LightGBM was the most accurate of the three models for every
+property (for the direct gap, the random forest was better by 0.001;
+Supporting Information, Table~S3), and its test scores are given in
+Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 
 \begin{table}[htbp]
 \centering
 \caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
 or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
-standard deviations are given in the text), with all 55 informative descriptors and with the ten most important
+standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 informative descriptors and with the ten most important
 descriptors of each property. MAE: mean absolute error with the 55
 descriptors. $n$: training and test materials.}
 \label{tab:properties}
