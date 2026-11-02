@@ -160,7 +160,7 @@ around O, the Mg atoms and the density on one face of the cell. Inside pydemi
 fields (gradient, Laplacian, Hartree potential $V_\mathrm{H}$) and the atomic
 cells of the geometry pass are computed once per structure and cached on it,
 and the registered descriptors reduce them. The radial
-bars give the percentile of each of the 56 descriptors of MgO within the
+bars give the percentile of each descriptor of MgO within the
 dataset, grouped by domain. The descriptors are used from Python, the command
 line or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}),
 and the property models of Section~\ref{sec:properties} take them as input
@@ -269,7 +269,7 @@ number of atoms or the total charge first. Whether the registered quantity is
 then really intensive is checked by the supercell test.
 
 % ==========================================================================
-\section{The 56 descriptors}
+\section{The descriptors}
 \label{sec:descriptors}
 
 Table~\ref{tab:families} defines each descriptor in one line; the full
@@ -478,7 +478,7 @@ self-consistency loop stopped at its iteration limit before reaching the energy
 criterion; these densities are kept. Details are given in Section~S7 of the
 Supporting Information.
 
-pydemi computed all 56 descriptors of every structure without a single failure.
+pydemi computed all descriptors of every structure without a single failure.
 On one core of an Intel Xeon Gold 6338N processor, a typical structure takes
 3.3\,s (median), and 95\% of the structures take less than 15\,s. The whole
 dataset took 8.4 CPU-hours, that is, the computing times of all structures on a
@@ -511,7 +511,7 @@ Technical details are given in Section~S2 of the Supporting Information.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_ml.pdf}
-\caption{Descriptors from predicted densities: all 56 descriptors of the 605 test
+\caption{Descriptors from predicted densities: the descriptors of the test
 structures of the density model, computed from the DFT and from the ChargE3Net
 density, grouped by domain. (a) Spearman rank correlation $\rho_s$ between the two
 sets of values (axis from 0.8 to 1; the three descriptors below 0.8 are marked
@@ -524,17 +524,17 @@ descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
-The predicted densities are close to the DFT ones: over the 605 test
+The predicted densities are close to the DFT ones: over the test
 structures, the typical difference is about 0.6\% of the density (median),
 somewhat larger for crystals with lanthanides or actinides. The question for
 pydemi is whether such small differences change the descriptors. A descriptor
 helps a property model when it puts materials in the right order, so we
 measured, for each descriptor, whether its values from the DFT and from the
-predicted densities rank the 605 test materials in the same order (Spearman
+predicted densities rank the test materials in the same order (Spearman
 rank correlation $\rho_s$, which is 1 for the same order). For 44 of the 55
 descriptors that vary between materials, $\rho_s$ is at least 0.95, and for 37
 of them at least 0.99 (Fig.~\ref{fig:ml}a); the typical value of a descriptor
-changes by less than 1\%. These 44 include all 18 heterogeneity descriptors, 16
+changes by less than 1\%. They include all 18 heterogeneity descriptors, 16
 of the 18 bonding descriptors, and the percolation levels, the density floor
 and the information measures. The other 11 fall into three groups, each with a
 clear reason. The counts of maxima and minima of the density change because the
@@ -550,11 +550,11 @@ predicted accurately, but many materials share almost the same value (every
 cubic crystal, for instance, is isotropic), so tiny differences reorder them;
 because several of these values are close to zero, their relative error in
 Fig.~\ref{fig:ml}b looks large although the absolute difference is small. When
-the density is predicted, the 44 transferable descriptors can therefore be used
+the density is predicted, the transferable descriptors can therefore be used
 as they are, and the other 11 with care. The Compare view of the graphical
 interface (Section~\ref{sec:software}) shows, for a given \texttt{CHGCAR}, the
 descriptors of the DFT and of the predicted density side by side, together with
-the transfer of each descriptor. Only five of the 605 test structures have a
+the transfer of each descriptor. Only five of the test structures have a
 typical descriptor error above 5\% (Supporting Information, Fig.~S4). Like the
 DFT path, which uses the total density of a \texttt{CHGCAR}, the model predicts
 the total density only, so neither path provides magnetic descriptors.
@@ -578,7 +578,7 @@ index~\cite{petousis2017}. The structures were split once at random into 4,847
 for training, 606 for validation and 606 for testing; a material without a
 value for a property is left out for that property only.
 
-For each property we trained three kinds of models on the 55 descriptors that
+For each property we trained three kinds of models on the descriptors that
 vary between materials: a linear model, a random forest~\cite{pedregosa2011}
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
 were tuned automatically on the validation set~\cite{akiba2019}, and the test
@@ -599,13 +599,13 @@ given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 \caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
 or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
 standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 informative descriptors and with the ten most important
-descriptors of each property. MAE: mean absolute error with the 55
+descriptors of each property. MAE: mean absolute error with all
 descriptors. $n$: training and test materials.}
 \label{tab:properties}
 \begin{adjustbox}{width=\textwidth}
 \begin{tabular}{llrrccr}
 \toprule
-Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & 55 descriptors & 10 descriptors & MAE \\
+Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & all descriptors & 10 descriptors & MAE \\
 \midrule
 \csname @@input\endcsname tables/tab_properties.tex
 \bottomrule
@@ -616,7 +616,7 @@ Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & 55 descriptors & 10 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_properties.pdf}
-\caption{Test scores of LightGBM with all 55 descriptors and with the ten most
+\caption{Test scores of LightGBM with all descriptors and with the ten most
 important descriptors of each property: $R^2$, or ROC-AUC for metallicity and the
 direct gap, in per cent; mean over five seeds, error bars one standard
 deviation.}
@@ -629,7 +629,7 @@ which predicted five properties from a compressed representation of the full
 density grid, alone or together with compositional features, and compared the
 results with the graph neural networks CGCNN~\cite{xie2018} and
 MEGNet~\cite{chen2019}. That study used its own data splits, so the comparison
-is indicative. For the bulk, shear and Young's moduli, LightGBM on the 55
+is indicative. For the bulk, shear and Young's moduli, LightGBM on the
 pydemi descriptors alone reaches $R^2$ of 0.949, 0.908 and 0.917. The best
 model of the earlier study, which also used the composition, reached 0.94, 0.87
 and 0.88, the density representation alone 0.90, 0.80 and 0.79, CGCNN 0.93,
@@ -656,7 +656,7 @@ Fig.~\ref{fig:top10}, and listed in Supporting Information, Table~S4) carry 46--
 these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}), least for the bulk modulus (0.937 against 0.949),
 $C_{12}$ and metallicity, most for the transverse sound velocity (0.782 against
 0.854), the band gap and the cohesive energy. Only 34 of the 55 descriptors
-appear in any of the 17 lists: the most important
+appear in any of the lists: the most important
 descriptor of every property is one of 6, the three most important are among
 16 and the five most important among 23; the mean interstitial density (in 16 lists), the
 radial spread $\sigma_r^2$ (14) and the negative-Laplacian volume fraction (13)
@@ -669,7 +669,7 @@ Several descriptors are closely related, by construction or in these materials:
 the standard deviation, range and between-element variance of the same site
 quantity, the eigenvalues of the anisotropy tensor ($t_1+t_2+t_3=1$) and its
 fractional anisotropy, $m_1$ and $m_2=m_1^2+\sigma_r^2$, or the Shannon entropy
-and the disequilibrium of the density. On the training set, 18 of the 55
+and the disequilibrium of the density. On the training set, 18
 descriptors have $|\rho_s|\geq0.90$ with another one, in 11 groups
 (Supporting Information, Table~S5). The models split the importance between the
 members of a group: the 18 carry 10--24\% of the mean absolute SHAP value of a
@@ -682,7 +682,7 @@ the bulk modulus); only the band gap loses, $R^2=0.832$ against 0.852
 Table~S6). For these properties, 37 of the 55 descriptors thus carry the information
 the models use, and the rank of a single descriptor in
 Fig.~\ref{fig:top10} depends on which member of its group the model happened
-to use. pydemi computes all 56 descriptors: most of these correlations are
+to use. pydemi still computes all of them: most of these correlations are
 observed in this dataset rather than fixed by definition, and need not hold for
 other materials or properties.
 
@@ -690,7 +690,7 @@ other materials or properties.
 \centering
 \includegraphics[width=\textwidth]{figures/fig_top10.pdf}
 \caption{The ten most important descriptors of each property, ranked by their
-mean absolute SHAP value in the 55-descriptor LightGBM model on the training
+mean absolute SHAP value in the LightGBM model with all descriptors on the training
 set. A dot marks a descriptor that is among the ten of a property; its area is
 the descriptor's share of the mean absolute SHAP value and its colour the
 domain. Only the 34 descriptors that are among the ten for at least one property
@@ -702,15 +702,15 @@ are shown, ordered by the number of properties for which they are among the ten.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_ml_properties.pdf}
-\caption{Properties of the 605 test structures of the density model predicted by
-the LightGBM models (55 descriptors, seed 0) from the descriptors of the DFT
+\caption{Properties of the test structures of the density model predicted by
+the LightGBM models (all descriptors, seed 0) from the descriptors of the DFT
 density ($x$) and of the ChargE3Net density ($y$); blue: the 63 structures that
 are also in the test set of the property models. $R^2$: agreement of the two
 predictions; for metallicity and the direct gap, predicted probabilities and the
 share of structures assigned to the same class.}
 \label{fig:mlprops}
 \end{figure}
-For the 605 test structures of the density model we evaluated the property
+For the test structures of the density model we evaluated the property
 models (LightGBM, seed 0) with the descriptors of the predicted densities in
 place of the DFT ones. The two predictions agree (Fig.~\ref{fig:mlprops}): $R^2$ between them is 0.985
 for the bulk modulus, 0.950 and 0.955 for the shear and Young's moduli,
@@ -754,7 +754,7 @@ the browser; it listens on the local machine only, so the files never leave it
 opens a \texttt{CHGCAR} or, for the density model, a CIF or POSCAR file, whose
 prediction runs in the background with progress and cancellation; a summary of
 the structure and grid and the partition setting sit below it. Four views show
-the structure with density slices through any lattice plane; the 56
+the structure with density slices through any lattice plane; the
 descriptors in a searchable table, each with its formula and a figure of the
 quantity it reduces, built so that the plotted data reproduce the value (this
 is tested); one such figure per descriptor, stepping through the domains; and
@@ -763,7 +763,7 @@ each model, the most important inputs and, where the structure belongs to the
 dataset, its DFT values. Models with a test $R^2$ below 0.5 are marked as weak,
 and their values are presented as rough indications. A fifth view compares the two routes for one
 material: for an open \texttt{CHGCAR} it predicts the density of the same structure
-on the same grid and sets the density error, the 56 descriptors and the
+on the same grid and sets the density error, the descriptors and the
 predicted properties from both densities side by side, marking descriptors that
 differ by more than 5\% and properties that differ by more than the typical
 error of their model. Results are exported as CSV or JSON with the run
@@ -773,7 +773,7 @@ metadata.
 \centering
 \includegraphics[width=\textwidth]{figures/fig_gui.pdf}
 \caption{The graphical interface with the DFT \texttt{CHGCAR} of MgO (a
-test-set structure), descriptor view: the 56 descriptors with the interstitial
+test-set structure), descriptor view: the descriptors with the interstitial
 charge fraction selected, its radial charge distribution with the shell
 boundaries and its formula.}
 \label{fig:gui}
@@ -787,9 +787,9 @@ pydemi reduces the one file every VASP calculation writes, the
 chosen so that each is defined on the PAW pseudo-density and converged on
 typical grids: on a coarsened grid 46 of the 55 informative descriptors change
 by at most 1\%. It featurized every density of the dataset without a failure,
-at a median of 3.3\,s per structure on one CPU core, and is verified by 352 tests. The included ChargE3Net model gives
+at a median of 3.3\,s per structure on one CPU core, and is verified by automated tests. The included ChargE3Net model gives
 the same descriptors from a crystal structure: 44 of the 55 keep a rank
-correlation of at least 0.95 with their DFT values on 605 held-out structures,
+correlation of at least 0.95 with their DFT values on held-out structures,
 and only the critical-point counts, quantities built on second derivatives in
 low-density regions and descriptors with clustered values do not.
 
@@ -798,14 +798,14 @@ properties of the dataset, and for the elastic moduli they match or exceed
 the graph neural networks and density-based models reported earlier for the
 same structures. The information is concentrated in a few simple, converged
 descriptors, led by the interstitial density and the NCI volume:
-ten descriptors per property retain 92--99\% of the test $R^2$ of all 55, and most of them transfer to ML-predicted densities. Because the property predictions from ML-predicted densities
+ten descriptors per property retain 92--99\% of the test $R^2$ of all descriptors, and most of them transfer to ML-predicted densities. Because the property predictions from ML-predicted densities
 are nearly as accurate as those from DFT densities, a structure suffices to
 obtain both the descriptors and the properties, in seconds to minutes instead
 of a DFT calculation. Models that predict the magnetization would extend this
 path to magnetic descriptors.
 
 \section*{Code and data availability}
-The source code, the 352 tests, the descriptor reference and the scripts that
+The source code, the tests, the descriptor reference and the scripts that
 train the property models are available at
 \url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, 0.2.1, is archived at
 Zenodo~\cite{pydemi} (\doi{10.5281/zenodo.23736932}). The fine-tuned
@@ -815,7 +815,7 @@ DFT dataset of charge densities was generated by members of the CMS Lab,
 Department of Materials Science \& Engineering, IIT Kanpur, including the
 authors, and was introduced in Ref.~\cite{kumar2026}; the data released with
 that work are available at \url{https://github.com/CMSLabIITK/LatentMatFusion}.
-The descriptors of all structures and of the 605 predicted test
+The descriptors of all structures and of the predicted test
 densities, the property targets and the model predictions are available from
 the corresponding author upon reasonable request, as are the DFT calculations
 themselves (about 180\,GB).
