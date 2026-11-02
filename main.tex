@@ -434,20 +434,14 @@ the Supporting Information.
 \label{sec:dataset}
 
 We applied pydemi to the charge densities of 6,059 inorganic crystals of 87
-elements, computed in our group for an earlier study~\cite{kumar2026}. The
-structures come from the Materials Project and were relaxed before the density
-was computed. They are 86 elemental solids, 3,195 intermetallic compounds and
-2,778 compounds with a non-metal (borides and carbides, hydrides, pnictides,
-chalcogenides, oxides and halides). The densities were computed with
-VASP~\cite{kresse1996}, the PBE functional~\cite{perdew1996} and PAW
-potentials~\cite{kresse1999}, a plane-wave cutoff of 500\,eV, a $k$-point
-spacing of 0.1\,\AA$^{-1}$ and spin polarization; after the relaxation, the
-density was recomputed with the tetrahedron method with Bl\"ochl corrections,
-so that it does not depend on a smearing width~\cite{kumar2026}. In 221 of
-the 4,901 calculations whose output files are available (4.5\%), the
-self-consistency loop stopped at its iteration limit before reaching the energy
-criterion; these densities are kept. Details are given in Section~S7 of the
-Supporting Information.
+elements from our earlier study~\cite{kumar2026}, computed with
+VASP~\cite{kresse1996} and the PBE functional~\cite{perdew1996} for structures
+taken from the Materials Project; the structures and the DFT settings are
+described there. The set contains elemental solids, intermetallic compounds and
+compounds of metals with non-metals (borides, carbides, hydrides, pnictides,
+chalcogenides, oxides and halides), so metallic, covalent and ionic bonding are
+all well represented. The number of structures in each class is given in
+Section~S7 of the Supporting Information.
 
 pydemi computed all descriptors of every structure without a single failure.
 On one core of an Intel Xeon Gold 6338N processor, a typical structure takes
@@ -469,8 +463,7 @@ the densities of our dataset, with 5,152 structures for training, 302 for
 validation and 605 for testing. The published model cannot be used directly,
 because it was trained with different PAW potentials, and hence different
 numbers of valence electrons, for several elements. A prediction therefore
-stands for a \texttt{CHGCAR} computed with the settings of our dataset
-(Section~\ref{sec:dataset}). pydemi places it on the grid that VASP would use
+stands for a \texttt{CHGCAR} computed with the settings of our dataset~\cite{kumar2026}. pydemi places it on the grid that VASP would use
 for these settings, scales it to the right number of valence electrons and
 records how it was obtained, and then computes every descriptor from it
 exactly as from a \texttt{CHGCAR}. The model covers the 87 elements of the
