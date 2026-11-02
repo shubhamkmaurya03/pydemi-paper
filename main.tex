@@ -376,9 +376,9 @@ below, which therefore use 55 informative descriptors.
 \section{What a CHGCAR supports}
 \label{sec:numerics}
 
-This section explains why the descriptors are the ones a \texttt{CHGCAR}
-supports: which fields it does not provide, which quantities are not converged
-on VASP grids, and how stable the 56 are. Figure~\ref{fig:stability} collects
+This section states which quantities of density analysis a \texttt{CHGCAR}
+does not support, how stable the 56 descriptors are on it, and what its PAW
+pseudo-density means for them. Figure~\ref{fig:stability} collects
 the sensitivity of each descriptor to the grid, the derivative scheme, the
 partition and, for Section~\ref{sec:ml}, the prediction of the density by ML.
 
@@ -402,30 +402,22 @@ definition.}
 \label{fig:stability}
 \end{figure}
 
-\paragraph{Fields a CHGCAR does not provide.}
-The electron localization function and the kinetic, potential and total energy
-densities require the orbitals or, at least, the kinetic-energy density. A
-\texttt{CHGCAR} contains neither, so these quantities would have to be
-reconstructed from the PAW pseudo-density through a gradient expansion of the
-kinetic energy~\cite{abramov1997,tsirelson2002}. The result is not the true
-quantity, and its gradient anisotropy, which involves third derivatives of
-$\rho$, changed by about 20\% between FFT and fourth-order derivatives and by
-25\% on the coarsened grid. Magnetic
-descriptors need the magnetization blocks, which the predicted densities of
-Section~\ref{sec:ml} do not have, and compositional descriptors do not need the
-density at all. These families are therefore left out of pydemi.
-
-\paragraph{Descriptors not converged on VASP grids.}
-The voxel-averaged ellipticity $\varepsilon=\lambda_1/\lambda_2-1$ diverges as
-$\lambda_2\to0^-$ at bond-shell voxels away from the bond paths: its mean and
-spread changed by a median 22\% and 67\% between fourth-order and FFT
-derivatives. The bounded form $\varepsilon/(1+\varepsilon)=1-\lambda_2/\lambda_1$
-changes by 0.21\% on the coarsened grid, 0.18\% with fourth-order and 1.2\% with
-second-order derivatives, and is the only ellipticity in pydemi. The
-saddle-point counts changed by a median 17--20\% on the coarsened grid, and a
-grid census of critical points satisfied the Morse relation of the three-torus
-for only 9.1\% of the structures; the counts of maxima and minima are kept, the
-saddle counts are not.
+\paragraph{Scope.}
+Some standard quantities of density analysis cannot be computed reliably from a
+\texttt{CHGCAR}, and pydemi does not offer them. The electron localization
+function and the kinetic, potential and total energy densities need the
+kinetic-energy density, which a \texttt{CHGCAR} does not contain; a gradient
+expansion of the kinetic energy~\cite{abramov1997,tsirelson2002} gives only an
+approximation, whose third-derivative terms changed by 20--25\% with the
+derivative scheme or the grid. The voxel-averaged bond ellipticity
+$\varepsilon=\lambda_1/\lambda_2-1$ diverges where $\lambda_2\to0^-$ (median
+changes of 22\% in its mean and 67\% in its spread between derivative schemes);
+pydemi uses the bounded form $\varepsilon/(1+\varepsilon)=1-\lambda_2/\lambda_1$,
+which changes by at most 1.2\%. The numbers of saddle points of $\rho$ changed
+by 17--20\% on a coarsened grid, and the grid census of critical points
+satisfied the Morse relation of a periodic cell for only 9.1\% of the
+structures, so only maxima and minima are counted. Magnetization densities are
+not used, because the predicted densities of Section~\ref{sec:ml} have none.
 
 \paragraph{Stability of the 56.}
 Of the 55 informative descriptors, 46 change by at most 1\% (median) and 21 by
