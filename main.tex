@@ -720,7 +720,7 @@ paired bootstrap (2,000 resamples of the test materials) on the seed-averaged
 predictions.
 
 \subsection{Accuracy}
-Table~\ref{tab:properties} gives the test scores
+Table~\ref{tab:properties} and Fig.~\ref{fig:properties} give the test scores
 of LightGBM, which was the most accurate of the three models for every property
 (for the direct-gap classification the random forest was better by 0.001;
 Supporting Information, Table~S3). With the descriptors alone, the models reach
@@ -757,10 +757,10 @@ Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & 55 descriptors & 10 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_properties.pdf}
-\caption{Share of the mean absolute SHAP value of each property (LightGBM on the
-55 descriptors, test set, mean over five seeds) carried by the eight descriptors
-that are most important over all properties; grey: the other 47 descriptors.
-Each bar adds up to 100\%; shares of at least 5\% are written in the bars.}
+\caption{Test scores of LightGBM with all 55 descriptors and with the ten most
+important descriptors of each property: $R^2$, or ROC-AUC for metallicity and the
+direct gap, in per cent; mean over five seeds, error bars one standard
+deviation.}
 \label{fig:properties}
 \end{figure}
 
@@ -789,7 +789,7 @@ value; the comparison is therefore indicative at the level of 0.01 in $R^2$.
 The most important descriptor overall is the mean interstitial density. It is
 the most important input for the bulk modulus (28\% of the mean absolute SHAP
 value), the shear and Young's moduli, the three elastic constants and the
-refractive index (Fig.~\ref{fig:properties}). The volume fraction of the NCI
+refractive index (Supporting Information, Fig.~S4). The volume fraction of the NCI
 region has the same role for the electronic properties: it is the most
 important input for the band gap (31\%), metallicity (30\%) and the formation
 energy (19\%). For the Debye temperature, the sound velocities and the minimum
@@ -799,14 +799,14 @@ draws on the bond-midpoint and interstitial densities. Only the direct-gap
 classification has no dominant descriptor (at most 7\%). The information is concentrated in few descriptors: the ten most important
 descriptors of a property (ranked on the training set;
 Fig.~\ref{fig:top10}, and listed in Supporting Information, Table~S5) carry 46--69\% of its mean absolute SHAP value, and models trained on
-these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties}), least for the bulk modulus (0.937 against 0.949),
+these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}), least for the bulk modulus (0.937 against 0.949),
 $C_{12}$ and metallicity, most for the transverse sound velocity (0.782 against
 0.854), the band gap and the cohesive energy. Only 34 of the 55 descriptors
 appear in any of the 17 lists: the most important
 descriptor of every property is one of 6, the three most important are among
 16 and the five most important among 23; the mean interstitial density (in 16 lists), the
 radial spread $\sigma_r^2$ (14) and the negative-Laplacian volume fraction (13)
-appear most often (Supporting Information, Fig.~S4). Six to nine (on average 8.4) of the ten descriptors of each
+appear most often (Supporting Information, Fig.~S5). Six to nine (on average 8.4) of the ten descriptors of each
 property transfer to predicted densities with $\rho_s\geq0.95$
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.

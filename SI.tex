@@ -294,6 +294,16 @@ Model & \multicolumn{2}{c}{$K$} & \multicolumn{2}{c}{$G$} & \multicolumn{2}{c}{$
 \end{adjustbox}
 \end{table}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_si_shap_shares.pdf}
+\caption{Share of the mean absolute SHAP value of each property (LightGBM on the
+55 descriptors, test set, mean over five seeds) carried by the eight descriptors
+that are most important over all properties; grey: the other 47 descriptors.
+Each bar adds up to 100\%; shares of at least 5\% are written in the bars.}
+\label{fig:si_shap_shares}
+\end{figure}
+
 \begin{table}[htbp]
 \centering
 \caption{The ten most important descriptors of each property, by mean absolute
