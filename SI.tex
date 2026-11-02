@@ -297,16 +297,16 @@ actinides.}
 \section{Property models}
 \label{si:props}
 
-\paragraph{Targets.} The bulk, shear and Young's moduli (Voigt--Reuss--Hill),
-the energy relative to the free atoms ($E_\mathrm{form}$ of the benchmark) and
-its Debye temperature are taken from the property table of the cross-model
-benchmark of S.~K.~Maurya and S.~Bhowmick (manuscript in preparation). All
-other targets come from the Materials Project, database version 2026.04.13, for
-the same material identifiers. Elastic data were kept only where $K$ and $G$ lie
-between 0 and 1000\,GPa and agree with the benchmark table (6,000 materials);
-$C_{11}$, $C_{12}$ and $C_{44}$ only where the smallest eigenvalue of the
-unrounded stiffness tensor exceeds 1\,GPa (5,791). The direct-gap label is
-defined only for materials with a gap (1,836).
+\paragraph{Targets.} The bulk, shear and Young's moduli (Voigt--Reuss--Hill)
+are the Materials Project values used in the earlier study of this dataset
+(Kumar et al., J.\ Chem.\ Inf.\ Model.\ 66, 7113, 2026). All other targets come
+from the Materials Project, database version 2026.04.13, for the same material
+identifiers. Elastic data were kept only where $K$ and $G$ lie between 0 and
+1000\,GPa and agree with these moduli (6,000 materials); $C_{11}$, $C_{12}$ and
+$C_{44}$ only where the smallest eigenvalue of the unrounded stiffness tensor
+exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
+a gap (1,836). The structures were split once at random into 4,847 training,
+606 validation and 606 test structures.
 
 \paragraph{Training.} Inputs: the 56 descriptors of pydemi without the constant
 Laplacian concentration ratio (55). Ridge and logistic regression: median
@@ -377,28 +377,6 @@ Property & Ridge / logistic & Random forest & LightGBM & Ridge / logistic & Rand
 \end{adjustbox}
 \end{table}
 
-\begin{table}[htbp]
-\centering
-\caption{Test $R^2$ and MAE for the five properties of the cross-model benchmark
-of S.~K.~Maurya and S.~Bhowmick (manuscript in preparation), on the same split.
-MAE in GPa for $K$, $G$, $E$, eV/atom for $E_\mathrm{form}$ (energy relative to
-the free atoms) and K for $\Theta_D$. Upper block: this work, LightGBM on the
-pydemi descriptors, mean over five seeds (test materials: 606, 606, 606, 592 and
-476). Lower block: as reported in the benchmark, one training run per model.
-$^\dagger$Equal to the MAE of $G$ in the source; as reported.}
-\label{tab:si_benchmark}
-\begin{adjustbox}{width=\textwidth}
-\begin{tabular}{lcccccccccc}
-\toprule
-Model & \multicolumn{2}{c}{$K$} & \multicolumn{2}{c}{$G$} & \multicolumn{2}{c}{$E$} & \multicolumn{2}{c}{$E_\mathrm{form}$} & \multicolumn{2}{c}{$\Theta_D$} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
- & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
-\midrule
-\csname @@input\endcsname tables/tab_benchmark.tex 
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-\end{table}
 
 \begin{figure}[htbp]
 \centering
@@ -834,7 +812,7 @@ iterations before reaching the energy criterion; these densities are kept. The
 
 \paragraph{Cost.} The descriptors of all 6,059 structures were computed in one
 batch run without a failure, on an Intel Xeon Gold 6338N workstation with 16
-worker processes. The time per structure has a median of
+worker processes; the run took 37 minutes. The time per structure has a median of
 3.3\,s and a 95th percentile of 15\,s; added up over the structures, the run
 took 8.4 CPU-hours. The time follows the number of grid points (Spearman
 correlation 0.96) more closely than the number of atoms (0.77). On one core,
