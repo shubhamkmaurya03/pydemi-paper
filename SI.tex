@@ -59,7 +59,7 @@ Quantities defined in atomic units (NCI, information measures) are evaluated in
 bohr. A descriptor that is undefined for a special input returns a documented
 constant and sets a flag.
 
-\subsection{Bonding (19)}
+\subsection{Bonding (18)}
 \begin{description}\sloppy
 \item[Mean charge distance, mean squared charge distance, charge-distance variance] (\dn{m1}, \dn{m2}, \dn{sigma_r2}) [\AA, \AA$^2$, \AA$^2$]
 $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$, $\sigma_r^2=m_2-m_1^2$: mean distance of
@@ -72,10 +72,10 @@ zero for spherical, non-overlapping atoms.
 charge is concentrated.
 \item[Negative-Laplacian charge fraction] (\dn{lnf_charge_weighted}) $\sum_{\nabla^2\rho_k<0}\rho_k/\sum_k\rho_k$: the
 same as a charge fraction.
-\item[Laplacian concentration] (\dn{lap_concentration}) $\sum_{\nabla^2\rho_k<0}|\nabla^2\rho_k|/\sum_k|\nabla^2\rho_k|$;
-identically $\tfrac12$ on a periodic grid, kept for completeness.
-\item[Valence Laplacian concentration] (\dn{lap_concentration_valence}) the same ratio over the voxels with
-$r_k>c_1$.
+\item[Valence Laplacian concentration] (\dn{lap_concentration_valence})
+$\sum_{r_k>c_1,\,\nabla^2\rho_k<0}|\nabla^2\rho_k|/\sum_{r_k>c_1}|\nabla^2\rho_k|$: the share of
+the absolute Laplacian outside the cores where it is negative. Over the whole cell the same ratio is
+$\tfrac12$ for every density, because $\int\nabla^2\rho\,\mathrm dV=0$ on a periodic grid.
 \item[Mean bond ellipticity] (\dn{ellip_bond_bounded_avg}) [0--1) mean of $1-\lambda_2/\lambda_1=\varepsilon/(1+\varepsilon)$
 over the bond-shell voxels with $\lambda_2<0$: zero for cylindrical charge.
 \item[NCI volume fraction] (\dn{f_NCI}) volume fraction of the NCI region
@@ -152,7 +152,7 @@ of the section gives the transfer of each descriptor to predicted densities
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_si_stability.pdf}
-\caption{Sensitivity of the 56 descriptors to every choice (labels coloured by
+\caption{Sensitivity of the 55 descriptors to every choice (labels coloured by
 domain): median relative change $|a-b|/\max(|a|,|b|)$ when the grid is
 Fourier-coarsened to 80\% of its points per axis (30 structures), when the FFT
 derivatives are replaced by fourth- or second-order central differences (200
@@ -160,8 +160,7 @@ structures; 60 for the site statistics of $\zeta$; 48 for the bounded
 ellipticity), when the nearest-atom partition is replaced by the power diagram
 or Becke cells (300 structures), and when the descriptors are computed from the
 ChargE3Net prediction instead of the DFT density (605 test structures, Section~4
-of the main text). Dots mark choices a descriptor does not depend on. The
-Laplacian concentration ratio is constant. The large values of the
+of the main text). Dots mark choices a descriptor does not depend on. The large values of the
 within-element variances on the coarsened grid and of the percolation
 anisotropy reflect a near-zero reference value; those of the heterogeneity
 descriptors under other partitions reflect a change of definition.}
@@ -252,7 +251,7 @@ the predictions is 0.72\% on average (median 0.58\%); crystals with lanthanides
 or actinides are predicted less accurately, and the worst case, YbPrZn$_2$, has
 10.4\%. Before rescaling, the predicted densities integrate to the nominal
 electron count within 0.13\% (median; largest deviation 1.5\%). All 605 were
-featurized without error. Over the 55 informative descriptors the median
+featurized without error. Over the 55 descriptors the median
 relative error is 0.66\%. Per structure, the median error over the 44
 transferable descriptors is 0.53\% (90th percentile 1.2\%) and follows the
 density error (Spearman 0.49; Fig.~\ref{fig:si_ml_structure}); it exceeds 5\%
@@ -271,7 +270,7 @@ of the eigenvalues is at most 0.07\%.
 \centering
 \includegraphics[width=\textwidth]{figures/fig_si_ml_parity_1.pdf}
 \caption{Descriptors of the predicted (ChargE3Net) against the DFT densities for
-the 605 test structures of the density model, first 28 of the 55 informative
+the 605 test structures of the density model, first 28 of the 55
 descriptors in the order of the pydemi catalogue (title colour: blue bonding, green
 structural, purple heterogeneity). Red: structures containing lanthanides or
 actinides. In each panel: Spearman correlation $\rho_s$ and median relative
@@ -313,8 +312,7 @@ exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
 a gap (1,836). The structures were split once at random into 4,847 training,
 606 validation and 606 test structures.
 
-\paragraph{Training.} Inputs: the 56 descriptors of pydemi without the constant
-Laplacian concentration ratio (55). Ridge and logistic regression: median
+\paragraph{Training.} Inputs: the 55 descriptors of pydemi. Ridge and logistic regression: median
 imputation, standardization, penalty from $10^{-3}$ to $10^{3}$ (13 values)
 chosen on the validation set. Random forests: 500 trees, $\frac13$ of the
 features per split for regression and $\sqrt{n}$ for classification, median
@@ -526,15 +524,15 @@ file whose density is predicted.}
 \section{Automated tests}
 \label{si:tests}
 
-The test suite of pydemi 0.2.2 consists of 352 tests in 21 files under
+The test suite of pydemi 0.3.0 consists of 349 tests in 21 files under
 \texttt{tests/} of the repository (Table~\ref{tab:si_tests}). They run with
 \texttt{pytest} after \texttt{pip install "pydemi[gui,ml]"}; on a Linux
-workstation with every optional dependency and the dataset available, all 352
+workstation with every optional dependency and the dataset available, all 349
 pass, none skipped, in 4 minutes.
 
 \begin{table}[htbp]
 \centering
-\caption{The 352 tests of pydemi 0.2.2 by file. Optional dependencies: G, the
+\caption{The 349 tests of pydemi 0.3.0 by file. Optional dependencies: G, the
 \texttt{gui} extra (Streamlit, Plotly, LightGBM); M, the \texttt{ml} extra
 (PyTorch, e3nn, ASE); L, LightGBM; in parentheses, the number of the file's
 tests that need it.}
@@ -544,7 +542,7 @@ tests that need it.}
 \toprule
 Group & File & Tests & Needs & Tolerance \\
 \midrule
-Invariance & \texttt{test\_invariance.py} & 169 & -- & $10^{-6}$ rel. \\
+Invariance & \texttt{test\_invariance.py} & 166 & -- & $10^{-6}$ rel. \\
 Derivatives & \texttt{test\_derivatives.py} & 16 & -- & $10^{-10}$--$5\times10^{-3}$ \\
 Geometry, partitions & \texttt{test\_geometry.py} & 6 & -- & $10^{-12}$ \\
  & \texttt{test\_partitions.py} & 12 & -- & $10^{-12}$--$10^{-5}$ \\
@@ -566,7 +564,7 @@ Interface & \texttt{gui/test\_core.py} & 10 & -- & exact \\
  & \texttt{gui/test\_compare.py} & 5 & G & $10^{-6}$ \\
  & \texttt{gui/test\_app.py} & 16 & G, M (4) & -- \\
 \midrule
-Total & & 352 & & \\
+Total & & 349 & & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -633,12 +631,12 @@ stay finite on a real, partly negative PAW pseudo-density; it runs where the
 dataset is available and skips elsewhere. The three tests that send signals to
 the interface server are skipped on Windows.
 
-\paragraph{Invariance harness (169).} A Fe$_2$O crystal in a triclinic cell
+\paragraph{Invariance harness (166).} A Fe$_2$O crystal in a triclinic cell
 (three Gaussians on a $20\times21\times22$ grid) is featurized as it is, as its
 $2\times2\times2$ supercell, with its origin translated by $(3,7,11)$ voxels and
-rigidly rotated by 37$^\circ$ about $(1,2,0.5)$. Each of the 56 descriptors must
+rigidly rotated by 37$^\circ$ about $(1,2,0.5)$. Each of the 55 descriptors must
 agree under each of the three transformations to
-$|a-b|\leq10^{-6}\max(|a|,|b|)+10^{-12}$ (168 tests). The tests are generated
+$|a-b|\leq10^{-6}\max(|a|,|b|)+10^{-12}$ (165 tests). The tests are generated
 from the descriptor registry, so a descriptor added later is checked without a
 new test. One more test confirms that the transformations do what they claim:
 the supercell has 8 times the atoms, volume and charge, and the rotation
@@ -685,9 +683,10 @@ $\sigma_{r^2}$ within 1\% and the anisotropy $\zeta_\mathrm{anis}<5\times10^{-5}
 with both derivative methods; the error of $m_1$ decreases on refining the grid;
 the negative-Laplacian volume fraction equals that of the sphere $r<1/\zeta$
 within 5\% with finite differences, whereas the ringing FFT Laplacian
-overestimates it by more than 10\%; two atoms give a non-zero anisotropy; the
-Laplacian concentration is $\tfrac12$ to $10^{-10}$ for any density because
-$\int\nabla^2\rho\,\mathrm dV=0$ on a periodic grid; a uniform density gives the
+overestimates it by more than 10\%; two atoms give a non-zero anisotropy; over the
+whole cell the share of $|\nabla^2\rho|$ where $\nabla^2\rho<0$ is $\tfrac12$ to $10^{-10}$,
+because $\int\nabla^2\rho\,\mathrm dV=0$ on a periodic grid, whereas outside the cores it
+is not; a uniform density gives the
 documented constants with their flags and no NaN; names, order, metadata and the
 catalogue are generated from the registry, which refuses extensive quantities;
 and invalid options are rejected. \emph{Structural} (11): the function
@@ -777,11 +776,11 @@ stored descriptors, to $10^{-9}$ (every 30th test material).
 \paragraph{Graphical interface (63).} \emph{Input} (10): a CHGCAR reads to the
 same density plain or compressed (gzip, bzip2, xz, zip); unreadable files and
 unknown partitions give clear errors; the summary (formula, lattice, electron
-count) and the result table cover all 56 descriptors; and every descriptor has
+count) and the result table cover all 55 descriptors; and every descriptor has
 a typeset formula. \emph{Descriptor figures} (10, each with the nearest-atom and
 the Becke partition): every descriptor has a figure, and the plotted data
 reproduce the descriptors: the radial charge distribution gives the shell
-fractions, the negative-Laplacian fractions, the Laplacian concentration and the
+fractions, the negative-Laplacian fractions, the whole-cell Laplacian share of $\tfrac12$ and the
 Fisher information to $10^{-9}$, the histograms are centred on $\zeta$, the
 anisotropy-tensor eigenvalues and the bond ellipticity within one bin, and the
 critical points, NNM charge, site potentials, bond midpoints, percolation

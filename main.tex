@@ -36,7 +36,7 @@ calculation contains the bonding that property models try to learn, yet it is
 rarely used as a model input. Learned density representations predict
 properties well but are hard to interpret, while interpretable density analysis
 treats one structure at a time. We present pydemi, an open-source Python
-package that turns a VASP \texttt{CHGCAR} file, and nothing else, into 56
+package that turns a VASP \texttt{CHGCAR} file, and nothing else, into 55
 interpretable descriptors of bonding, structure and site heterogeneity. Each
 descriptor is stable with respect to the grid and the numerical method and is
 documented with its formula, units and range. From the crystal structure
@@ -145,7 +145,7 @@ them carry the information. A few chosen examples cannot answer it. It has to be
 answered on a large, well-defined dataset and for many properties at once.
 
 Here we describe pydemi, a Python package built around these three problems.
-(i) It reads one file, the VASP \texttt{CHGCAR}, and computes 56 descriptors
+(i) It reads one file, the VASP \texttt{CHGCAR}, and computes 55 descriptors
 that are defined on it and whose values are set by the material, not by the
 grid or the numerical method (Sections~\ref{sec:design}
 and~\ref{sec:descriptors}). The descriptors describe how the charge is
@@ -299,7 +299,7 @@ $\hat{\mathbf u}_k$ the unit vector from that nucleus to the voxel.
 
 \begin{table}[!t]
 \centering
-\caption{The 19 bonding descriptors of pydemi, with a descriptive name and
+\caption{The 18 bonding descriptors of pydemi, with a descriptive name and
 the name used in the package and in the text. Shells around the nearest nucleus:
 core within 0.8\,\AA, bond shell 0.8--1.5\,\AA, interstitial region beyond
 1.5\,\AA{} (defaults). Formulas, ranges, references and fallback values:
@@ -320,8 +320,7 @@ Interstitial charge fraction & \texttt{f\_int} & fraction of the charge in the i
 Non-radial gradient share & \texttt{zeta} & non-radial share of the density gradient (0 for spherical atoms) & -- \\
 Negative-Laplacian volume fraction & \texttt{lnf} & volume fraction with negative Laplacian (charge concentrated) & -- \\
 Negative-Laplacian charge fraction & \texttt{lnf\_charge\_weighted} & fraction of the charge where the Laplacian is negative & -- \\
-Laplacian concentration & \texttt{lap\_concentration} & share of the absolute Laplacian where it is negative; always $\tfrac12$ & -- \\
-Valence Laplacian concentration & \texttt{lap\_concentration\_valence} & the same share outside the cores & -- \\
+Valence Laplacian concentration & \texttt{lap\_concentration\_valence} & share of the absolute Laplacian outside the cores where it is negative & -- \\
 Mean bond ellipticity & \texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity in the bond shell: 0 cylindrical, 1 flat & -- \\
 NCI volume fraction & \texttt{f\_NCI} & volume fraction of the non-covalent-interaction (NCI) region & -- \\
 Attractive NCI fraction & \texttt{NCI\_attractive} & fraction of the NCI region that is attractive & -- \\
@@ -383,7 +382,10 @@ gradient anisotropy
 \end{equation}
 vanishes for spherical, non-overlapping atoms and grows as charge is pulled off
 the radial direction. The Laplacian descriptors locate where charge is
-concentrated ($\nabla^2\rho<0$), the bounded ellipticity distinguishes
+concentrated ($\nabla^2\rho<0$). The share of $|\nabla^2\rho|$ that lies where
+$\nabla^2\rho<0$ is computed only outside the cores: over the whole cell
+$\nabla^2\rho$ integrates to zero, so this share would be $\tfrac12$ for every
+crystal. The bounded ellipticity distinguishes
 cylindrical from flattened charge in the bond shell, and the NCI descriptors
 pick out the low-density, low-gradient regions of weak
 interactions~\cite{johnson2010}. The structural descriptors treat the density of
@@ -395,16 +397,8 @@ statistics over the atoms, including the decomposition
 $\mathrm{Var}_iX=\sum_e x_e\mathrm{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
 into within- and between-element parts, where $x_e$ is the site fraction of
 element $e$; the decomposition is exact, as in a one-way analysis of variance.
-
 Every descriptor is invariant under supercell expansion, translation and rotation
-of the crystal. One, the Laplacian concentration ratio
-$\sum_{\nabla^2\rho<0}|\nabla^2\rho_k|/\sum_k|\nabla^2\rho_k|$, is identically
-$\tfrac12$ for any periodic density, because the cell integral of
-$\nabla^2\rho$ vanishes; over our dataset it
-differs from $\tfrac12$ by at most $2\times10^{-16}$. It is kept for continuity
-with the original specification, and the same ratio restricted to the valence
-region ($r_k>c_1$) carries the information. It is excluded from the analyses
-below, which therefore use 55 informative descriptors.
+of the crystal.
 
 A descriptor should describe the material, not the way it was computed. Two
 things in a pydemi calculation are not set by the material. The first is the
@@ -506,8 +500,7 @@ sets of values (axis from 0.8 to 1; the three descriptors below 0.8 are marked
 with their value; dotted lines at 0.95 and 0.99). (b) Median relative error
 $|a-b|/\max(|a|,|b|)$ over the structures (logarithmic axis; 0 where both values
 are zero for most structures, as for the non-nuclear maxima). Colours: green
-$\rho_s\geq0.99$, orange $0.95\leq\rho_s<0.99$, red $\rho_s<0.95$. The Laplacian
-concentration ratio is $\tfrac12$ in both densities. Parity plots of every
+$\rho_s\geq0.99$, orange $0.95\leq\rho_s<0.99$, red $\rho_s<0.95$. Parity plots of every
 descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
@@ -520,7 +513,7 @@ helps a property model when it puts materials in the right order, so we
 measured, for each descriptor, whether its values from the DFT and from the
 predicted densities rank the test materials in the same order (Spearman
 rank correlation $\rho_s$, which is 1 for the same order). For 44 of the 55
-descriptors that vary between materials, $\rho_s$ is at least 0.95, and for 37
+descriptors, $\rho_s$ is at least 0.95, and for 37
 of them at least 0.99 (Fig.~\ref{fig:ml}a); the typical value of a descriptor
 changes by less than 1\%. They include all 18 heterogeneity descriptors, 16
 of the 18 bonding descriptors, and the percolation levels, the density floor
@@ -585,7 +578,7 @@ given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 \centering
 \caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
 or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
-standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 informative descriptors and with the ten most important
+standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 descriptors and with the ten most important
 descriptors of each property. MAE: mean absolute error with all
 descriptors. $n$: training and test materials.}
 \label{tab:properties}
@@ -756,7 +749,7 @@ format are read correctly; that a batch run continues past a broken file; that
 the included density model gives the same predictions as the original ChargE3Net
 code; that the property models reproduce their stored predictions; and that every
 figure of the graphical interface shows data that reproduce the descriptor
-values. With all extras installed, the 352 tests run automatically on Linux,
+values. With all extras installed, the 349 tests run automatically on Linux,
 macOS and Windows with every supported Python version whenever the code changes;
 they are listed in Section~S6 of the Supporting Information.
 
@@ -774,7 +767,7 @@ boundaries and its formula.}
 \section{Conclusions}
 \label{sec:conclusions}
 pydemi turns the one file that every VASP calculation writes, the
-\texttt{CHGCAR}, into 56 descriptors, each with a short physical meaning and a
+\texttt{CHGCAR}, into 55 descriptors, each with a short physical meaning and a
 value set by the material rather than by the grid or the numerical method. It
 computed every descriptor for every crystal of our dataset without a failure,
 and automated tests check each descriptor against known answers. It can be used
