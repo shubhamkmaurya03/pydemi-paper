@@ -239,6 +239,16 @@ it has to be divided by the volume, the number of atoms or the total charge
 first, and the supercell test then checks that the result really does not
 change with the cell size.
 
+Throughout this work, pydemi is applied to the charge densities of 6,059
+inorganic crystals of 87 elements from our earlier study~\cite{kumar2026},
+computed with VASP~\cite{kresse1996} and the PBE functional~\cite{perdew1996}
+for structures taken from the Materials Project; the structures and the DFT
+settings are described there. The set contains elemental solids, intermetallic
+compounds and compounds of metals with non-metals (borides, carbides, hydrides,
+pnictides, chalcogenides, oxides and halides), so metallic, covalent and ionic
+bonding are all well represented. The number of structures in each class is
+given in Section~S7 of the Supporting Information.
+
 % ==========================================================================
 \section{The descriptors}
 \label{sec:descriptors}
@@ -335,7 +345,7 @@ Every descriptor is invariant under supercell expansion, translation and rotatio
 of the crystal. One, the Laplacian concentration ratio
 $\sum_{\nabla^2\rho<0}|\nabla^2\rho_k|/\sum_k|\nabla^2\rho_k|$, is identically
 $\tfrac12$ for any periodic density, because the cell integral of
-$\nabla^2\rho$ vanishes; over the dataset of Section~\ref{sec:dataset} it
+$\nabla^2\rho$ vanishes; over our dataset it
 differs from $\tfrac12$ by at most $2\times10^{-16}$. It is kept for continuity
 with the original specification, and the same ratio restricted to the valence
 region ($r_k>c_1$) carries the information. It is excluded from the analyses
@@ -354,8 +364,7 @@ computed. If a descriptor changed noticeably when either of these changed, the
 same material could get different values, and a model trained on the
 descriptor would learn this noise instead of the material.
 
-We therefore tested both on structures of our dataset
-(Section~\ref{sec:dataset}). For the grid, we recomputed the descriptors on a
+We therefore tested both on structures of our dataset. For the grid, we recomputed the descriptors on a
 coarser grid with about half as many points, as a calculation with a lower
 cutoff would give. For the derivatives, we replaced the default method, which
 takes exact derivatives from the Fourier transform of the density, by the
@@ -428,29 +437,6 @@ when the grid is refined. The tests run
 automatically on Linux, macOS and Windows with every supported Python version.
 Each test, its reference and its allowed difference are listed in Section~S6 of
 the Supporting Information.
-
-% ==========================================================================
-\section{Running pydemi on a DFT dataset}
-\label{sec:dataset}
-
-We applied pydemi to the charge densities of 6,059 inorganic crystals of 87
-elements from our earlier study~\cite{kumar2026}, computed with
-VASP~\cite{kresse1996} and the PBE functional~\cite{perdew1996} for structures
-taken from the Materials Project; the structures and the DFT settings are
-described there. The set contains elemental solids, intermetallic compounds and
-compounds of metals with non-metals (borides, carbides, hydrides, pnictides,
-chalcogenides, oxides and halides), so metallic, covalent and ionic bonding are
-all well represented. The number of structures in each class is given in
-Section~S7 of the Supporting Information.
-
-pydemi computed all descriptors of every structure without a single failure.
-On one core of an Intel Xeon Gold 6338N processor, a typical structure takes
-3.3\,s (median), and 95\% of the structures take less than 15\,s. The whole
-dataset took 8.4 CPU-hours, that is, the computing times of all structures on a
-single core added up; run on 16 cores in parallel, it took 37 minutes.
-The cost grows with the size of the density grid rather than with the number of
-atoms. Even the largest \texttt{CHGCAR} we tried, 350\,MB, takes under a minute
-and 2.6\,GB of memory, well within the memory of an ordinary laptop.
 
 % ==========================================================================
 \section{Descriptors without a DFT calculation}
@@ -681,6 +667,13 @@ through the Python functions \texttt{read\_chgcar}, \texttt{featurize},
 \texttt{batch}, \texttt{catalogue}, \texttt{sweep}, \texttt{predict},
 \texttt{gui}). Batch runs write one row per structure, with the flag columns and
 the run metadata, and continue past structures that fail, recording the error.
+On our dataset, a batch run computed all descriptors of every structure without
+a failure. On one core of an Intel Xeon Gold 6338N processor, a typical
+structure takes 3.3\,s. Added up over all structures, the run needed 8.4
+CPU-hours; on 16 cores in parallel it finished in 37 minutes. The time depends
+mainly on the size of the density grid, not on the number of atoms, and even the
+largest \texttt{CHGCAR} in the dataset takes under a minute and 2.6\,GB of
+memory, well within the memory of an ordinary laptop.
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
 the browser; it listens on the local machine only, so the files never leave it
