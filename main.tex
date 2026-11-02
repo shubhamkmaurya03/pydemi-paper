@@ -158,8 +158,10 @@ top) and a crystal structure (CIF, POSCAR or any format ASE reads) whose density
 is predicted by the included ChargE3Net model (left, bottom) give the same
 density grid $\rho(\mathbf{r})$, shown as the $1.5$~e\,\AA$^{-3}$ isosurface
 around O, the Mg atoms and the density on one face of the cell. Inside pydemi
-(centre box), derived fields and the geometry pass are computed once per
-structure and cached, and the registered descriptors reduce them. The radial
+(centre box), the grid is held in a \texttt{VolumetricData} object; the derived
+fields (gradient, Laplacian, Hartree potential $V_\mathrm{H}$) and the atomic
+cells of the geometry pass are computed once per structure and cached on it,
+and the registered descriptors reduce them. The radial
 bars give the percentile of each of the 56 descriptors of MgO within the
 dataset, grouped by domain. The descriptors are used from Python, the command
 line or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}),
