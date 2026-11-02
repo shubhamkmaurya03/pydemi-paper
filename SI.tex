@@ -526,7 +526,7 @@ file whose density is predicted.}
 \section{Automated tests}
 \label{si:tests}
 
-The test suite of pydemi 0.2.1 consists of 352 tests in 21 files under
+The test suite of pydemi 0.2.2 consists of 352 tests in 21 files under
 \texttt{tests/} of the repository (Table~\ref{tab:si_tests}). They run with
 \texttt{pytest} after \texttt{pip install "pydemi[gui,ml]"}; on a Linux
 workstation with every optional dependency and the dataset available, all 352
@@ -534,7 +534,7 @@ pass, none skipped, in 4 minutes.
 
 \begin{table}[htbp]
 \centering
-\caption{The 352 tests of pydemi 0.2.1 by file. Optional dependencies: G, the
+\caption{The 352 tests of pydemi 0.2.2 by file. Optional dependencies: G, the
 \texttt{gui} extra (Streamlit, Plotly, LightGBM); M, the \texttt{ml} extra
 (PyTorch, e3nn, ASE); L, LightGBM; in parentheses, the number of the file's
 tests that need it.}
@@ -770,9 +770,9 @@ $\geq1$, probabilities in $[0,1]$) and allow NaN descriptors; dataset materials 
 recognized from their descriptors and out-of-range inputs flagged; the model
 path, a missing model and a LightGBM that cannot load (macOS without OpenMP) are
 reported clearly; and the tables, figures and texts of the property view are
-built. The distributed bundle of 22 models reproduces the test-set predictions
-made with the untrimmed models when it was built, from the stored descriptors
-and formulas, to $10^{-9}$ (every 30th test material).
+built. The distributed bundle of the 17 models of the main text reproduces the
+test-set predictions made with the untrimmed models when it was built, from the
+stored descriptors, to $10^{-9}$ (every 30th test material).
 
 \paragraph{Graphical interface (63).} \emph{Input} (10): a CHGCAR reads to the
 same density plain or compressed (gzip, bzip2, xz, zip); unreadable files and
