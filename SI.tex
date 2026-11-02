@@ -777,13 +777,17 @@ halides. The cells contain 1--152 atoms (median 6) on grids of
 $1.8\times10^5$ to $1.7\times10^6$ points (5th--95th percentile).
 
 \paragraph{DFT calculations.} The structures were taken from the Materials
-Project and relaxed (ionic positions, cell shape and volume, conjugate
-gradient, residual forces below $10^{-3}$\,eV\,\AA$^{-1}$) with VASP, the PBE
-functional and PAW potentials, a plane-wave cutoff of 500\,eV and a $k$-point
-spacing of 0.1\,\AA$^{-1}$, as described in the original study. Each run folder
-holds the \texttt{CHGCAR}; 4,901 also hold the \texttt{OUTCAR}, which records a
-spin-polarized single-point calculation on the relaxed structure with one PAW
-dataset per element. In 221 of these 4,901 runs (4.5\%, 133 of them
+Project and relaxed with VASP, the PBE functional and PAW potentials, a
+plane-wave cutoff of 500\,eV and a $k$-point spacing of 0.1\,\AA$^{-1}$: ionic
+positions, cell shape and volume were optimized with the conjugate-gradient
+algorithm until the residual forces were below $10^{-3}$\,eV\,\AA$^{-1}$, with
+Gaussian smearing and an energy criterion of $10^{-5}$\,eV for the electronic
+self-consistency. The density was then recomputed on the relaxed structure with
+the tetrahedron method with Bl\"ochl corrections, which makes it independent of
+a smearing width (original study). Each run folder holds the \texttt{CHGCAR} of
+this last calculation; 4,901 also hold its \texttt{OUTCAR}, which records a
+spin-polarized single-point calculation with one PAW dataset per element and an
+energy criterion of $10^{-6}$\,eV. In 221 of these 4,901 runs (4.5\%, 133 of them
 intermetallics) the self-consistency loop stopped at its limit of 200
 iterations before reaching the energy criterion; these densities are kept. The
 1,158 runs without an \texttt{OUTCAR} are assumed to follow the same protocol.

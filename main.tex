@@ -470,7 +470,9 @@ was computed. They are 86 elemental solids, 3,195 intermetallic compounds and
 chalcogenides, oxides and halides). The densities were computed with
 VASP~\cite{kresse1996}, the PBE functional~\cite{perdew1996} and PAW
 potentials~\cite{kresse1999}, a plane-wave cutoff of 500\,eV, a $k$-point
-spacing of 0.1\,\AA$^{-1}$ and spin polarization~\cite{kumar2026}. In 221 of
+spacing of 0.1\,\AA$^{-1}$ and spin polarization; after the relaxation, the
+density was recomputed with the tetrahedron method with Bl\"ochl corrections,
+so that it does not depend on a smearing width~\cite{kumar2026}. In 221 of
 the 4,901 calculations whose output files are available (4.5\%), the
 self-consistency loop stopped at its iteration limit before reaching the energy
 criterion; these densities are kept. Details are given in Section~S7 of the
