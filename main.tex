@@ -488,10 +488,10 @@ atoms. Even the largest \texttt{CHGCAR} we tried, 350\,MB, takes under a minute
 and 2.6\,GB of memory, well within the memory of an ordinary laptop.
 
 % ==========================================================================
-\section{Descriptors from the crystal structure alone}
+\section{Descriptors without a DFT calculation}
 \label{sec:ml}
 
-\subsection{The density model}
+\subsection{Predicting the density from the structure}
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
 electron density of a crystal from its atomic structure alone. We kept its
 published architecture and retrained the published Materials Project model on
@@ -509,7 +509,7 @@ reproduces the predictions of the original implementation; its cost grows with
 the number of atoms and grid points, and a GPU is used when one is available.
 Technical details are given in Section~S2 of the Supporting Information.
 
-\subsection{Transfer of the descriptors}
+\subsection{Do the descriptors survive the prediction?}
 The predicted densities are close to the DFT ones: over the 605 test
 structures, the typical difference is about 0.6\% of the density (median),
 somewhat larger for crystals with lanthanides or actinides. The question for
