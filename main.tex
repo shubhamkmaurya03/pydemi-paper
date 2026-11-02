@@ -31,41 +31,36 @@
 
 % --- ABSTRACT -------------------------------------------------------------
 \begin{abstract}
-The electronic charge density $\rho(\mathbf{r})$ of a density-functional theory
-(DFT) calculation records the bonding that property models try to learn, but it
-is rarely used directly as a model input. Learned representations of the
-density grid predict properties well but have no individually interpretable
-features, and the interpretable quantities of density analysis are computed one
-structure at a time. We present pydemi, an open-source Python package that
-reduces a VASP \texttt{CHGCAR}, and nothing else, to 56 fixed-length,
-intensive and physically interpretable descriptors in three domains: bonding
-(19), structural (19) and site heterogeneity (18). Each descriptor is defined
-on the PAW pseudo-density that a \texttt{CHGCAR} holds, is converged on typical
-VASP grids, and is registered with its formula, units, range and documented
-fallback values. When no DFT calculation is available, pydemi predicts the
-density from the crystal structure with a ChargE3Net model fine-tuned on our
-dataset, on the grid VASP would use. Computed from the predicted densities of
-605 held-out structures, 44 of the 55 descriptors that vary between materials
-keep a rank correlation of at least 0.95 with their DFT values; the exceptions
-are four critical-point descriptors, two quantities built on second derivatives and
-five anisotropy measures whose values cluster. pydemi computes all descriptors
-of a 6,059-structure VASP dataset without a failure, in a median of 3.3\,s per
-structure on one CPU core, is verified by 352 automated tests, and is used from
-Python, the command line or a local graphical interface. Gradient-boosted
-models trained on the descriptors alone predict 17 elastic, thermal,
-energetic, electronic and optical properties of the same dataset, with test
-$R^2$ of 0.85--0.95 for the moduli, elastic constants, thermal properties,
-formation and cohesive energies and band gap, and a ROC-AUC of 0.984 for
-metallicity. For the bulk, shear and Young's moduli ($R^2$ 0.949, 0.908 and
-0.917) they match or exceed the graph neural networks and density-based models
-reported earlier for the same structures. Ten descriptors per property, chosen by their SHAP values on the training set, retain 92--99\% of the test $R^2$. The mean interstitial
-density and the volume fraction of the non-covalent-interaction region are the
-most important descriptors. Properties predicted from the descriptors of
-ML-predicted densities agree with those from DFT densities (test $R^2$ for the
-bulk modulus 0.958 against 0.956 on structures held out from both models), so
-the whole path from a crystal structure to the properties runs without a DFT
-calculation.
+The electronic charge density from a density-functional theory (DFT)
+calculation contains the bonding that property models try to learn, yet it is
+rarely used directly as a model input. Learned representations of the density
+predict properties well but are hard to interpret, and the interpretable
+quantities of density analysis are usually computed one structure at a time. We
+present pydemi, an open-source Python package that turns a VASP
+\texttt{CHGCAR} file, and nothing else, into 56 physically interpretable
+descriptors of bonding, structure and site heterogeneity. Each descriptor is
+stable with respect to the grid and the numerical method, and is documented with
+its formula, units, range and the value returned where it is undefined. When no
+DFT calculation is available, pydemi predicts the density from the crystal
+structure with an included ChargE3Net model, and most descriptors computed from
+the predicted densities rank materials almost exactly as their DFT values do.
+On a dataset of 6,059 inorganic crystals, pydemi computed every descriptor
+without a failure, in a few seconds per structure. Gradient-boosted models
+trained on the descriptors alone predict 17 elastic, thermal, energetic,
+electronic and optical properties, most of them with a test $R^2$ between 0.85
+and 0.95; for the bulk, shear and Young's moduli they match or exceed the graph
+neural networks reported for the same structures. The mean interstitial density
+and the volume of the non-covalent-interaction region are the most informative
+descriptors. Properties predicted from the descriptors of ML-predicted densities
+agree closely with those from DFT densities, so pydemi can go from a crystal
+structure to its properties without a DFT calculation.
+% TODO: reword the previous sentence from the 605-structure held-out results (Sec. 8.3)
+pydemi can be used from Python, the command line or a local graphical
+interface.
 \end{abstract}
+
+\noindent\textbf{Keywords:} electron charge density; descriptors; machine
+learning; materials property prediction; interpretability; Python
 
 \section{Introduction}
 \label{sec:intro}
