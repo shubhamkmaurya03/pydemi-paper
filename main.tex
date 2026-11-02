@@ -39,21 +39,19 @@ treats one structure at a time. We present pydemi, an open-source Python
 package that turns a VASP \texttt{CHGCAR} file, and nothing else, into 56
 interpretable descriptors of bonding, structure and site heterogeneity. Each
 descriptor is stable with respect to the grid and the numerical method and is
-documented with its formula, units and range. Without a DFT calculation, pydemi
-predicts the density from the crystal structure with an included ChargE3Net
-model; most descriptors of the predicted densities rank materials almost
-exactly as their DFT values do. For 6,059 inorganic crystals, pydemi computed
-every descriptor without a failure in a few seconds per structure.
-Gradient-boosted models on the descriptors alone predict 17 elastic,
-thermal, energetic, electronic and optical properties, mostly with a test $R^2$
-between 0.85 and 0.95; for the bulk, shear and Young's moduli they match or
-exceed the graph neural networks reported for the same structures. The most
-informative descriptors are the mean interstitial density and the
-non-covalent-interaction volume. On structures unseen by either model,
-properties predicted from ML-predicted densities are nearly as accurate as
-those from DFT densities, so a relaxed crystal structure suffices to predict
-properties without a DFT calculation. pydemi runs from Python, the command line
-or a local graphical interface.
+documented with its formula, units and range. From the crystal structure
+alone, pydemi can also predict the density with an included ChargE3Net model;
+most descriptors of the predicted densities rank materials almost exactly as
+their DFT values do. For 6,059 inorganic crystals, pydemi computed every
+descriptor without a failure in a few seconds per structure. Gradient-boosted
+models on the descriptors alone predict 17 elastic, thermal, energetic,
+electronic and optical properties, mostly with a test $R^2$ between 0.85 and
+0.95. SHAP values show which descriptors drive each prediction, and ten
+descriptors per property are almost as good as all of them. On structures that
+neither model saw in training, properties predicted from ML-predicted densities
+are nearly as accurate as those from DFT densities. pydemi can therefore
+predict the properties of a relaxed crystal structure without computing its
+density. It runs from Python, the command line or a local graphical interface.
 \end{abstract}
 
 \noindent\textbf{Keywords:} electron charge density; descriptors; machine
@@ -479,7 +477,7 @@ when the grid is refined. Each test, its reference and its allowed difference ar
 the Supporting Information.
 
 % ==========================================================================
-\section{Descriptors without a DFT calculation}
+\section{Descriptors from a predicted density}
 \label{sec:ml}
 
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
@@ -697,9 +695,9 @@ Section~S4 and Table~S7 of the Supporting Information.
 
 The test structures were relaxed with DFT. For a new material, the structure has
 to come from elsewhere, for example from experiment or from an ML interatomic
-potential, and its errors add to those measured here. Within this limit, a
-crystal structure is enough to obtain the descriptors and the properties without
-a DFT calculation.
+potential, and its errors add to those measured here. Within this limit, the
+descriptors and the properties of a relaxed crystal structure can be obtained
+without computing its density.
 
 % ==========================================================================
 \section{Software}
@@ -786,17 +784,14 @@ a crystal structure alone. The exceptions are the counts of density maxima and
 minima, quantities built from second derivatives in low-density regions, and
 descriptors whose values cluster.
 
-Used alone, the descriptors predict 17 properties. For the elastic moduli they
-are as accurate as the graph neural networks and the density-based model
-reported earlier for the same structures, although that comparison uses
-different data splits. A few descriptors carry most of the information, led by
-the mean interstitial density and the volume of the non-covalent-interaction
-region, and ten descriptors per property are almost as good as all 55. On
-structures that neither model had seen, properties predicted from ML-predicted
-densities are nearly as accurate as those from DFT densities, and the small
-losses come from the descriptors that transfer less well. A relaxed crystal
-structure is therefore enough to obtain both the descriptors and the properties
-without a DFT calculation.
+Used alone, the descriptors predict 17 elastic, thermal, energetic,
+electronic and optical properties. SHAP values show which descriptors drive
+each prediction, and ten descriptors per property are almost as good as all of
+them. On structures that neither model had seen, properties predicted from
+ML-predicted densities are nearly as accurate as those from DFT densities, and
+the small losses come from the descriptors that transfer less well. pydemi can
+therefore predict the properties of a relaxed crystal structure without
+computing its density.
 
 The main limits point to future work. pydemi reads only VASP files. It ignores
 magnetization densities, because the density model does not predict them. The
