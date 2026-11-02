@@ -587,8 +587,7 @@ with different random seeds, and we report the average. To find out which
 descriptors the models rely on, we used SHAP values~\cite{lundberg2020}, which
 split each prediction into the contributions of the individual descriptors. We
 also retrained every model on only the ten most important descriptors of its
-property, chosen on the training set, and on the descriptors that remain after
-removing those that closely duplicate others. All details are given in
+property, chosen on the training set. All details are given in
 Section~S3 of the Supporting Information. LightGBM was the most accurate of the
 three models for every property (for the direct gap, the random forest was
 better by 0.001; Supporting Information, Table~S3), and its test scores are
@@ -624,67 +623,38 @@ deviation.}
 \end{figure}
 
 \subsection{Results and interpretation}
-The same structures were used in our earlier study~\cite{kumar2026},
-which predicted five properties from a compressed representation of the full
-density grid, alone or together with compositional features, and compared the
-results with the graph neural networks CGCNN~\cite{xie2018} and
-MEGNet~\cite{chen2019}. That study used its own data splits, so the comparison
-is indicative. For the bulk, shear and Young's moduli, LightGBM on the
-pydemi descriptors alone reaches $R^2$ of 0.949, 0.908 and 0.917. The best
-model of the earlier study, which also used the composition, reached 0.94, 0.87
-and 0.88, the density representation alone 0.90, 0.80 and 0.79, CGCNN 0.93,
-0.88 and 0.89, and MEGNet 0.93, 0.87 and 0.86~\cite{kumar2026}. With only ten
-descriptors per property, the moduli still reach 0.937, 0.875 and 0.890. For
-the Debye temperature, the descriptors ($R^2=0.896$) match the best model of
-the earlier study (0.89) but stay behind CGCNN (0.94). The formation energy of
+The same structures were used in our earlier study~\cite{kumar2026}, which
+predicted five properties from a compressed representation of the full density
+grid, alone or together with compositional features, and compared the results
+with the graph neural networks CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}.
+That study used its own data splits, so the comparison is indicative. For the
+bulk, shear and Young's moduli, LightGBM on the pydemi descriptors alone reaches
+$R^2$ of 0.949, 0.908 and 0.917. This is slightly above the best model of the
+earlier study (0.94, 0.87 and 0.88), which also used the composition, and above
+the density representation alone, CGCNN and MEGNet (at most 0.93, 0.88 and
+0.89)~\cite{kumar2026}. For the Debye temperature, the descriptors match the
+best model of the earlier study but stay behind CGCNN. The formation energy of
 the earlier study is measured from the free atoms and was computed differently
 from the cohesive energy used here, so the two are not compared.
 
-The most important descriptor overall is the mean interstitial density. It is
-the most important input for the bulk modulus (28\% of the mean absolute SHAP
-value), the shear and Young's moduli, the three elastic constants and the
-refractive index (Supporting Information, Fig.~S5). The volume fraction of the NCI
-region has the same role for the electronic properties: it is the most
-important input for the band gap (31\%), metallicity (30\%) and the formation
-energy (19\%). For the Debye temperature, the sound velocities and the minimum
-thermal conductivities, the radial spread $\sigma_r^2$, the interstitial charge
-fraction and the valence Laplacian concentration lead, and the cohesive energy
-draws on the bond-midpoint and interstitial densities. Only the direct-gap
-classification has no dominant descriptor (at most 7\%). The information is concentrated in few descriptors: the ten most important
-descriptors of a property (ranked on the training set;
-Fig.~\ref{fig:top10}, and listed in Supporting Information, Table~S4) carry 46--69\% of its mean absolute SHAP value, and models trained on
-these ten alone lose 0.01--0.07 in $R^2$ (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}), least for the bulk modulus (0.937 against 0.949),
-$C_{12}$ and metallicity, most for the transverse sound velocity (0.782 against
-0.854), the band gap and the cohesive energy. Only 34 of the 55 descriptors
-appear in any of the lists: the most important
-descriptor of every property is one of 6, the three most important are among
-16 and the five most important among 23; the mean interstitial density (in 16 lists), the
-radial spread $\sigma_r^2$ (14) and the negative-Laplacian volume fraction (13)
-appear most often (Supporting Information, Fig.~S6). Six to nine (on average 8.4) of the ten descriptors of each
-property transfer to predicted densities with $\rho_s\geq0.95$
+The mean interstitial density is the most important descriptor overall: it
+leads for the elastic moduli and constants and for the refractive index. The
+volume fraction of the NCI region plays the same role for the band gap,
+metallicity and the formation energy. The thermal properties rely mainly on the
+radial spread $\sigma_r^2$, the interstitial charge fraction and the valence
+Laplacian concentration, and the cohesive energy on the bond-midpoint and
+interstitial densities; only the direct-gap classification has no dominant
+descriptor (Supporting Information, Fig.~S5). The information is concentrated
+in a few descriptors. Models trained on only the ten most important descriptors
+of each property, chosen on the training set (Fig.~\ref{fig:top10};
+Supporting Information, Table~S4), keep 92--99\% of the test score obtained
+with all descriptors (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}).
+Across all properties, these lists together use 34 of the 55 descriptors, and
+a few of them appear for most properties, led by the mean interstitial density,
+the radial spread and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). Most of
+the ten descriptors of each property also transfer to predicted densities
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.
-
-Several descriptors are closely related, by construction or in these materials:
-the standard deviation, range and between-element variance of the same site
-quantity, the eigenvalues of the anisotropy tensor ($t_1+t_2+t_3=1$) and its
-fractional anisotropy, $m_1$ and $m_2=m_1^2+\sigma_r^2$, or the Shannon entropy
-and the disequilibrium of the density. On the training set, 18
-descriptors have $|\rho_s|\geq0.90$ with another one, in 11 groups
-(Supporting Information, Table~S5). The models split the importance between the
-members of a group: the 18 carry 10--24\% of the mean absolute SHAP value of a
-property, and three of them are among the ten most important descriptors of the
-cohesive energy and of the direct gap. Without them, the remaining 37
-descriptors give the same test score, within the bootstrap interval, for 16 of
-the 17 properties (changes $-0.010$ to $+0.008$, with a small gain of 0.003 for
-the bulk modulus); only the band gap loses, $R^2=0.832$ against 0.852
-(interval of the change $-0.037$ to $-0.007$; Supporting Information,
-Table~S6). For these properties, 37 of the 55 descriptors thus carry the information
-the models use, and the rank of a single descriptor in
-Fig.~\ref{fig:top10} depends on which member of its group the model happened
-to use. pydemi still computes all of them: most of these correlations are
-observed in this dataset rather than fixed by definition, and need not hold for
-other materials or properties.
 
 \begin{figure}[htbp]
 \centering
