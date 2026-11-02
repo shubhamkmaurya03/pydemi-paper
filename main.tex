@@ -54,7 +54,7 @@ and the volume of the non-covalent-interaction region are the most informative
 descriptors. Properties predicted from the descriptors of ML-predicted densities
 agree closely with those from DFT densities, so pydemi can go from a crystal
 structure to its properties without a DFT calculation.
-% TODO: reword the previous sentence from the 605-structure held-out results (Sec. 8.3)
+% TODO: reword the previous sentence from the 605-structure held-out results (Sec. 5.3)
 pydemi can be used from Python, the command line or a local graphical
 interface.
 \end{abstract}
@@ -158,7 +158,7 @@ distributed around each nucleus and between the atoms, the shape of the density
 over the whole cell, and how much the atoms of a crystal differ from one
 another. Each has a short physical definition, and each is checked by automated
 tests against densities with known answers and against different descriptions of
-the same crystal (Section~\ref{sec:validation}). (ii) It includes a density
+the same crystal. (ii) It includes a density
 model, so that the same descriptors are obtained from a crystal structure alone,
 and we measure which descriptors transfer from DFT to predicted densities
 (Section~\ref{sec:ml}). (iii) We train property models on the descriptors alone
@@ -245,7 +245,7 @@ exactly the same distance from two nuclei, which is common when atoms sit on
 high-symmetry grid points, is given to one of them by a fixed geometric rule
 that does not depend on the order in which the atoms are listed. The same point
 then belongs to the same atom in a cell, in its supercell and in a translated or
-rotated copy, which the invariance tests of Section~\ref{sec:validation}
+rotated copy, which the invariance tests of Section~\ref{sec:descriptors}
 require. The distance to the nearest nucleus also divides the cell into a core,
 a bond shell and an interstitial region, with boundaries at 0.8 and 1.5\,\AA{}
 by default or at multiples of the covalent radius of each atom. The descriptors
@@ -273,7 +273,7 @@ This registry is the single list from which everything else is built. The
 feature vector always has the registered descriptors in the order of
 registration, so its columns never change between runs. The catalogue of names,
 units, ranges, formulas and undefined cases is read from it, and so are the
-invariance tests of Section~\ref{sec:validation}, so a descriptor added later is
+invariance tests of Section~\ref{sec:descriptors}, so a descriptor added later is
 tested without writing a new test. Registration refuses a quantity that grows
 with the size of the cell, such as a total charge or a number of density maxima;
 it has to be divided by the volume, the number of atoms or the total charge
@@ -447,14 +447,10 @@ function, which needs more than the density~\cite{abramov1997,tsirelson2002}),
 and what the PAW pseudo-density~\cite{blochl1994,kresse1999} stored in a
 \texttt{CHGCAR} means for the descriptors.
 
-% ==========================================================================
-\section{Validation}
-\label{sec:validation}
-
-A descriptor library is only useful if its numbers are right. pydemi is
-therefore checked by 352 automated tests that run every time the code changes.
-Each test computes something with pydemi and compares it with an answer that is
-known independently. The tests are of three kinds.
+A descriptor must also be computed correctly. pydemi is therefore checked by
+automated tests that run every time the code changes. Each test computes
+something with pydemi and compares it with an answer that is known
+independently. Two kinds of tests check the descriptors.
 
 The first kind checks that each descriptor computes what it claims. These tests
 run pydemi on artificial densities for which the right answer is known exactly from a
@@ -477,21 +473,12 @@ rotated in space. All four must give the same value. These symmetry tests are
 generated automatically from the list of descriptors, so a descriptor added in
 the future is checked without writing a new test.
 
-The third kind checks that the other parts of the software work as intended:
-that \texttt{CHGCAR} files of every VASP format are read correctly; that
-a batch run continues past a broken file; that the included density model gives
-the same predictions as the original ChargE3Net code; that the property models
-reproduce their stored predictions; and that every figure of the graphical
-interface shows data that reproduce the descriptor values.
-
 No two computer calculations agree to the last digit, so each test allows a
 small difference, chosen from what can cause it. Where only rounding can cause
 it, the allowed difference is one part in a billion or less; where the grid
 cannot represent a sharp atomic peak exactly, it is larger and set from the
 known size of this grid error, and the tests also check that the error shrinks
-when the grid is refined. The tests run
-automatically on Linux, macOS and Windows with every supported Python version.
-Each test, its reference and its allowed difference are listed in Section~S6 of
+when the grid is refined. Each test, its reference and its allowed difference are listed in Section~S6 of
 the Supporting Information.
 
 % ==========================================================================
@@ -751,6 +738,16 @@ predicted properties from both densities side by side, marking descriptors that
 differ by more than 5\% and properties that differ by more than the typical
 error of their model. Results are exported as CSV or JSON with the run
 metadata.
+
+Besides the descriptor tests of Section~\ref{sec:descriptors}, the test suite
+checks the other parts of the package: that \texttt{CHGCAR} files of every VASP
+format are read correctly; that a batch run continues past a broken file; that
+the included density model gives the same predictions as the original ChargE3Net
+code; that the property models reproduce their stored predictions; and that every
+figure of the graphical interface shows data that reproduce the descriptor
+values. All 352 tests run automatically on Linux, macOS and Windows with every
+supported Python version whenever the code changes; they are listed in
+Section~S6 of the Supporting Information.
 
 \begin{figure}[htbp]
 \centering
