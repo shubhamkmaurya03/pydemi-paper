@@ -232,8 +232,8 @@ $\mathbf a_i$ the wavefunction grid is the smallest even size with prime factors
 2, 3, 5 and 7 that is at least $\mathrm{nint}(2w\,x_i)$, with
 $x_i=|\mathbf a_i|\sqrt{E_{\mathrm{cut}}/\mathrm{Ry}}/2\pi$ in atomic units and
 $w=2$ for accurate precision, and the density grid is twice that; for
-$E_{\mathrm{cut}}=500$\,eV the rule reproduces the grids of all 6,059
-calculations. The predicted density is rescaled to the valence electron count of
+$E_{\mathrm{cut}}=500$\,eV the rule reproduces the grids of all
+calculations of the dataset. The predicted density is rescaled to the valence electron count of
 the PAW datasets of the training data (87 elements), and the model, the
 checkpoint hash and the scale factor are recorded with the result. The included
 code reproduces the predictions of the original implementation to
@@ -810,7 +810,7 @@ intermetallics) the self-consistency loop stopped at its limit of 200
 iterations before reaching the energy criterion; these densities are kept. The
 1,158 runs without an \texttt{OUTCAR} are assumed to follow the same protocol.
 
-\paragraph{Cost.} The descriptors of all 6,059 structures were computed in one
+\paragraph{Cost.} The descriptors of all structures were computed in one
 batch run without a failure, on an Intel Xeon Gold 6338N workstation with 16
 worker processes; the run took 37 minutes. The time per structure has a median of
 3.3\,s and a 95th percentile of 15\,s; added up over the structures, the run
