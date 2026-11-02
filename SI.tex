@@ -460,24 +460,46 @@ Property & 55 descriptors & 37 descriptors & Change & 95\% interval \\
 \section{Properties from predicted densities}
 \label{si:mlprops}
 
-For the 605 test structures of the density model, the LightGBM models on the 55
-descriptors (seed 0) were evaluated with the descriptors of the DFT and of the
-predicted densities. Agreement: $R^2$ between the two predictions and their
-median relative difference over all 605 (for the classifications, the share of
-structures with the same class). Accuracy: against the target values for the 63
-structures (fewer where the target is missing) that are also in the test set of
-the property models.
+The property models of Section~5 of the main text were retrained with the same
+protocol (LightGBM on the 55 descriptors, 50 Optuna trials, five seeds) after
+the 605 test structures of the density model had been removed from their
+training and validation sets: 4,365 structures for training and 546 for
+validation; the 543 structures of the original test set that are not among the
+605 were set aside. The models were then applied to the 605 structures, which
+neither the density model nor the property models had seen, once with the
+descriptors of the DFT density and once with those of the ChargE3Net density;
+the predictions are averaged over the five seeds. Table~\ref{tab:si_mlprops}
+gives the accuracy of both routes against the DFT values and the agreement
+between them. The test set differs from that of Table~3 of the main text, so the
+values differ from it; for the refractive index, the $R^2$ on these 131
+structures is set by three materials with DFT values of 14 to 24 (the other
+values lie between 1.4 and 5), and without the 3\% largest errors it is 0.86.
+
+The last column gives, for each property, the share of the mean absolute SHAP
+value of the model (DFT descriptors, mean over the five seeds) that falls on the
+11 descriptors with $\rho_s<0.95$ (Section~S2). Over the 14 regression
+properties other than the refractive index, the loss of $R^2$ from the DFT to the ML descriptors increases with
+this share (Spearman rank correlation 0.81). The same 11 descriptors account
+for 29 to 50\% of the difference between the two predictions, measured as the
+mean absolute change of each descriptor's SHAP value between the two routes;
+the bounded bond ellipticity contributes most for 11 of the 14 regression
+properties, and the number of density maxima for the cohesive energy.
 
 \begin{table}[htbp]
 \centering
-\caption{Property predictions from DFT and predicted descriptors.}
+\caption{Property predictions from the descriptors of DFT and of predicted
+(ML) densities for the 605 test structures of the density model, with property
+models trained without them. $n$: structures with the property. Agreement:
+$R^2$ between the two predictions, or the share of structures placed in the same
+class. Reliance: share (\%) of the SHAP importance on the 11 descriptors with
+$\rho_s<0.95$.}
 \label{tab:si_mlprops}
 \begin{adjustbox}{width=\textwidth}
-\begin{tabular}{lccccccc}
+\begin{tabular}{lcccccccc}
 \toprule
- & \multicolumn{2}{c}{Agreement (605)} & & \multicolumn{2}{c}{$R^2$ / AUC} & \multicolumn{2}{c}{MAE} \\
-\cmidrule(lr){2-3} \cmidrule(lr){5-6} \cmidrule(lr){7-8}
-Property & $R^2$ & diff.\ (\%) / same class (\%) & $n$ & DFT desc. & ML desc. & DFT desc. & ML desc. \\
+ & & \multicolumn{2}{c}{$R^2$ / ROC-AUC} & \multicolumn{2}{c}{MAE} & & \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6}
+Property & $n$ & DFT desc. & ML desc. & DFT desc. & ML desc. & Agreement $R^2$ / same class (\%) & Reliance (\%) \\
 \midrule
 \csname @@input\endcsname tables/tab_si_mlprops.tex 
 \bottomrule
