@@ -374,71 +374,42 @@ below, which therefore use 55 informative descriptors.
 \section{Numerical stability of the descriptors}
 \label{sec:numerics}
 
-A descriptor is useful only if its value is set by the material. Every value
-that pydemi returns, however, also depends on numerical choices that have
-nothing to do with the material: the density grid, which VASP sets from the
-plane-wave cutoff and which differs between two calculations of the same
-compound; the way derivatives of $\rho$ are taken; and, for the site
-descriptors, the way voxels are assigned to atoms. A descriptor that moved
-noticeably with these choices would give different values for the same
-material, and a property model trained on it would learn the noise. We
-therefore changed each choice on structures of the dataset of
-Section~\ref{sec:dataset} and measured how much each descriptor moved
-(Fig.~\ref{fig:stability}).
+A descriptor should describe the material, not the way it was computed. Two
+things in a pydemi calculation are not set by the material. The first is the
+density grid: VASP chooses it from the plane-wave cutoff, so two calculations
+of the same compound can give grids of different fineness. The second is the
+way the derivatives of the density, which several descriptors need, are
+computed. If a descriptor changed noticeably when either of these changed, the
+same material could get different values, and a model trained on the
+descriptor would learn this noise instead of the material.
 
-\paragraph{Tests.} For the grid, each density was Fourier-interpolated to 80\%
-of its points along each axis, about half the number of voxels, which mimics a
-calculation at a lower cutoff (30 structures). For the derivatives, the FFT
-default was replaced by fourth- and by second-order central differences (200
-structures). The change of a descriptor is the median over the structures of
-$|a-b|/\max(|a|,|b|)$, where $a$ and $b$ are its values with the default and the
-changed choice.
+We therefore tested both on structures of our dataset
+(Section~\ref{sec:dataset}). For the grid, we recomputed the descriptors on a
+coarser grid with about half as many points, as a calculation with a lower
+cutoff would give. For the derivatives, we replaced the default method, which
+takes exact derivatives from the Fourier transform of the density, by the
+simpler finite differences.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig_stability.pdf}
-\caption{Numerical stability of the descriptors. (a) Number of descriptors in
-each band of the median relative change $|a-b|/\max(|a|,|b|)$ over the
-structures, when the grid is coarsened to 80\% of its points per axis (the 55
-informative descriptors, 30 structures) and when the FFT derivatives are
-replaced by fourth- or second-order central differences (the 16 descriptors
-that use derivatives, 200 structures; 48 for the bounded ellipticity, 60 for the
-site statistics of $\zeta$). (b) The same change for each descriptor (labels
-coloured by domain); values of $10^{-6}$ or less, including exact agreement, are
-drawn at $10^{-6}$. $\dagger$: descriptors whose value is close to zero, so that
-a small absolute change is a large relative one (see text). The Laplacian
-concentration ratio is constant and not shown. All choices, including the
-atomic partition, are given per descriptor in Supporting Information, Fig.~S1
-and Table~S1.}
-\label{fig:stability}
-\end{figure}
+The descriptors pass both tests. On the coarser grid, almost all of them (46 of
+the 55 that vary between materials) change by less than 1\%. The few that change
+more have values close to zero for many materials, for example the anisotropy of
+a cubic crystal, or the spread between atoms of an element that are all
+equivalent by symmetry; for such values, a tiny absolute change is a large
+percentage. Accurate finite differences give the same values as the default
+method, which confirms that the default is accurate, whereas crude finite
+differences change some descriptors by up to 16\%; pydemi therefore does not
+use them by default.
 
-\paragraph{Results.} On the coarser grid, 46 of the 55 informative descriptors
-change by at most 1\% and 21 by at most 0.1\% (Fig.~\ref{fig:stability}a). Of
-the five that change by more than 5\%, four have values close to zero, where a
-relative change has little meaning: the percolation anisotropy (40\%), which is
-near zero for every cubic cell, and the three within-element variances
-(63--75\%), which are numerical noise of order $10^{-9}$\,\AA$^2$ in structures
-whose sites of each element are all equivalent. The fifth, the number of
-non-nuclear maxima (6\%), is a small integer that changes in a few structures.
-For the 16 descriptors that use derivatives, fourth-order differences agree with
-the FFT result to a median of $1.6\times10^{-4}$ and at most
-$6\times10^{-3}$, so the FFT result is converged on these grids; second-order
-differences, a common shortcut, shift them by up to 16\% (the fractional
-anisotropy of $T$), which is why they are not the default.
-
-The 18 site descriptors also depend on the atomic partition, but by definition
-and not as a numerical error: they describe per-atom regions, and a different
-partition defines different regions. The partition is therefore a setting,
-recorded with every result, and its effect is given in Section~S2 of the
-Supporting Information. The same section explains why some standard quantities
-of density analysis are not offered, because a \texttt{CHGCAR} does not support
-them reliably (the electron localization function and the energy densities need
-the kinetic-energy density, which can only be approximated from
-$\rho$~\cite{abramov1997,tsirelson2002}; the raw bond ellipticity and the
-saddle-point counts are not converged on VASP grids), and what the PAW
-pseudo-density~\cite{blochl1994,kresse1999} of a \texttt{CHGCAR} means for the
-descriptors.
+The site descriptors also depend on how the cell is divided into atomic
+regions. This is not an error: a different division describes different
+regions, so pydemi treats it as a setting and records it with every result.
+The Supporting Information (Section~S2) gives the result for every descriptor
+and every choice, the effect of the division into atomic regions, the
+quantities of density analysis that pydemi does not offer because a
+\texttt{CHGCAR} cannot support them reliably (such as the electron localization
+function, which needs more than the density~\cite{abramov1997,tsirelson2002}),
+and what the PAW pseudo-density~\cite{blochl1994,kresse1999} stored in a
+\texttt{CHGCAR} means for the descriptors.
 
 % ==========================================================================
 \section{Validation}
