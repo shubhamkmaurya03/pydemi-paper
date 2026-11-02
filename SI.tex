@@ -141,7 +141,7 @@ variance is zero (flagged) for an elemental crystal.
 \caption{Median relative change (\%) of each descriptor when the grid is
 coarsened to 80\% per axis, the FFT derivatives are replaced by fourth- or
 second-order differences, and the nearest-atom partition by the power diagram
-or Becke cells (sample sizes as in Fig.~3 of the main text; -- = does not depend
+or Becke cells (sample sizes as in Fig.~2 of the main text; -- = does not depend
 on the choice), and the Spearman correlation $\rho_s$ and median relative error
 (\%) between the descriptors of the DFT and ChargE3Net-predicted densities of the
 605 test structures. Relative change: $|a-b|/\max(|a|,|b|)$.}
@@ -175,6 +175,16 @@ values span two to six decades.}
 \includegraphics[width=\textwidth]{figures/fig_si_ml_parity_2.pdf}
 \caption{As Fig.~\ref{fig:si_ml_parity_1}, for the remaining 27 descriptors.}
 \label{fig:si_ml_parity_2}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.65\textwidth]{figures/fig_si_ml_structure.pdf}
+\caption{Median relative error per structure over the 44 descriptors with
+$\rho_s\geq0.95$ against the error of the predicted density (NMAPE), for the 605
+test structures of the density model; red: structures containing lanthanides or
+actinides.}
+\label{fig:si_ml_structure}
 \end{figure}
 
 % ==========================================================================
@@ -263,6 +273,29 @@ Property & Ridge / logistic & Random forest & LightGBM & Ridge / logistic & Rand
 
 \begin{table}[htbp]
 \centering
+\caption{Test $R^2$ and MAE for the five properties of the cross-model benchmark
+of S.~K.~Maurya and S.~Bhowmick (manuscript in preparation), on the same split.
+MAE in GPa for $K$, $G$, $E$, eV/atom for $E_\mathrm{form}$ (energy relative to
+the free atoms) and K for $\Theta_D$. Upper block: this work, LightGBM on the
+pydemi descriptors, mean over five seeds (test materials: 606, 606, 606, 592 and
+476). Lower block: as reported in the benchmark, one training run per model.
+$^\dagger$Equal to the MAE of $G$ in the source; as reported.}
+\label{tab:si_benchmark}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lcccccccccc}
+\toprule
+Model & \multicolumn{2}{c}{$K$} & \multicolumn{2}{c}{$G$} & \multicolumn{2}{c}{$E$} & \multicolumn{2}{c}{$E_\mathrm{form}$} & \multicolumn{2}{c}{$\Theta_D$} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+ & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
+\midrule
+\csname @@input\endcsname tables/tab_benchmark.tex 
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
 \caption{The ten most important descriptors of each property, by mean absolute
 SHAP value on the training set, in decreasing order, and their share of the
 total (\%).}
@@ -276,6 +309,16 @@ Property & Share & Descriptors \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig_si_top10_lists.pdf}
+\caption{Number of properties (of 17) for which each descriptor is among the ten
+most important (Table~\ref{tab:si_top10}); the 34 descriptors that appear at
+least once, coloured by domain (blue bonding, green structural, purple
+heterogeneity).}
+\label{fig:si_top10_lists}
+\end{figure}
 
 \begin{table}[htbp]
 \centering
