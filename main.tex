@@ -705,44 +705,52 @@ a DFT calculation.
 \section{Software}
 \label{sec:software}
 
-pydemi is written in Python ($\geq$3.10). The library requires only
-NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and pandas; optional extras
-add the graphical interface (Streamlit and Plotly), the density model (PyTorch,
-e3nn and ASE~\cite{larsen2017}) and the property models (LightGBM). It is used
-through the Python functions \texttt{read\_chgcar}, \texttt{featurize},
-\texttt{featurize\_batch}, \texttt{catalogue}, \texttt{ml.predict} and
-\texttt{props.predict}, or the command line (\texttt{pydemi featurize},
-\texttt{batch}, \texttt{catalogue}, \texttt{sweep}, \texttt{predict},
-\texttt{gui}). Batch runs write one row per structure, with the flag columns and
-the run metadata, and continue past structures that fail, recording the error.
+pydemi is written in Python ($\geq$3.10) and is installed with
+\texttt{pip install pydemi}. The core library needs only
+NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and pandas. Optional extras
+add the graphical interface (\texttt{pydemi[gui]}: Streamlit, Plotly and
+LightGBM), the density model (\texttt{pydemi[ml]}: PyTorch, e3nn and
+ASE~\cite{larsen2017}) and the property models (\texttt{pydemi[props]}:
+LightGBM).
+
+In Python, a density is read with \texttt{read\_chgcar} and its descriptors are
+computed with \texttt{featurize}, or with \texttt{featurize\_batch} for many
+files. \texttt{catalogue} returns the name, units, range and formula of every
+descriptor, \texttt{ml.predict} predicts a density from a crystal structure, and
+\texttt{props.predict} predicts properties from the descriptors. The command
+line offers the same steps (\texttt{pydemi featurize}, \texttt{batch},
+\texttt{catalogue}, \texttt{predict} and \texttt{gui}), and \texttt{pydemi
+sweep} shows how the descriptors change with the shell boundaries. Batch runs
+write one row per structure, with the flag columns and the run metadata, and
+continue past structures that fail, recording the error.
+
 On our dataset, a batch run computed all descriptors of every structure without
 a failure. On one core of an Intel Xeon Gold 6338N processor, a typical
 structure takes 3.3\,s. Added up over all structures, the run needed 8.4
 CPU-hours; on 16 cores in parallel it finished in 37 minutes. The time depends
 mainly on the size of the density grid, not on the number of atoms, and even the
 largest \texttt{CHGCAR} in the dataset takes under a minute and 2.6\,GB of
-memory, well within the memory of an ordinary laptop.
+memory, well within the memory of an ordinary laptop. pydemi currently reads
+only VASP files.
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
-the browser; it listens on the local machine only, so the files never leave it
-(Fig.~\ref{fig:gui}). It is laid out like desktop software: an input panel
-opens a \texttt{CHGCAR} or, for the density model, a CIF or POSCAR file, whose
-prediction runs in the background with progress and cancellation; a summary of
-the structure and grid and the partition setting sit below it. Four views show
-the structure with density slices through any lattice plane; the
+the browser. It listens on the local machine only, so the files never leave it
+(Fig.~\ref{fig:gui}). It is laid out like desktop software. An input panel on
+the left opens a \texttt{CHGCAR}, or a CIF or POSCAR file whose density is then
+predicted in the background, with its progress shown and the option to cancel.
+Below it are a summary of the structure and the grid and the choice of atomic
+partition. The main area has five views. The structure view shows the cell with
+density slices through any lattice plane. The descriptor view lists the
 descriptors in a searchable table, each with its formula and a figure of the
-quantity it reduces, built so that the plotted data reproduce the value (this
-is tested); one such figure per descriptor, stepping through the domains; and
-the predicted properties with their typical error, the test-set parity plot of
-each model, the most important inputs and, where the structure belongs to the
-dataset, its DFT values. Models with a test $R^2$ below 0.5 are marked as weak,
-and their values are presented as rough indications. A fifth view compares the two routes for one
-material: for an open \texttt{CHGCAR} it predicts the density of the same structure
-on the same grid and sets the density error, the descriptors and the
-predicted properties from both densities side by side, marking descriptors that
-differ by more than 5\% and properties that differ by more than the typical
-error of their model. Results are exported as CSV or JSON with the run
-metadata.
+quantity it is computed from, and the plot view steps through these figures one
+descriptor at a time. The property view gives the predicted properties with the
+typical error of each model, its test-set parity plot, its most important inputs
+and, for structures of the dataset, the DFT values. The compare view takes an
+open \texttt{CHGCAR}, predicts the density of the same structure on the same
+grid, and shows the density error and the descriptors and properties from both
+densities side by side. It marks the descriptors that differ by more than 5\%
+and the properties that differ by more than the typical error of their model.
+Results are exported as CSV or JSON with the run metadata.
 
 Besides the descriptor tests of Section~\ref{sec:descriptors}, the test suite
 checks the other parts of the package: that \texttt{CHGCAR} files of every VASP
@@ -750,9 +758,9 @@ format are read correctly; that a batch run continues past a broken file; that
 the included density model gives the same predictions as the original ChargE3Net
 code; that the property models reproduce their stored predictions; and that every
 figure of the graphical interface shows data that reproduce the descriptor
-values. All 352 tests run automatically on Linux, macOS and Windows with every
-supported Python version whenever the code changes; they are listed in
-Section~S6 of the Supporting Information.
+values. With all extras installed, the 352 tests run automatically on Linux,
+macOS and Windows with every supported Python version whenever the code changes;
+they are listed in Section~S6 of the Supporting Information.
 
 \begin{figure}[htbp]
 \centering
@@ -767,29 +775,35 @@ boundaries and its formula.}
 % ==========================================================================
 \section{Conclusions}
 \label{sec:conclusions}
-pydemi reduces the one file every VASP calculation writes, the
-\texttt{CHGCAR}, to 56 intensive and individually interpretable descriptors,
-chosen so that each is defined on the PAW pseudo-density and converged on
-typical grids: on a coarsened grid 46 of the 55 informative descriptors change
-by at most 1\%. It featurized every density of the dataset without a failure,
-at a median of 3.3\,s per structure on one CPU core, and is verified by automated tests. The included ChargE3Net model gives
-the same descriptors from a crystal structure: 44 of the 55 keep a rank
-correlation of at least 0.95 with their DFT values on held-out structures,
-and only the critical-point counts, quantities built on second derivatives in
-low-density regions and descriptors with clustered values do not.
+pydemi turns the one file that every VASP calculation writes, the
+\texttt{CHGCAR}, into 56 descriptors, each with a short physical meaning and a
+value set by the material rather than by the grid or the numerical method. It
+computed every descriptor for every crystal of our dataset without a failure,
+and automated tests check each descriptor against known answers. It can be used
+as a Python library, from the command line or through a local graphical
+interface. The included ChargE3Net model gives most of the same descriptors from
+a crystal structure alone. The exceptions are the counts of density maxima and
+minima, quantities built from second derivatives in low-density regions, and
+descriptors whose values cluster.
 
-As the only inputs of gradient-boosted models, the descriptors predict 17
-properties of the dataset, and for the elastic moduli they match or exceed
-the graph neural networks and density-based models reported earlier for the
-same structures. The information is concentrated in a few simple, converged
-descriptors, led by the interstitial density and the NCI volume:
-ten descriptors per property retain 92--99\% of the test $R^2$ of all descriptors, and most of them transfer to ML-predicted densities. On structures that neither model had seen, the
-properties predicted from ML-predicted densities are nearly as accurate as those
-from DFT densities; the losses are largest for the properties whose models rely
-most on the descriptors that transfer less well. A relaxed crystal structure
-therefore suffices to obtain both the descriptors and the properties without a
-DFT calculation. Models that predict the magnetization would extend this
-path to magnetic descriptors.
+Used alone, the descriptors predict 17 properties. For the elastic moduli they
+are as accurate as the graph neural networks and the density-based model
+reported earlier for the same structures, although that comparison uses
+different data splits. A few descriptors carry most of the information, led by
+the mean interstitial density and the volume of the non-covalent-interaction
+region, and ten descriptors per property are almost as good as all 55. On
+structures that neither model had seen, properties predicted from ML-predicted
+densities are nearly as accurate as those from DFT densities, and the small
+losses come from the descriptors that transfer less well. A relaxed crystal
+structure is therefore enough to obtain both the descriptors and the properties
+without a DFT calculation.
+
+The main limits point to future work. pydemi reads only VASP files. It ignores
+magnetization densities, because the density model does not predict them. The
+structures used here were relaxed with DFT, so structures from other sources
+will add their own error. Readers for other codes, a density model for spin
+densities and tests on structures relaxed with ML potentials would extend the
+path from a structure to its properties.
 
 \section*{Code and data availability}
 The source code, the tests, the descriptor reference and the scripts that
