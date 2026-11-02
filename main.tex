@@ -189,7 +189,7 @@ object (Fig.~\ref{fig:architecture}), a \texttt{VolumetricData} that holds the
 structure, the density grid and a note of where the density came from; this note
 is written into the metadata of every output row.
 
-\begin{figure}[!tbp]
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_architecture.pdf}
 \caption{Architecture of pydemi, drawn for MgO. A DFT \texttt{CHGCAR} (left,
@@ -302,7 +302,7 @@ package. In what follows $k$ runs over the voxels,
 $i(k)$ is the nearest nucleus of voxel $k$, $r_k$ its distance and
 $\hat{\mathbf u}_k$ the unit vector from that nucleus to the voxel.
 
-\begin{table}[!tbp]
+\begin{table}[!t]
 \centering
 \caption{The 19 bonding descriptors of pydemi, with a descriptive name and
 the name used in the package and in the text. Shells around the nearest nucleus:
@@ -339,7 +339,7 @@ Bond-midpoint density spread & \texttt{rho\_mid\_std} & standard deviation of th
 \end{tabular}
 \end{table}
 
-\begin{table}[!tbp]
+\begin{table}[!t]
 \centering
 \caption{The 19 structural and 18 site-heterogeneity descriptors of pydemi,
 as in Table~\ref{tab:families}. Density shape: the density divided by the
@@ -649,7 +649,7 @@ the ten descriptors of each property also transfer to predicted densities
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.
 
-\begin{figure}[!tbp]
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_top10.pdf}
 \caption{The ten most important descriptors of each property, ranked by their
