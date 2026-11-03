@@ -230,7 +230,13 @@ Descriptor & grid 80\% & FD4 & FD2 & power & Becke & $\rho_s$ (ML) & ML error \\
 (three interaction layers, $l_{\max}=4$, 4\,\AA{} cutoff; 1.9 million
 parameters). The checkpoint shipped with pydemi (8\,MB) was fine-tuned for
 50,000 steps from the published Materials Project checkpoint on the densities of
-the dataset (5,152 training, 302 validation and 605 test structures). The
+the dataset (5,152 training, 302 validation and 605 test structures). On
+1,000 grid points of each test structure, the released weights used as they
+are give a median NMAPE (defined below) of 32\%, because several elements have
+a different number of valence electrons in the Materials Project; the same
+network trained from scratch on the dataset (200,000 steps) gives 0.78\%, and
+the fine-tuned model 0.59\%, better than the one from scratch for 470 of the
+605 structures. The
 prediction grid is the one VASP would use: along each lattice vector
 $\mathbf a_i$ the wavefunction grid is the smallest even size with prime factors
 2, 3, 5 and 7 that is at least $\mathrm{nint}(2w\,x_i)$, with
@@ -239,8 +245,9 @@ $w=2$ for accurate precision, and the density grid is twice that; for
 $E_{\mathrm{cut}}=500$\,eV the rule reproduces the grids of all
 calculations of the dataset. The predicted density is rescaled to the valence electron count of
 the PAW datasets of the training data (87 elements), and the model, the
-checkpoint hash and the scale factor are recorded with the result. The included
-code reproduces the predictions of the original implementation to
+checkpoint hash and the scale factor are recorded with the result. The network
+code in pydemi is a copy of the original one that runs without its training
+framework; it reproduces the predictions of the original code to
 $6\times10^{-7}$ of the peak density for the structures checked. Its cost grows
 with the number of atom--grid-point pairs within the cutoff, about 0.35\,ms per
 pair on one CPU core.
@@ -253,7 +260,7 @@ or actinides are predicted less accurately, and the worst case, YbPrZn$_2$, has
 electron count within 0.13\% (median; largest deviation 1.5\%). All 605 were
 featurized without error. Over the 55 descriptors the median
 relative error is 0.66\%. Per structure, the median error over the 44
-transferable descriptors is 0.53\% (90th percentile 1.2\%) and follows the
+descriptors with $\rho_s\geq0.95$ is 0.53\% (90th percentile 1.2\%) and follows the
 density error (Spearman 0.49; Fig.~\ref{fig:si_ml_structure}); it exceeds 5\%
 only for Ba$_3$N, Li, TiH$_2$, Yb$_2$MgIn and YbPrZn$_2$.
 
@@ -483,7 +490,7 @@ mean absolute change of each descriptor's SHAP value between the two routes;
 the bounded bond ellipticity contributes most for 11 of the 14 regression
 properties, and the number of density maxima for the cohesive energy.
 
-\begin{table}[htbp]
+\begin{table}[!tbp]
 \centering
 \caption{Property predictions from the descriptors of DFT and of predicted
 (ML) densities for the 605 test structures of the density model, with property
@@ -509,7 +516,7 @@ Property & $n$ & DFT desc. & ML desc. & DFT desc. & ML desc. & Agreement $R^2$ /
 \section{Graphical interface}
 \label{si:gui}
 
-\begin{figure}[!htbp]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.75\textwidth]{figures/fig_gui_structure.png}
 \caption{Structure view of the graphical interface for MgO: the cell and atoms

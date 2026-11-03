@@ -484,18 +484,24 @@ the Supporting Information.
 \label{sec:ml}
 
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
-electron density of a crystal from its atomic structure alone. We kept its
-published architecture and retrained the published Materials Project model on
-the densities of our dataset, with 5,152 structures for training, 302 for
-validation and 605 for testing. The published model cannot be used directly,
-because it was trained with different PAW potentials, and hence different
-numbers of valence electrons, for several elements. A prediction therefore
-stands for a \texttt{CHGCAR} computed with the settings of our dataset~\cite{kumar2026}. pydemi places it on the grid that VASP would use
+electron density of a crystal from its atomic structure alone. Its authors
+released the network together with weights trained on the charge densities of
+the Materials Project~\cite{shen2022}. These weights cannot be used for our
+dataset as they are: for several elements the Materials Project used different
+PAW potentials, and hence a different number of valence electrons, so its
+predictions differ strongly from our DFT densities. We therefore started from
+the released weights and continued the training on the densities of our dataset
+(fine-tuning), with 5,152 structures for training, 302 for validation and 605
+for testing; this gave a lower error than training the same network from
+scratch on our data. The fine-tuned model is the one included in pydemi, so its
+predictions stand for a \texttt{CHGCAR} computed with the settings of our
+dataset~\cite{kumar2026}. pydemi places it on the grid that VASP would use
 for these settings, scales it to the right number of valence electrons and
 records how it was obtained, and then computes every descriptor from it
 exactly as from a \texttt{CHGCAR}. The model covers the 87 elements of the
-dataset and refuses structures with other elements. The included code
-reproduces the predictions of the original implementation; its cost grows with
+dataset and refuses structures with other elements. The network code in pydemi
+is a copy of the original one that runs without its training framework, and it
+gives the same predictions; its cost grows with
 the number of atoms and grid points, and a GPU is used when one is available.
 Technical details are given in Section~S2 of the Supporting Information.
 
@@ -515,18 +521,18 @@ descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \end{figure}
 
 The predicted densities are close to the DFT ones: over the test
-structures, the typical difference is about 0.6\% of the density (median),
-somewhat larger for crystals with lanthanides or actinides. The question for
+structures, the absolute difference summed over the grid is about 0.6\% of
+the total charge (median over the test structures), somewhat larger for crystals with lanthanides or actinides. The question for
 pydemi is whether such small differences change the descriptors. A descriptor
 helps a property model when it puts materials in the right order, so we
 measured, for each descriptor, whether its values from the DFT and from the
 predicted densities rank the test materials in the same order (Spearman
 rank correlation $\rho_s$, which is 1 for the same order). For 44 of the 55
 descriptors, $\rho_s$ is at least 0.95, and for 37
-of them at least 0.99 (Fig.~\ref{fig:ml}a); the typical value of a descriptor
-changes by less than 1\%. They include all 18 heterogeneity descriptors, 16
-of the 18 bonding descriptors, and the percolation levels, the density floor
-and the information measures. The other 11 fall into three groups, each with a
+of them at least 0.99 (Fig.~\ref{fig:ml}a), and most of them change by
+less than 1\%. They include all 18 heterogeneity descriptors, 16
+of the 18 bonding descriptors, and the percolation levels, the lowest and
+the mean interstitial density, and the information measures. The other 11 fall into three groups, each with a
 clear reason. The counts of maxima and minima of the density change because the
 prediction adds or removes tiny bumps in flat regions far from the atoms,
 without changing the density noticeably; the number and charge of non-nuclear
@@ -540,12 +546,12 @@ predicted accurately, but many materials share almost the same value (every
 cubic crystal, for instance, is isotropic), so tiny differences reorder them;
 because several of these values are close to zero, their relative error in
 Fig.~\ref{fig:ml}b looks large although the absolute difference is small. When
-the density is predicted, the transferable descriptors can therefore be used
-as they are, and the other 11 with care. The Compare view of the graphical
+the density is predicted, the 44 can therefore be used as they are, and the
+other 11 with care. The Compare view of the graphical
 interface (Section~\ref{sec:software}) shows, for a given \texttt{CHGCAR}, the
 descriptors of the DFT and of the predicted density side by side, together with
 the transfer of each descriptor. Only five of the test structures have a
-typical descriptor error above 5\% (Supporting Information, Fig.~S4). Like the
+median error over the 44 descriptors above 5\% (Supporting Information, Fig.~S4). Like the
 DFT path, which uses the total density of a \texttt{CHGCAR}, the model predicts
 the total density only, so neither path provides magnetic descriptors.
 
