@@ -560,19 +560,19 @@ the total density only, so neither path provides magnetic descriptors.
 \label{sec:properties}
 
 \subsection{Data and protocol}
-We used the descriptors to predict 17 properties of the materials of the dataset. The
-bulk, shear and Young's moduli are the Materials Project values used in our
-earlier study of this dataset~\cite{kumar2026}. All other properties were
-retrieved from the Materials Project~\cite{jain2013} (database version
-2026.04.13) for the same materials: the elastic constants $C_{11}$, $C_{12}$
+We used the descriptors to predict 17 properties of the materials of the dataset.
+All 17 are Materials Project values~\cite{jain2013}: the bulk, shear and Young's
+moduli as distributed with the structures, and the others retrieved from
+database version 2026.04.13 for the same materials: the elastic constants $C_{11}$, $C_{12}$
 and $C_{44}$~\cite{dejong2015}; the Debye temperature, the sound velocities and
 the minimum thermal conductivities in the Clarke and Cahill
 models~\cite{clarke2003,cahill1992}, all derived by the Materials Project from
 the elastic data; the
 formation and cohesive energies; the PBE band gap, whether a material is a
 metal and whether its gap is direct; and the refractive
-index~\cite{petousis2017}. The structures were split once at random into 4,847
-for training, 606 for validation and 606 for testing; a material without a
+index~\cite{petousis2017}. The structures were split at random into 4,847
+for training, 606 for validation and 606 for testing, the split distributed with
+the dataset~\cite{kumar2026}; a material without a
 value for a property is left out for that property only.
 
 For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
@@ -619,19 +619,43 @@ deviation.}
 \end{figure}
 
 \subsection{Results and interpretation}
-The same structures were used in our earlier study~\cite{kumar2026}, which
-predicted five properties from a compressed representation of the full density
-grid, alone or together with compositional features, and compared the results
-with the graph neural networks CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}.
-That study used its own data splits, so the comparison is indicative. For the
-bulk, shear and Young's moduli, LightGBM on the pydemi descriptors alone reaches
-$R^2$ of 0.949, 0.908 and 0.917. This is slightly above the best model of the
-earlier study (0.94, 0.87 and 0.88), which also used the composition, and above
-the density representation alone, CGCNN and MEGNet (at most 0.93, 0.88 and
-0.89)~\cite{kumar2026}. For the Debye temperature, the descriptors match the
-best model of the earlier study but stay behind CGCNN. The formation energy of
-the earlier study is measured from the free atoms and was computed differently
-from the cohesive energy used here, so the two are not compared.
+Table~\ref{tab:compare} compares the descriptors with models trained on the
+same structures and the same split~\cite{kumar2026}: a compressed representation
+of the full density grid, compositional (Magpie) features, both together, and
+the graph neural networks CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}.
+For this comparison our models were also trained on the two properties whose
+data differ from ours: the energy relative to the free atoms used there, and
+the Debye temperature, which is given there for fewer materials. For the
+three moduli, the descriptors alone give the highest $R^2$ of all models. For
+the Debye temperature they are above the density and composition models, level
+with MEGNet and behind CGCNN. For the energy relative to the free atoms they are
+well above the density representation alone but below MEGNet and the models
+that use the composition: this energy depends strongly on which elements are
+present, which the composition describes directly.
+
+\begin{table}[!t]
+\centering
+\caption{Test $R^2$ of models trained on the same structures with the same
+split. All rows except the last are from Ref.~\cite{kumar2026}; latent density:
+compressed representation of the full density grid. $E_\mathrm{atoms}$: energy
+relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.}
+\label{tab:compare}
+\footnotesize
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & $K$ & $G$ & $E$ & $E_\mathrm{atoms}$ & $\Theta_D$ \\
+\midrule
+Latent density, CNN & 0.90 & 0.80 & 0.79 & 0.68 & 0.73 \\
+Magpie, attention CNN & 0.92 & 0.85 & 0.85 & 0.88 & 0.90 \\
+Latent density + Magpie, LightGBM & 0.94 & 0.87 & 0.88 & 0.96 & 0.89 \\
+Latent density + Magpie, attention CNN & 0.94 & 0.85 & 0.87 & 0.88 & 0.86 \\
+CGCNN & 0.93 & 0.88 & 0.89 & -- & 0.94 \\
+MEGNet & 0.93 & 0.87 & 0.86 & 0.94 & 0.91 \\
+\midrule
+pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & 0.86 & 0.91 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The mean interstitial density is the most important descriptor overall: it
 leads for the elastic moduli and constants and for the refractive index. The
@@ -647,10 +671,11 @@ Supporting Information, Table~S4), keep 92--99\% of the test score obtained
 with all descriptors (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}).
 Across all properties, these lists together use 34 of the 55 descriptors, and
 a few of them appear for most properties, led by the mean interstitial density,
-the charge-distance variance and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). Most of
-the ten descriptors of each property also transfer to predicted densities
-(Section~\ref{sec:ml}), so the information the models use is largely the
-information that survives the density model.
+the charge-distance variance and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). For most
+properties, eight or nine of the ten are among the 44 descriptors that are
+reliably computed from a predicted density (Section~\ref{sec:ml}), so the
+property models should change little when the density is predicted; the next
+paragraph tests this.
 
 \begin{figure}[!t]
 \centering

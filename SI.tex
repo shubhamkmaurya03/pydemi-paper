@@ -308,11 +308,16 @@ actinides.}
 \section{Property models}
 \label{si:props}
 
-\paragraph{Targets.} The bulk, shear and Young's moduli (Voigt--Reuss--Hill)
-are the Materials Project values used in the earlier study of this dataset
-(Kumar et al., J.\ Chem.\ Inf.\ Model.\ 66, 7113, 2026). All other targets come
-from the Materials Project, database version 2026.04.13, for the same material
-identifiers. Elastic data were kept only where $K$ and $G$ lie between 0 and
+\paragraph{Targets.} All targets are Materials Project values. The bulk, shear
+and Young's moduli (Voigt--Reuss--Hill) are those distributed with the
+structures of the dataset (Kumar et al., J.\ Chem.\ Inf.\ Model.\ 66, 7113,
+2026), together with its training, validation and test split; all other targets
+were retrieved from database version 2026.04.13 for the same material
+identifiers. For the comparison of Table~4 of the main text, LightGBM models
+were also trained with the same protocol on two columns of that dataset: the
+energy relative to the free atoms, and the Debye temperature of the 4,903
+materials that have one there (equal to the Materials Project value for all of
+them). Elastic data were kept only where $K$ and $G$ lie between 0 and
 1000\,GPa and agree with these moduli (6,000 materials); $C_{11}$, $C_{12}$ and
 $C_{44}$ only where the smallest eigenvalue of the unrounded stiffness tensor
 exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
