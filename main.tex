@@ -560,14 +560,15 @@ the total density only, so neither path provides magnetic descriptors.
 \label{sec:properties}
 
 \subsection{Data and protocol}
-We used the descriptors to predict 17 properties of the structures of the dataset. The
+We used the descriptors to predict 17 properties of the materials of the dataset. The
 bulk, shear and Young's moduli are the Materials Project values used in our
 earlier study of this dataset~\cite{kumar2026}. All other properties were
 retrieved from the Materials Project~\cite{jain2013} (database version
 2026.04.13) for the same materials: the elastic constants $C_{11}$, $C_{12}$
 and $C_{44}$~\cite{dejong2015}; the Debye temperature, the sound velocities and
 the minimum thermal conductivities in the Clarke and Cahill
-models~\cite{clarke2003,cahill1992}, all derived from the elastic data; the
+models~\cite{clarke2003,cahill1992}, all derived by the Materials Project from
+the elastic data; the
 formation and cohesive energies; the PBE band gap, whether a material is a
 metal and whether its gap is direct; and the refractive
 index~\cite{petousis2017}. The structures were split once at random into 4,847
@@ -577,15 +578,15 @@ value for a property is left out for that property only.
 For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
 were tuned automatically on the validation set~\cite{akiba2019}, and the test
-set was used only once, for the final scores. Each model was trained five times
-with different random seeds, and we report the average. To find out which
+set was used only once, for the final scores. Each random forest and LightGBM
+model was trained five times with different random seeds, and we report the average. To find out which
 descriptors the models rely on, we used SHAP values~\cite{lundberg2020}, which
 split each prediction into the contributions of the individual descriptors. We
 also retrained every model on only the ten most important descriptors of its
 property, chosen on the training set. All details are given in
 Section~S3 of the Supporting Information. LightGBM was the most accurate of the
-three models for every property (for the direct gap, the random forest was
-better by 0.001; Supporting Information, Table~S3), and its test scores are
+three models for every property except the direct gap, where the random forest
+was better by 0.001 (Supporting Information, Table~S3), and its test scores are
 given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 
 \begin{table}[htbp]
@@ -636,7 +637,7 @@ The mean interstitial density is the most important descriptor overall: it
 leads for the elastic moduli and constants and for the refractive index. The
 volume fraction of the NCI region plays the same role for the band gap,
 metallicity and the formation energy. The thermal properties rely mainly on the
-radial spread $\sigma_r^2$, the interstitial charge fraction and the valence
+charge-distance variance, the interstitial charge fraction and the valence
 Laplacian concentration, and the cohesive energy on the bond-midpoint and
 interstitial densities; only the direct-gap classification has no dominant
 descriptor (Supporting Information, Fig.~S5). The information is concentrated
@@ -646,7 +647,7 @@ Supporting Information, Table~S4), keep 92--99\% of the test score obtained
 with all descriptors (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}).
 Across all properties, these lists together use 34 of the 55 descriptors, and
 a few of them appear for most properties, led by the mean interstitial density,
-the radial spread and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). Most of
+the charge-distance variance and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). Most of
 the ten descriptors of each property also transfer to predicted densities
 (Section~\ref{sec:ml}), so the information the models use is largely the
 information that survives the density model.
@@ -664,14 +665,17 @@ are shown, ordered by the number of properties for which they are among the ten.
 \end{figure}
 
 The descriptors can also be computed from a predicted density, and we tested
-whether they still serve the property models. We retrained the models without
-the 605 test structures of the density model and evaluated them on these
-structures, which neither model had seen, once with the descriptors of the DFT
+whether they still serve the property models. We trained the property models
+again with the same protocol, leaving out the 605 test structures of the
+density model, and evaluated them on these structures, which neither the
+density model nor the property models had seen, once with the descriptors of the DFT
 density and once with those of the ChargE3Net density
 (Fig.~\ref{fig:mlprops}). This answers two questions: whether the two routes
 give the same prediction, and how close each prediction is to the DFT value.
-Because the test structures are not those of Table~\ref{tab:properties}, the
-scores differ somewhat from it.
+Because these models were trained on fewer materials (4,365 instead of 4,847)
+and tested on other structures, their scores differ from those of
+Table~\ref{tab:properties}, most for the shear-related properties and the
+refractive index.
 
 \begin{figure}[!t]
 \centering
@@ -693,8 +697,9 @@ temperature and the cohesive energy. The losses follow how much each model
 relies on the 11 descriptors that transfer less well to predicted densities
 (Section~\ref{sec:ml}). These descriptors carry 7\% of the importance in the
 bulk-modulus model but about a fifth in the models of the sound velocities and
-the Debye temperature. They also cause 29 to 50\% of the difference between
-the two predictions, mostly through the bond ellipticity. Two properties are weak by either route: whether a
+the Debye temperature. For the regression properties other than the refractive
+index, they also cause 29 to 50\% of the difference between the two
+predictions, mostly through the bond ellipticity. Two properties are weak by either route: whether a
 gap is direct, and the refractive index, whose $R^2$ on these structures is set
 by three materials with unusually large DFT values. All values are given in
 Section~S4 and Table~S7 of the Supporting Information.
