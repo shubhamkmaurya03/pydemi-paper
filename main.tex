@@ -740,10 +740,13 @@ without computing its density.
 \label{sec:software}
 
 pydemi is written in Python ($\geq$3.10) and is installed with
-\texttt{pip install pydemi}. The core library needs only
+\texttt{pip install pydemi}. This core installation reads \texttt{CHGCAR}
+files, computes the 55 descriptors of one structure or of many, and gives their
+catalogue, from Python and from the command line; it needs only
 NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and
-pandas~\cite{mckinney2010}. Optional extras add the graphical interface
-(\texttt{pydemi[gui]}: Streamlit, Plotly and LightGBM), the density model
+pandas~\cite{mckinney2010}. Three optional extras add the rest: the graphical
+interface (\texttt{pydemi[gui]}: Streamlit, Plotly and LightGBM), the density
+model that predicts a density from a crystal structure
 (\texttt{pydemi[ml]}: PyTorch~\cite{paszke2019}, e3nn and
 ASE~\cite{larsen2017}) and the property models (\texttt{pydemi[props]}:
 LightGBM~\cite{ke2017}). A descriptor reference with the definition, formula,
