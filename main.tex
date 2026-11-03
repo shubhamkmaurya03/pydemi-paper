@@ -744,10 +744,14 @@ pydemi is written in Python ($\geq$3.10) and is installed with
 files, computes the 55 descriptors of one structure or of many, and gives their
 catalogue, from Python and from the command line; it needs only
 NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and
-pandas~\cite{mckinney2010}. Three optional extras add the rest: the graphical
-interface (\texttt{pydemi[gui]}: Streamlit, Plotly and LightGBM), the density
+pandas~\cite{mckinney2010}. \texttt{CHGCAR} is the density format of VASP; a
+density from another code, such as Quantum ESPRESSO, can be read once
+it is written in this format, but the density and property models were trained
+on VASP densities. Three optional extras add the rest: the graphical
+interface (\texttt{pydemi[gui]}: Streamlit and Plotly, with LightGBM for the property
+view), the density
 model that predicts a density from a crystal structure
-(\texttt{pydemi[ml]}: PyTorch~\cite{paszke2019}, e3nn and
+(\texttt{pydemi[ml]}: PyTorch~\cite{paszke2019}, e3nn~\cite{geiger2022} and
 ASE~\cite{larsen2017}) and the property models (\texttt{pydemi[props]}:
 LightGBM~\cite{ke2017}). A descriptor reference with the definition, formula,
 physical meaning and limits of every descriptor is included and is opened from
@@ -761,8 +765,9 @@ descriptor, \texttt{ml.predict} predicts a density from a crystal structure, and
 line offers the same steps (\texttt{pydemi featurize}, \texttt{batch},
 \texttt{catalogue}, \texttt{predict} and \texttt{gui}), and \texttt{pydemi
 sweep} shows how the descriptors change with the shell boundaries. Batch runs
-write one row per structure, with the flag columns and the run metadata, and
-continue past structures that fail, recording the error.
+write one row per structure, with the descriptors, a flag for every value that
+took its fallback and the run metadata; they continue past structures that fail
+and record the error.
 
 On our dataset, a batch run computed all descriptors of every structure without
 a failure. A typical structure takes a few seconds on one processor core, and
@@ -770,16 +775,13 @@ the whole dataset was featurized in well under an hour on one workstation. The
 time depends mainly on the size of the density grid, not on the number of
 atoms, and even the largest \texttt{CHGCAR} of the dataset needs less than a
 minute and fits in the memory of an ordinary laptop (Section~S7 of the
-Supporting Information). pydemi reads densities in the \texttt{CHGCAR} format
-of VASP; a density from another code, such as Quantum ESPRESSO, can be read once
-it is written in this format, but the density and property models were trained
-on VASP densities.
+Supporting Information).
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
-the browser (Fig.~\ref{fig:gui}). An input panel on the left opens a \texttt{CHGCAR}, or a CIF or POSCAR file whose density is then
+the browser (Fig.~\ref{fig:gui}). An input panel on the left opens a \texttt{CHGCAR}, or a crystal structure file (CIF, POSCAR or any format ASE reads) whose density is then
 predicted in the background, with its progress shown and the option to cancel.
-Below it are a summary of the structure and the grid and the choice of atomic
-partition. The main area has five views. The structure view shows the cell with
+Below it are a summary of the structure and the grid and the choice of how the cell is divided between the atoms
+(Section~\ref{sec:design}). The main area has five views. The structure view shows the cell with
 density slices through any lattice plane. The descriptor view lists the
 descriptors by the names of Tables~\ref{tab:families} and~\ref{tab:families2}
 in a searchable table, each with its formula and a figure of the
@@ -787,20 +789,20 @@ quantity it is computed from, and the plot view steps through these figures one
 descriptor at a time. The property view gives the predicted properties with the
 mean absolute error of each model on the test set, its test-set parity plot, its most important inputs
 and, for structures of the dataset, the DFT values. The compare view (with the ML
-extra) takes an open \texttt{CHGCAR}, predicts the density of the same structure on the same
+extra) takes the \texttt{CHGCAR} shown in the input panel, predicts the density of the same structure on the same
 grid, and shows the density error and the descriptors and properties from both
 densities side by side. All results can be exported.
 
-Besides the descriptor tests of Section~\ref{sec:descriptors}, the test suite
-checks the other parts of the package: that \texttt{CHGCAR} files of every VASP
-format are read correctly; that a batch run continues past a broken file; that
-the included density model gives the same predictions as the original ChargE3Net
-code; that the property models reproduce their stored predictions; and that every
-figure of the graphical interface shows data that reproduce the descriptor
-values. Whenever the code changes, the tests run automatically on Linux, macOS
-and Windows with Python 3.10 to 3.13, the tests of each optional extra in jobs
-with that extra installed; with every extra and the dataset available, all 350
-pass. They are listed in Section~S6 of the Supporting Information.
+The tests of Section~\ref{sec:descriptors} check the descriptors; other tests
+check the rest of the package. The reader is tested with \texttt{CHGCAR} files in
+every layout VASP writes, including spin-polarized and non-collinear runs and the
+older VASP~4 layout. The density model is tested by comparing its prediction for
+one structure with the output of the original ChargE3Net code. The property models
+are tested by comparing their predictions with those saved when the models were
+trained. The interface is tested by checking that each figure is drawn from the
+same numbers that give its descriptor. The tests run automatically on Linux, macOS
+and Windows each time the code changes, and Section~S6 of the Supporting
+Information lists all 350 of them.
 
 \begin{figure}[htbp]
 \centering
