@@ -26,6 +26,7 @@
 
 % --- Document Start ---
 \begin{document}
+\newcommand{\rev}[1]{{\color{blue}#1}}
 
 \maketitle
 
@@ -36,22 +37,21 @@ calculation describes how a material is bonded, yet it is rarely used as the
 input of machine-learning models of material properties. Learned density representations predict
 properties well but are hard to interpret, while interpretable density analysis
 treats one structure at a time. We present pydemi, an open-source Python
-package that turns a VASP \texttt{CHGCAR} file, and nothing else, into 55
+package that turns a VASP \texttt{CHGCAR} file into 55
 interpretable descriptors of bonding, structure and site heterogeneity. Each
-descriptor is stable with respect to the grid and the numerical method and is
+descriptor is stable with respect to the grid and the numerical method\rev{, though
+not to the PAW potentials,} and is
 documented with its formula, units and range. From the crystal structure
 alone, pydemi can also predict the density with an included ChargE3Net model;
 most descriptors of the predicted densities rank materials almost exactly as
-their DFT values do. For 6,059 inorganic crystals, pydemi computed every
-descriptor without a failure in a few seconds per structure. Gradient-boosted
+their DFT values do. \rev{pydemi featurized 6,059 inorganic crystals without a failure, in
+seconds per structure.} Gradient-boosted
 models on the descriptors alone predict 17 elastic, thermal, energetic,
 electronic and optical properties, mostly with a test $R^2$ between 0.85 and
-0.95. SHAP values show which descriptors drive each prediction, and ten
-descriptors per property are almost as good as all of them. On structures that
-neither model saw in training, properties predicted from ML-predicted densities
-are nearly as accurate as those from DFT densities. pydemi can therefore
-predict the properties of a relaxed crystal structure without computing its
-density. It runs from Python, the command line or a local graphical interface.
+0.95. \rev{For elastic properties they match composition
+features, and the two together beat either.} SHAP values show which descriptors drive each prediction, and ten
+descriptors per property are almost as good as all of them. On \rev{DFT-relaxed structures unseen by either model}, properties predicted from ML-predicted densities
+are nearly as accurate as those from DFT densities\rev{, so the density need not be computed}. It runs from Python, the command line or a graphical interface.
 \end{abstract}
 
 \noindent\textbf{Keywords:} electron charge density; descriptors; machine
@@ -148,7 +148,7 @@ answered on a large, well-defined dataset and for many properties at once.
 Here we describe pydemi, a Python package built around these three problems.
 (i) It reads one file, the VASP \texttt{CHGCAR}, and computes 55 descriptors
 that are defined on it and whose values are set by the material, not by the
-grid or the numerical method (Sections~\ref{sec:design}
+grid or the numerical method \rev{(for a given choice of PAW potentials)} (Sections~\ref{sec:design}
 and~\ref{sec:descriptors}). The descriptors describe how the charge is
 distributed around each nucleus and between the atoms, the shape of the density
 over the whole cell, and how much the atoms of a crystal differ from one
@@ -159,7 +159,8 @@ model, so that the same descriptors are obtained from a crystal structure alone,
 and we measure which descriptors transfer from DFT to predicted densities
 (Section~\ref{sec:ml}). (iii) We train property models on the descriptors alone
 for 17 properties of a large DFT dataset, compare them with the models reported
-earlier for the same structures, and identify the descriptors that carry the
+earlier for the same structures \rev{and with models on simple features and on the
+composition}, and identify the descriptors that carry the
 information (Section~\ref{sec:properties}). The package is used as a Python
 library, a command-line tool or a graphical interface that runs locally
 (Section~\ref{sec:software}); the code, the tests and the scripts that train the
@@ -283,7 +284,16 @@ Throughout this work, pydemi is applied to the charge densities of 6,059
 inorganic crystals of 87 elements from our earlier study~\cite{kumar2026},
 computed with VASP~\cite{kresse1996} and the PBE functional~\cite{perdew1996}
 for structures taken from the Materials Project; the structures and the DFT
-settings are described there. The set contains elemental solids, intermetallic
+settings are described there. \rev{In brief, the calculations used PAW
+potentials~\cite{blochl1994,kresse1999}, a plane-wave cutoff of 500\,eV and a
+$k$-point spacing of 0.1\,\AA$^{-1}$, and each density comes from a final
+calculation with the tetrahedron method (Section~S7 of the Supporting
+Information). Each element has one PAW dataset throughout the set. For 41 of the 87
+elements it differs from the one in the input set of the Materials Project,
+mostly by having
+fewer semicore electrons in the valence (for example Ti instead of Ti\_pv) or,
+for the lanthanides, by keeping the $f$ electrons in the valence; Table~S9 of
+the Supporting Information lists them.} The set contains elemental solids, intermetallic
 compounds and compounds of metals with non-metals (borides, carbides, hydrides,
 pnictides, chalcogenides, oxides and halides), so metallic, covalent and ionic
 bonding are all well represented. The number of structures in each class is
@@ -402,7 +412,11 @@ $\mathrm{Var}_iX=\sum_e x_e\mathrm{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
 into within- and between-element parts, where $x_e$ is the fraction of the atoms
 that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.
 Every descriptor is invariant under supercell expansion, rotation and
-translation of the crystal by whole grid steps.
+translation of the crystal by whole grid steps\rev{, with one exception: the
+within-element variances are undefined (NaN) for a cell in which every element
+has a single atom, while a supercell of the same crystal gives zero. This
+affects 421 of the 6,059 materials of our dataset; the property models of
+Section~\ref{sec:properties} treat these values as missing}.
 
 A descriptor should describe the material, not the way it was computed. Three
 things in a pydemi calculation are not set by the material. The first is the
@@ -431,6 +445,29 @@ coarser grid can miss small maxima. Fourth-order finite differences give the
 same values as the default method to better than 1\%, which confirms that the
 default is accurate, whereas second-order ones change some descriptors by up to
 16\%; pydemi therefore does not use them by default.
+
+\rev{The PAW potentials are a further choice that the material does not set. A
+\texttt{CHGCAR} holds the valence pseudo-density, so a potential that treats more
+electrons as valence, such as the semicore $3p$ electrons of Ti\_pv, adds charge
+near the nuclei and changes the descriptors that measure it. To see how large this
+effect is, we computed the descriptors from the densities that the Materials
+Project distributes for 80 of our test materials, which it computed with its own
+structures, cutoffs and $k$-points. For the 40 materials whose elements all have
+the same potentials as in our dataset, 44 of the 55 descriptors still rank the
+materials in the same order ($\rho_s\geq0.95$), the median change of a descriptor
+is about 1.5\%, and the property models score almost the same from both
+densities. For the 40 materials with at least one other potential, the median
+change is about 20\%, and only four descriptors keep the ranking: the mean
+interstitial density, the mean and spread of the bond-midpoint density and one
+percolation level. The bulk modulus, which rests mainly on the interstitial
+density, is predicted as well as before, but the scores for the sound
+velocities, the Debye temperature and the energies drop by 0.15 to 0.25. The
+descriptors are therefore set by the material for a given set of potentials, and
+the property models of pydemi should be used with densities computed with the
+potentials of our dataset (Table~S9 of the Supporting Information). A
+\texttt{CHGCAR} does not record its potentials, so pydemi cannot check this.
+Section~S8 of the Supporting Information gives the comparison for every
+descriptor and property.}
 
 The site descriptors also depend on the division into atomic regions. This is
 not an error: a different division describes different regions, so pydemi
@@ -573,13 +610,30 @@ metal and whether its gap is direct; and the refractive
 index~\cite{petousis2017}. The structures were split at random into 4,847
 for training, 606 for validation and 606 for testing, the split distributed with
 the dataset~\cite{kumar2026}; a material without a
-value for a property is left out for that property only.
+value for a property is left out for that property only. \rev{The targets were
+computed by the Materials Project for its own structures and settings, whereas the
+descriptors come from the densities of our dataset. The two structures have the
+same volume per atom to within 0.01\% for 81\% of the materials and to within 2\%
+for 90\%. On the test set, the bulk modulus is predicted less well for the
+materials whose volumes differ by more than 0.01\% (mean absolute error 13\,GPa,
+against 8\,GPa for the others), so part of the remaining error comes from this
+mismatch and not from the descriptors.}
 
 For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
 were tuned automatically on the validation set~\cite{akiba2019}, and the test
 set was used only once, for the final scores. Each random forest and LightGBM
-model was trained five times with different random seeds, and we report the average. To find out which
+model was trained five times with different random seeds, and we report the average. \rev{LightGBM
+handles the undefined within-element variances (Section~\ref{sec:descriptors}) as
+missing values: each split of a tree learns on which side to send them. To show
+how uncertain a test score is, we resampled the test materials with replacement
+(bootstrap, 2,000 samples) and give the 95\% interval of the score. To see
+what the descriptors add to simpler inputs, the same LightGBM models were also
+trained on three other inputs: four simple features (the volume per atom, the
+number of valence electrons per atom and per volume, and the mean
+electronegativity), 138 composition features (the Magpie element statistics and the
+stoichiometry~\cite{ward2016}), and the
+descriptors together with these composition features.} To find out which
 descriptors the models rely on, we used SHAP values~\cite{lundberg2020}, which
 split each prediction into the contributions of the individual descriptors. We
 also retrained every model on only the ten most important descriptors of its
@@ -595,12 +649,16 @@ given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
 standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 descriptors and with the ten most important
 descriptors of each property. MAE: mean absolute error with all
-descriptors. $n$: training and test materials.}
+descriptors. $n$: training and test materials. \rev{The last three columns give
+the scores of the same models on four simple features (volume per atom, valence
+electrons per atom and per volume, mean electronegativity), on 138 composition
+features (Magpie) and on the descriptors together with the composition
+features.}}
 \label{tab:properties}
 \begin{adjustbox}{width=\textwidth}
-\begin{tabular}{llrrccr}
+\begin{tabular}{llrrccrccc}
 \toprule
-Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & all descriptors & 10 descriptors & MAE \\
+Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & all descriptors & 10 descriptors & MAE & \rev{simple} & \rev{composition} & \rev{descr.\ + comp.} \\
 \midrule
 \csname @@input\endcsname tables/tab_properties.tex
 \bottomrule
@@ -624,21 +682,32 @@ same structures and the same split~\cite{kumar2026}: a compressed representation
 of the full density grid, compositional (Magpie) features, both together, and
 the graph neural networks CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}.
 For this comparison our models were also trained on the two properties whose
-data differ from ours: the energy relative to the free atoms used there, and
+data differ from ours: the energy relative to the free atoms used there \rev{(computed in
+Ref.~\cite{kumar2026} from the energies of the dataset and of the free atoms; it
+is not the Materials Project cohesive energy of Table~\ref{tab:properties}, which
+comes from other calculations of both, and the two differ by 0.5\,eV/atom on
+average)}, and
 the Debye temperature, which is given there for fewer materials. For the
-three moduli, the descriptors alone give the highest $R^2$ of all models. For
+three moduli, the descriptors alone give the highest $R^2$ of all models\rev{,
+but only by 0.01 to 0.03. This is about the size of the uncertainty of the
+scores: resampling the test materials gives 95\% intervals of about $\pm0.02$
+for our models, and the other rows of the table come without intervals, so the
+differences between the best models for the moduli are not significant}. For
 the Debye temperature they are above the density and composition models, level
 with MEGNet and behind CGCNN. For the energy relative to the free atoms they are
 well above the density representation alone but below MEGNet and the models
 that use the composition: this energy depends strongly on which elements are
-present, which the composition describes directly.
+present, which the composition describes directly. \rev{With the composition
+features added, the descriptors give the highest $R^2$ for all five properties,
+and clearly so for the shear and Young's moduli and for the energy.}
 
 \begin{table}[!t]
 \centering
 \caption{Test $R^2$ of models trained on the same structures with the same
-split. All rows except the last are from Ref.~\cite{kumar2026}; latent density:
+split. All rows \rev{above the line} are from Ref.~\cite{kumar2026}; latent density:
 compressed representation of the full density grid. $E_\mathrm{atoms}$: energy
-relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.}
+relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.
+\rev{95\% interval: from 2,000 bootstrap resamples of the test materials.}}
 \label{tab:compare}
 \footnotesize
 \begin{tabular}{@{}lccccc@{}}
@@ -653,9 +722,28 @@ CGCNN & 0.93 & 0.88 & 0.89 & -- & 0.94 \\
 MEGNet & 0.93 & 0.87 & 0.86 & 0.94 & 0.91 \\
 \midrule
 pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & 0.86 & 0.91 \\
+\rev{\quad 95\% interval} & \rev{0.92--0.97} & \rev{0.88--0.93} & \rev{0.89--0.94} & \rev{0.83--0.89} & \rev{0.88--0.93} \\
+\rev{pydemi descriptors + Magpie, LightGBM} & \rev{0.96} & \rev{0.93} & \rev{0.94} & \rev{0.98} & \rev{0.95} \\
+\rev{\quad 95\% interval} & \rev{0.94--0.98} & \rev{0.91--0.95} & \rev{0.92--0.95} & \rev{0.98--0.99} & \rev{0.94--0.97} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\rev{Table~\ref{tab:properties} also compares the descriptors with simpler
+inputs. The four simple features, which include the valence electron density,
+give an $R^2$ of only 0.71 for the bulk modulus and at most 0.84 for the other
+regression properties, so the descriptors carry much more than the electron
+count and the volume. The composition features alone are as accurate as the
+descriptors for the elastic properties, the thermal conductivities,
+metallicity, the direct gap and the refractive index: the differences lie within
+the 95\% intervals. They are more accurate for the formation and cohesive
+energies, the band gap, the sound velocities and the Debye temperature. Adding
+the descriptors to the composition improves every elastic and thermal property
+by 0.01 to 0.04 in $R^2$, beyond the uncertainty for all of them except
+$C_{12}$, but it does not improve the energies or the band gap. The descriptors
+thus add information on the bonding and the structure that the composition does
+not contain, and they help most for the properties that depend on it; the
+energies and the band gap are set mainly by which elements are present.}
 
 The mean interstitial density is the most important descriptor overall: it
 leads for the elastic moduli and constants and for the refractive index. The
@@ -733,7 +821,14 @@ The test structures were relaxed with DFT. For a new material, the structure has
 to come from elsewhere, for example from experiment or from an ML interatomic
 potential, and its errors add to those measured here. Within this limit, the
 descriptors and the properties of a relaxed crystal structure can be obtained
-without computing its density.
+without computing its density. \rev{We did not test structures relaxed with an ML interatomic
+potential. Graph networks such as CGCNN and MEGNet also predict properties from
+the structure directly, with similar accuracy (Table~\ref{tab:compare}). The
+route through the predicted density adds what they lack: the prediction rests on
+the same 55 descriptors as for a DFT density, each with a physical meaning, so a
+user can see which feature of the bonding drives it, compare the material with
+those of the dataset, and check the descriptors against a DFT density once one
+is computed.}
 
 % ==========================================================================
 \section{Software}
@@ -823,7 +918,10 @@ value largely set by the material rather than by the grid or the numerical
 method. It computed every descriptor for every crystal of our dataset without a
 failure. Automated tests compare the descriptors with exact values for model
 densities and check that every descriptor stays the same when the cell is
-enlarged, moved or rotated. It can be used
+enlarged, moved or rotated\rev{, the within-element variances of cells with one
+atom per element being the only undefined case}. \rev{The descriptors do depend
+on the PAW potentials of the calculation, so the property models should be applied
+to densities computed with the potentials of our dataset.} It can be used
 as a Python library, from the command line or through a local graphical
 interface. The included ChargE3Net model gives most of the same descriptors from
 a crystal structure alone. The exceptions are the counts of density maxima and
@@ -831,29 +929,35 @@ minima, quantities built from second derivatives in low-density regions, and
 descriptors whose values cluster.
 
 Used alone, the descriptors predict 17 elastic, thermal, energetic,
-electronic and optical properties. SHAP values show which descriptors drive
+electronic and optical properties. \rev{For the elastic and thermal properties
+they are as accurate as composition features and improve on them when the two
+are combined, while the energies and the band gap are set mainly by the
+composition.} SHAP values show which descriptors drive
 each prediction, and ten descriptors per property are almost as good as all of
-them. On structures that neither model had seen, properties predicted from
+them. On \rev{DFT-relaxed} structures that neither model had seen, properties predicted from
 ML-predicted densities are nearly as accurate as those from DFT densities, and
 the small losses come from the descriptors that transfer less well. pydemi can
 therefore predict the properties of a relaxed crystal structure without
-computing its density.
+computing its density\rev{; whether this holds for structures relaxed with an ML
+interatomic potential remains to be tested}.
 
 \section*{Code and data availability}
 The source code, the tests, the descriptor reference and the scripts that
 train the property models are available at
-\url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, 0.2.2, is archived at
-Zenodo (\doi{10.5281/zenodo.23891115}). The fine-tuned
+\url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, \rev{0.3.0}, is archived at
+Zenodo (\rev{\doi{10.5281/zenodo.22995680}, which resolves to every released
+version}). The fine-tuned
 ChargE3Net checkpoint and the property models are included in the package. The ChargE3Net code included in pydemi is
 taken from \url{https://github.com/AIforGreatGood/charge3net} (MIT licence). The
 DFT dataset of charge densities was generated by members of the CMS Lab,
 Department of Materials Science \& Engineering, IIT Kanpur, including the
 authors, and was introduced in Ref.~\cite{kumar2026}; the data released with
 that work are available at \url{https://github.com/CMSLabIITK/LatentMatFusion}.
-The descriptors of all structures and of the predicted test
-densities, the property targets and the model predictions are available from
-the corresponding author upon reasonable request, as are the DFT calculations
-themselves (about 180\,GB).
+\rev{The descriptors of all 6,059 structures and of the 605 predicted test
+densities, the property targets, the test-set predictions of every model and the
+PAW datasets of every calculation are deposited on Zenodo (DOI to be added).} The
+DFT calculations themselves (about 180\,GB) are available from the corresponding
+author upon reasonable request.
 
 \section*{Acknowledgements}
 We acknowledge the National Supercomputing Mission (NSM) for providing

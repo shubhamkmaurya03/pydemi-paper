@@ -26,6 +26,7 @@
 
 % --- Document Start ---
 \begin{document}
+\newcommand{\rev}[1]{{\color{blue}#1}}
 
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
@@ -324,7 +325,13 @@ exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
 a gap (1,836). The structures were split once at random into 4,847 training,
 606 validation and 606 test structures.
 
-\paragraph{Training.} Inputs: the 55 descriptors of pydemi. Ridge and logistic regression: median
+\paragraph{Training.} Inputs: the 55 descriptors of pydemi\rev{; for the
+comparisons of Table~3 of the main text also four simple features (volume per
+atom; valence electrons per atom and per volume, from the valence charges of the
+PAW datasets of Table~\ref{tab:si_paw}; mean Pauling electronegativity), 138
+composition features (the 132 Magpie element statistics and six stoichiometry
+norms, from matminer) and the descriptors together with the composition
+features}. Ridge and logistic regression: median
 imputation, standardization, penalty from $10^{-3}$ to $10^{3}$ (13 values)
 chosen on the validation set. Random forests: 500 trees, $\frac13$ of the
 features per split for regression and $\sqrt{n}$ for classification, median
@@ -336,6 +343,11 @@ error of the (transformed) target or the log-loss; early stopping after 200
 rounds without improvement on the validation set, at most 10,000 rounds.
 $\log_{10}$ was applied to the refractive index. Three of the 34 LightGBM models, those of the cohesive energy, the Debye temperature and the Cahill conductivity with all descriptors, used more than 9,500 rounds on average, so a larger cap could improve them slightly. SHAP values are the
 exact tree contributions of LightGBM on the test set, averaged over the seeds.
+\rev{Uncertainty of a test score: the test materials were resampled with
+replacement 2,000 times (generator seed 0); for each resample the score of each
+of the five seeds was computed and averaged, and the 2.5th and 97.5th percentiles
+of these averages give the 95\% interval. Differences between two inputs were
+resampled in the same way, with the same materials in both (paired).}
 
 \paragraph{Ten descriptors per property.} For each property, the 55 descriptors
 were ranked by their mean absolute SHAP value in the five LightGBM models on the
@@ -872,6 +884,108 @@ SnBi$_2$Te$_4$, 350\,MB & $216^3$ & 54\,s & 2.6\,GB \\
 \paragraph{Undefined values.} In 421 structures every element has a
 single atom in the cell, so there are no atoms of the same element to compare. For
 these structures the three within-element variances are returned as NaN with a
-flag, as documented in the descriptor reference.
+flag, as documented in the descriptor reference. \rev{A supercell of such a
+structure has several equivalent atoms of each element and gives zero, so these
+are the only values that change under supercell expansion; the invariance tests
+use a crystal in which one element has two atoms. LightGBM handles the NaN values as
+missing, learning at every split the side to which they go; the random forests
+and the linear models replace them by the training median.}
+
+\paragraph{\rev{PAW datasets.}} \rev{The \texttt{OUTCAR} files of the 4,901 runs
+that have one name one PAW dataset per element, the same for every structure of
+the element (Table~\ref{tab:si_paw}). For 41 of the 87 elements the dataset
+differs from the one in the Materials Project input set (\texttt{MPRelaxSet} of
+pymatgen): 30 have fewer semicore electrons in the valence, and 11 lanthanides
+keep their $f$ electrons in the valence where the Materials Project freezes them
+in the core. 4,912 of the 6,059 structures contain at least one of these
+elements.}
+
+\paragraph{\rev{Structures.}} \rev{The volume per atom of each cell, read from
+its \texttt{CHGCAR}, agrees with that of the Materials Project structure of the
+same identifier (database version 2026.04.13) to within 0.01\% for 81\% of the
+6,047 structures that have one, to within 2\% for 90\% and to within 5\% for
+99\%.}
+
+\begin{table}[htbp]
+\centering
+\caption{\rev{PAW dataset of each element in the calculations of the dataset,
+with its number of valence electrons, and the dataset of the Materials Project
+input set where it differs.}}
+\label{tab:si_paw}
+\footnotesize
+\color{blue}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Dataset & Materials Project & Dataset & Materials Project & Dataset & Materials Project \\
+\midrule
+\csname @@input\endcsname tables/tab_si_paw.tex 
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{\rev{Densities of the Materials Project}}
+\label{si:mp}
+\color{blue}
+\paragraph{Materials.} From the 606 test structures, 80 were drawn at random
+(seed 0, \texttt{CHGCAR} below 60\,MB): 40 whose elements all use the same PAW
+dataset as the Materials Project input set and 40 with at least one element that
+does not (Table~\ref{tab:si_paw}). Their charge densities were downloaded from
+the Materials Project with its API; they were computed by the Materials Project on
+its own structures, with its cutoff, $k$-points and smearing. The descriptors of
+these densities were computed with the default settings of pydemi and compared
+with those of the densities of the dataset (Table~\ref{tab:si_mp}), and both
+sets of descriptors were given to the 17 property models of pydemi
+(Table~\ref{tab:si_mp_props}).
+
+\paragraph{Result.} With the same PAW datasets, the descriptors change little:
+the exceptions are the same kinds as for predicted densities (main text,
+Section~4), namely counts of extrema and non-nuclear maxima, anisotropy measures
+whose values cluster, and the within-element variances, which are close to zero
+for most materials. With other PAW datasets, every descriptor that measures the
+charge near the nuclei changes, and so do the site-heterogeneity and information
+measures; the interstitial and bond-midpoint densities, which lie outside the
+augmentation spheres, do not. The range check of the property view, which marks
+descriptors outside the 1st--99th percentile of the training materials, flags
+about as many materials for the densities of the dataset (27 of 80) as for those
+of the Materials Project (30), so it does not detect a change of PAW datasets.
+The groups are small, so the scores of Table~\ref{tab:si_mp_props}, and those of
+the direct gap and the refractive index in particular, are indicative only.
+
+\begin{table}[htbp]
+\centering
+\caption{Descriptors from Materials Project densities against those from the
+densities of the dataset, for 40 test materials with the same and 40 with at
+least one different PAW dataset: Spearman correlation $\rho_s$ over the
+materials and median relative change $|a-b|/\max(|a|,|b|)$ in per cent.}
+\label{tab:si_mp}
+\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{same PAW datasets} & \multicolumn{2}{c}{other PAW datasets} \\
+Descriptor & $\rho_s$ & change (\%) & $\rho_s$ & change (\%) \\
+\midrule
+\csname @@input\endcsname tables/tab_si_mp.tex 
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Test scores ($R^2$, or ROC-AUC) of the property models of pydemi for
+the 80 materials of Table~\ref{tab:si_mp}, from the descriptors of the densities
+of the dataset and of the Materials Project, against the Materials Project
+targets. $n$: materials with a target in both groups together.}
+\label{tab:si_mp_props}
+\footnotesize
+\begin{tabular}{lccccc}
+\toprule
+ & & \multicolumn{2}{c}{same PAW datasets} & \multicolumn{2}{c}{other PAW datasets} \\
+Property & $n$ & dataset & MP & dataset & MP \\
+\midrule
+\csname @@input\endcsname tables/tab_si_mp_props.tex 
+\bottomrule
+\end{tabular}
+\end{table}
+\normalcolor
 
 \end{document}
