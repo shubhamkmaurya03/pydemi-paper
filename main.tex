@@ -261,8 +261,8 @@ descriptors (the registry) together with a record that describes it: its name, i
 (bonding, structural or heterogeneity), the cached quantities it needs, its
 units, the range of values it can take, its formula and references, and the
 cases in which it is undefined, each with the constant returned instead. A
-uniform density, for instance, has no gradient, so the anisotropy of the
-gradient is zero divided by zero; the descriptor returns 0 and is flagged, and
+uniform density, for instance, has no gradient, so the non-radial
+gradient share is zero divided by zero; the descriptor returns 0 and is flagged, and
 the output then carries a companion flag column set to 1, so a user can find and
 exclude such values. No descriptor returns a bare NaN, with one documented
 exception: the within-element variances of Table~\ref{tab:families2}, when no
@@ -297,15 +297,16 @@ Tables~\ref{tab:families} and~\ref{tab:families2} give each descriptor a
 descriptive name, its name in the package and a one-line definition; the full
 definitions, units, ranges, references and fallback values are given in
 Section~S1 of the Supporting Information and in the reference document of the
-package. In what follows $k$ runs over the voxels,
-$i(k)$ is the nearest nucleus of voxel $k$, $r_k$ its distance and
-$\hat{\mathbf u}_k$ the unit vector from that nucleus to the voxel.
+package. In what follows $k$ runs over the grid points,
+$i(k)$ is the nearest nucleus of grid point $k$, $r_k$ its distance and
+$\hat{\mathbf u}_k$ the unit vector from that nucleus to the grid point.
 
 \begin{table}[!t]
 \centering
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
-the name used in the package and in the text. Core, bond shell and interstitial region
-as defined in Section~\ref{sec:design}. Formulas, ranges, references and fallback values:
+the name used in the package. Core, bond shell and interstitial region
+as defined in Section~\ref{sec:design}. The signed NCI density is given in
+atomic units, as is usual for this quantity. Formulas, ranges, references and fallback values:
 Supporting Information, Section~S1.}
 \label{tab:families}
 \footnotesize
@@ -325,7 +326,7 @@ Negative-Laplacian volume fraction & \texttt{lnf} & volume fraction with negativ
 Negative-Laplacian charge fraction & \texttt{lnf\_charge\_weighted} & fraction of the charge where the Laplacian is negative & -- \\
 Valence Laplacian concentration & \texttt{lap\_concentration\_valence} & share of the absolute Laplacian outside the cores where it is negative & -- \\
 Mean bond ellipticity & \texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity in the bond shell: 0 cylindrical, 1 flat & -- \\
-NCI volume fraction & \texttt{f\_NCI} & volume fraction of the non-covalent-interaction (NCI) region & -- \\
+Non-covalent interaction (NCI) volume fraction & \texttt{f\_NCI} & volume fraction of the NCI region (low density, low gradient) & -- \\
 Attractive NCI fraction & \texttt{NCI\_attractive} & fraction of the NCI region that is attractive & -- \\
 Signed NCI density & \texttt{sign\_lambda2\_rho\_mean} & signed mean density of the NCI region (negative where attractive) & e\,bohr$^{-3}$ \\
 Site potential spread & \texttt{V\_spread} & standard deviation of the electronic Hartree potential at the atoms & eV \\
@@ -340,7 +341,7 @@ Bond-midpoint density spread & \texttt{rho\_mid\_std} & standard deviation of th
 \centering
 \caption{The 19 structural and 18 site-heterogeneity descriptors of pydemi,
 as in Table~\ref{tab:families}. Density shape: the density divided by the
-number of electrons.}
+number of electrons. The Fisher information is given in atomic units.}
 \label{tab:families2}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -365,7 +366,7 @@ Disequilibrium & \texttt{disequilibrium} & mean squared density shape; 1 for a u
 LMC complexity & \texttt{LMC\_complexity} & statistical complexity of L\'opez-Ruiz, Mancini and Calbet~\cite{lopezruiz1995} & -- \\
 Fisher information & \texttt{fisher\_information} & Fisher information of the density shape; large for steep changes & bohr$^{-2}$ \\
 \addlinespace
-\multicolumn{4}{@{}l}{\emph{Site heterogeneity (18): \texttt{X} = \texttt{m1}, \texttt{f\_bond} or \texttt{zeta} of each atom, from its own cell}} \\
+\multicolumn{4}{@{}l}{\emph{Site heterogeneity (18): \texttt{X} = \texttt{m1}, \texttt{f\_bond} or \texttt{zeta} of each atom, from its own atomic region}} \\
 Site spread of \texttt{X} & \texttt{X\_site\_std} & standard deviation of \texttt{X} over the atoms & as \texttt{X} \\
 Site range of \texttt{X} & \texttt{X\_site\_range} & largest minus smallest \texttt{X} over the atoms & as \texttt{X} \\
 Site maximum, minimum of \texttt{X} & \texttt{X\_site\_max}, \texttt{\_min} & largest and smallest \texttt{X} over the atoms & as \texttt{X} \\
@@ -379,7 +380,7 @@ The bonding descriptors ask how the charge is arranged around the atoms and in
 the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the shell
 fractions describe how far the charge sits from its nearest nucleus; a large
 interstitial fraction points to delocalized charge between the atoms. The
-gradient anisotropy
+non-radial gradient share
 \begin{equation}
 \zeta = 1-\frac{\sum_k|\nabla\rho_k\cdot\hat{\mathbf u}_k|}{\sum_k|\nabla\rho_k|}
 \end{equation}
@@ -389,55 +390,58 @@ concentrated ($\nabla^2\rho<0$). The share of $|\nabla^2\rho|$ that lies where
 $\nabla^2\rho<0$ is computed only outside the cores: over the whole cell
 $\nabla^2\rho$ integrates to zero, so this share would be $\tfrac12$ for every
 crystal. The bounded ellipticity distinguishes
-cylindrical from flattened charge in the bond shell, and the NCI descriptors
+cylindrical from flattened charge in the bond shell, and the non-covalent interaction (NCI) descriptors
 pick out the low-density, low-gradient regions of weak
 interactions~\cite{johnson2010}. The structural descriptors treat the density of
 the whole cell: how well it connects (percolation levels, detected by a
 union--find over periodic images), its maxima, minima and non-nuclear maxima,
-its floor, its directionality and its information content. The heterogeneity
+its lowest density, its directionality and its information content. The heterogeneity
 descriptors turn per-atom values of $m_1$, $f_\mathrm{bond}$ and $\zeta$ into
 statistics over the atoms, including the decomposition
 $\mathrm{Var}_iX=\sum_e x_e\mathrm{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
-into within- and between-element parts, where $x_e$ is the site fraction of
-element $e$; the decomposition is exact, as in a one-way analysis of variance.
-Every descriptor is invariant under supercell expansion, translation and rotation
-of the crystal.
+into within- and between-element parts, where $x_e$ is the fraction of the atoms
+that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.
+Every descriptor is invariant under supercell expansion, rotation and
+translation of the crystal by whole grid steps.
 
-A descriptor should describe the material, not the way it was computed. Two
+A descriptor should describe the material, not the way it was computed. Three
 things in a pydemi calculation are not set by the material. The first is the
 density grid: VASP chooses it from the plane-wave cutoff, so two calculations
 of the same compound can give grids of different fineness. The second is the
 way the derivatives of the density, which several descriptors need, are
-computed. If a descriptor changed noticeably when either of these changed, the
+computed. The third is the division of the cell into atomic regions, which
+the site descriptors use. If a descriptor changed noticeably when the grid or
+the derivative method changed, the
 same material could get different values, and a model trained on the
 descriptor would learn this noise instead of the material.
 
-We therefore tested both on structures of our dataset. For the grid, we recomputed the descriptors on a
+We therefore tested the first two on structures of our dataset. For the grid, we recomputed the descriptors on a
 coarser grid with about half as many points, as a calculation with a lower
 cutoff would give. For the derivatives, we replaced the default method, which
 takes exact derivatives from the Fourier transform of the density, by the
 simpler finite differences.
 
-The descriptors pass both tests. On the coarser grid, almost all of them (46 of
-the 55) change by less than 1\%. The few that change
-more have values close to zero for many materials, for example the anisotropy of
-a cubic crystal, or the spread between atoms of an element that are all
+Most descriptors are insensitive to both choices. On the coarser grid, the
+median change is below 1\% for 46 of the 55. Most of the few that change more
+have values close to zero for many materials, for example the percolation
+anisotropy of a cubic crystal, or the spread between atoms of an element that are all
 equivalent by symmetry; for such values, a tiny absolute change is a large
-percentage. Accurate finite differences give the same values as the default
-method, which confirms that the default is accurate, whereas crude finite
-differences change some descriptors by up to 16\%; pydemi therefore does not
-use them by default.
+percentage. The number of non-nuclear maxima changes for a different reason: a
+coarser grid can miss small maxima. Fourth-order finite differences give the
+same values as the default method to better than 1\%, which confirms that the
+default is accurate, whereas second-order ones change some descriptors by up to
+16\%; pydemi therefore does not use them by default.
 
-The site descriptors also depend on how the cell is divided into atomic
-regions. This is not an error: a different division describes different
-regions, so pydemi treats it as a setting and records it with every result.
-The Supporting Information (Section~S2) gives the result for every descriptor
-and every choice, the effect of the division into atomic regions, the
-quantities of density analysis that pydemi does not offer because a
-\texttt{CHGCAR} cannot support them reliably (such as the electron localization
-function, which needs more than the density~\cite{abramov1997,tsirelson2002}),
-and what the PAW pseudo-density~\cite{blochl1994,kresse1999} stored in a
-\texttt{CHGCAR} means for the descriptors.
+The site descriptors also depend on the division into atomic regions. This is
+not an error: a different division describes different regions, so pydemi
+treats it as a setting and records it with every result. Section~S2 of the
+Supporting Information gives the change of every descriptor for every choice,
+including the division into atomic regions. It also explains which quantities
+of density analysis pydemi does not offer because a \texttt{CHGCAR} cannot
+support them reliably (such as the electron localization function, which needs
+more than the density~\cite{abramov1997,tsirelson2002}), and what the PAW
+pseudo-density~\cite{blochl1994,kresse1999} stored in a \texttt{CHGCAR} means
+for the descriptors.
 
 A descriptor must also be computed correctly. pydemi is therefore checked by
 automated tests that run every time the code changes. Each test computes
@@ -460,14 +464,16 @@ The second kind checks that a descriptor stays the same when the crystal is
 described differently. The same material can be written down in many ways, and
 a descriptor must not depend on the choice. For a low-symmetry test crystal,
 every descriptor is computed four times: for the original cell, for a cell
-eight times larger, for the cell with its origin moved, and for the cell
+eight times larger, for the cell with its origin moved by a whole number of grid steps, and for the cell
 rotated in space. All four must give the same value. These symmetry tests are
 generated automatically from the list of descriptors, so a descriptor added in
 the future is checked without writing a new test.
 
 No two computer calculations agree to the last digit, so each test allows a
 small difference, chosen from what can cause it. Where only rounding can cause
-it, the allowed difference is one part in a billion or less; where the grid
+it, the allowed difference is one part in a billion or less, and one part in a
+million for the symmetry tests, whose sums run over the grid in a different
+order; where the grid
 cannot represent a sharp atomic peak exactly, it is larger and set from the
 known size of this grid error, and the tests also check that the error shrinks
 when the grid is refined. Each test, its reference and its allowed difference are listed in Section~S6 of
@@ -529,7 +535,7 @@ decided by a few materials. The bounded bond ellipticity and the volume
 fraction of negative Laplacian use second derivatives of the density in
 low-density regions, and derivatives magnify the small errors of the
 prediction. Five anisotropy measures, the three eigenvalues and the fractional
-anisotropy of the anisotropy tensor and the percolation anisotropy, are
+anisotropy of the tensor of gradient directions and the percolation anisotropy, are
 predicted accurately, but many materials share almost the same value (every
 cubic crystal, for instance, is isotropic), so tiny differences reorder them;
 because several of these values are close to zero, their relative error in

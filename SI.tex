@@ -423,8 +423,8 @@ heterogeneity).}
 $|\rho_s|\geq0.90$ (training set), the descriptor kept in their group, their
 Spearman correlation with it, and the reason. $m_1$, $m_2$: first and second
 moments of the distance of the charge from its nearest nucleus; $t_i$:
-eigenvalues of the anisotropy tensor $T$; FA: its fractional anisotropy; $\zeta$:
-gradient anisotropy (definitions in Section~\ref{si:defs}).}
+eigenvalues of the tensor of gradient directions $T$; FA: its fractional anisotropy; $\zeta$:
+non-radial gradient share (definitions in Section~\ref{si:defs}).}
 \label{tab:si_redundant_groups}
 \footnotesize
 \begin{tabular}{>{\raggedright}p{3.6cm}>{\raggedright}p{2.6cm}>{\raggedright}p{1.3cm}>{\raggedright\arraybackslash}p{6.6cm}}
@@ -679,7 +679,7 @@ transformations of the harness to $10^{-6}$ (12 tests).
 Slater density ($\zeta=3$\,\AA$^{-1}$, $96^3$ grid, 4\,\AA{} box) the charge
 integrates to 1 ($10^{-4}$), $m_1=3/(2\zeta)$ ($5\times10^{-4}$), $m_2=3/\zeta^2$
 ($1.5\times10^{-3}$, limited by nearest-image distances in the small box),
-$\sigma_{r^2}$ within 1\% and the anisotropy $\zeta_\mathrm{anis}<5\times10^{-5}$,
+$\sigma_{r^2}$ within 1\% and the non-radial gradient share below $5\times10^{-5}$,
 with both derivative methods; the error of $m_1$ decreases on refining the grid;
 the negative-Laplacian volume fraction equals that of the sphere $r<1/\zeta$
 within 5\% with finite differences, whereas the ringing FFT Laplacian
@@ -699,7 +699,7 @@ percolation threshold does not depend on the cell origin, needs a cluster that
 winds around the cell, and is the highest spanning level; a non-nuclear maximum
 placed between two atoms is counted with its basin charge; a uniform density
 gives zero Shannon entropy, unit disequilibrium and LMC complexity and an
-isotropic anisotropy tensor (flagged); and a layered density gives
+isotropic tensor of gradient directions (flagged); and a layered density gives
 $t_3=1$ and fractional anisotropy 1. \emph{Fields} (6): the Hartree potential of a
 Gaussian in a cubic box matches $kN[\mathrm{erf}(\sqrt\alpha r)/r-2\sqrt{\alpha/\pi}]$
 plus the $r^2$ term of the neutralizing background to $2\times10^{-3}$; the
