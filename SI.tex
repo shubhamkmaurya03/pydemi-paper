@@ -536,15 +536,15 @@ file whose density is predicted.}
 \section{Automated tests}
 \label{si:tests}
 
-The test suite of pydemi 0.3.0 consists of 349 tests in 21 files under
+The test suite of pydemi 0.3.0 consists of 350 tests in 21 files under
 \texttt{tests/} of the repository (Table~\ref{tab:si_tests}). They run with
 \texttt{pytest} after \texttt{pip install "pydemi[gui,ml]"}; on a Linux
-workstation with every optional dependency and the dataset available, all 349
+workstation with every optional dependency and the dataset available, all 350
 pass, none skipped, in 4 minutes.
 
 \begin{table}[!htbp]
 \centering
-\caption{The 349 tests of pydemi 0.3.0 by file. Optional dependencies: G, the
+\caption{The 350 tests of pydemi 0.3.0 by file. Optional dependencies: G, the
 \texttt{gui} extra (Streamlit, Plotly, LightGBM); M, the \texttt{ml} extra
 (PyTorch, e3nn, ASE); L, LightGBM; in parentheses, the number of the file's
 tests that need it.}
@@ -568,7 +568,7 @@ Input and tooling & \texttt{test\_io.py} & 10 & pymatgen (1) & $10^{-10}$ \\
  & \texttt{test\_regressions.py} & 2 & -- & $10^{-12}$ \\
 Density model & \texttt{ml/test\_ml.py} & 13 & M (8) & $10^{-5}$ of $\rho_{\max}$ \\
 Property models & \texttt{test\_props.py} & 12 & L (8) & $10^{-9}$ rel. \\
-Interface & \texttt{gui/test\_core.py} & 10 & -- & exact \\
+Interface & \texttt{gui/test\_core.py} & 11 & -- & exact \\
  & \texttt{gui/test\_plots.py} & 10 & G & $10^{-7}$--$10^{-12}$ \\
  & \texttt{gui/test\_viewer.py} & 11 & G & $10^{-6}$ \\
  & \texttt{gui/test\_launch.py} & 7 & POSIX (3) & -- \\
@@ -576,7 +576,7 @@ Interface & \texttt{gui/test\_core.py} & 10 & -- & exact \\
  & \texttt{gui/test\_compare.py} & 5 & G & $10^{-6}$ \\
  & \texttt{gui/test\_app.py} & 16 & G, M (4) & -- \\
 \midrule
-Total & & 349 & & \\
+Total & & 350 & & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -785,16 +785,16 @@ built. The distributed bundle of the 17 models of the main text reproduces the
 test-set predictions made with the untrimmed models when it was built, from the
 stored descriptors, to $10^{-9}$ (every 30th test material).
 
-\paragraph{Graphical interface (63).} \emph{Input} (10): a CHGCAR reads to the
+\paragraph{Graphical interface (64).} \emph{Input} (11): a CHGCAR reads to the
 same density plain or compressed (gzip, bzip2, xz, zip); unreadable files and
 unknown partitions give clear errors; the summary (formula, lattice, electron
 count) and the result table cover all 55 descriptors; and every descriptor has
-a typeset formula. \emph{Descriptor figures} (10, each with the nearest-atom and
+a typeset formula and its own descriptive name. \emph{Descriptor figures} (10, each with the nearest-atom and
 the Becke partition): every descriptor has a figure, and the plotted data
 reproduce the descriptors: the radial charge distribution gives the shell
 fractions, the negative-Laplacian fractions, the whole-cell Laplacian share of $\tfrac12$ and the
 Fisher information to $10^{-9}$, the histograms are centred on $\zeta$, the
-anisotropy-tensor eigenvalues and the bond ellipticity within one bin, and the
+eigenvalues of the tensor of gradient directions and the bond ellipticity within one bin, and the
 critical points, NNM charge, site potentials, bond midpoints, percolation
 levels and site statistics give their descriptors to $10^{-7}$--$10^{-12}$; the
 figure data stay below 2\,MB. \emph{Viewer} (11): large grids are subsampled to
