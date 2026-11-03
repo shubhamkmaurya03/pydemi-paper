@@ -765,13 +765,15 @@ write one row per structure, with the flag columns and the run metadata, and
 continue past structures that fail, recording the error.
 
 On our dataset, a batch run computed all descriptors of every structure without
-a failure. On one core of an Intel Xeon Gold 6338N processor, a typical
-structure takes 3.3\,s. Added up over all structures, the run needed 8.4
-CPU-hours; on 16 cores in parallel it finished in 37 minutes. The time depends
-mainly on the size of the density grid, not on the number of atoms, and even the
-largest \texttt{CHGCAR} in the dataset takes under a minute and 2.6\,GB of
-memory, well within the memory of an ordinary laptop. pydemi currently reads
-densities only in the VASP \texttt{CHGCAR} format.
+a failure. A typical structure takes a few seconds on one processor core, and
+the whole dataset was featurized in well under an hour on one workstation. The
+time depends mainly on the size of the density grid, not on the number of
+atoms, and even the largest \texttt{CHGCAR} of the dataset needs less than a
+minute and fits in the memory of an ordinary laptop (Section~S7 of the
+Supporting Information). pydemi reads densities in the \texttt{CHGCAR} format
+of VASP; a density from another code, such as Quantum ESPRESSO, can be read once
+it is written in this format, but the density and property models were trained
+on VASP densities.
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
 the browser (Fig.~\ref{fig:gui}). By default it listens on the local machine
