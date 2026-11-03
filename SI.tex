@@ -134,7 +134,7 @@ the site spread \dn{X_site_std} ($\mathrm{std}_iX^{(i)}$), the site range
 ($\sum_e x_e\mathrm{Var}_{i\in e}X^{(i)}$) and the between-element variance
 \dn{X_between_element_var} ($\sum_e x_e(\bar X_e-\bar X)^2$), with $x_e$ the site fraction of element $e$;
 the last two add up to $\mathrm{Var}_iX^{(i)}$. The within-element variance is NaN
-(flagged) when no element has two or more sites, and the between-element
+(flagged) when no element has two or more atoms in the cell, and the between-element
 variance is zero (flagged) for an elemental crystal.
 
 % ==========================================================================
@@ -637,7 +637,7 @@ $2\times2\times2$ supercell, with its origin translated by $(3,7,11)$ voxels and
 rigidly rotated by 37$^\circ$ about $(1,2,0.5)$. Each of the 55 descriptors must
 agree under each of the three transformations to
 $|a-b|\leq10^{-6}\max(|a|,|b|)+10^{-12}$ (165 tests). The tests are generated
-from the descriptor registry, so a descriptor added later is checked without a
+from the list of all descriptors in the package, so a descriptor added later is checked without a
 new test. One more test confirms that the transformations do what they claim:
 the supercell has 8 times the atoms, volume and charge, and the rotation
 preserves the volume and the metric tensor.
@@ -688,7 +688,7 @@ whole cell the share of $|\nabla^2\rho|$ where $\nabla^2\rho<0$ is $\tfrac12$ to
 because $\int\nabla^2\rho\,\mathrm dV=0$ on a periodic grid, whereas outside the cores it
 is not; a uniform density gives the
 documented constants with their flags and no NaN; names, order, metadata and the
-catalogue are generated from the registry, which refuses extensive quantities;
+catalogue are generated from the list of descriptors, and a quantity that grows with the cell size is refused when it is added;
 and invalid options are rejected. \emph{Structural} (11): the function
 $\cos2\pi x+\cos2\pi y+\cos2\pi z$ with a small periodic tilt has exactly one
 maximum, one minimum and $3+3$ saddles per cell, with Euler characteristic
@@ -711,7 +711,7 @@ to $10^{-6}$; and the NCI fields are finite on a real CHGCAR (above).
 the total variance to $10^{-12}$, for random numbers and for computed site
 values; the site charges add up to the cell charge and the site moments to
 $m_1$ ($10^{-12}$); range, extrema and standard deviation are consistent; the
-within-element variance is NaN (flagged) when no element has two sites and the
+within-element variance is NaN (flagged) when no element has two atoms in the cell and the
 between-element variance is zero (flagged) for one element; and the power
 partition gives a different tiling with the same total charge. \emph{Bond
 ellipticity} (5): the bounded ellipticity $1-\lambda_2/\lambda_1$ is in the
