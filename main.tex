@@ -32,8 +32,8 @@
 % --- ABSTRACT -------------------------------------------------------------
 \begin{abstract}
 The electronic charge density from a density-functional theory (DFT)
-calculation contains the bonding that property models try to learn, yet it is
-rarely used as a model input. Learned density representations predict
+calculation describes how a material is bonded, yet it is rarely used as the
+input of machine-learning models of material properties. Learned density representations predict
 properties well but are hard to interpret, while interpretable density analysis
 treats one structure at a time. We present pydemi, an open-source Python
 package that turns a VASP \texttt{CHGCAR} file, and nothing else, into 55
@@ -73,7 +73,8 @@ materials~\cite{jain2013,shen2022}. Large collections of charge densities
 therefore already exist, and more are computed every day.
 
 Over the past decade, machine learning (ML) has become a standard tool for
-predicting materials properties from such databases~\cite{butler2018,schmidt2019}.
+predicting materials properties from such databases~\cite{butler2018,schmidt2019};
+we call these models property models.
 How accurate a model is, and what can be learned from it, depends largely on how
 each material is represented, that is, on its descriptors~\cite{ghiringhelli2015}.
 Compositional featurizers compute statistics of elemental
@@ -180,8 +181,8 @@ any collection of calculations can be featurized without going back to the
 original runs, and no descriptor depends on a file that some structures have and
 others do not. The density can also come from a crystal structure through the
 included ChargE3Net model (Section~\ref{sec:ml}). Both routes give the same
-object (Fig.~\ref{fig:architecture}), a \texttt{VolumetricData} that holds the
-structure, the density grid and a note of where the density came from; this note
+density object (Fig.~\ref{fig:architecture}), an instance of the
+\texttt{VolumetricData} class of the package, which holds the structure, the density grid and a note of where the density came from; this note
 is written into the metadata of every output row.
 
 \begin{figure}[!t]
@@ -192,10 +193,10 @@ top) and a crystal structure (CIF, POSCAR or any format ASE reads) whose density
 is predicted by the included ChargE3Net model (left, bottom) give the same
 density grid $\rho(\mathbf{r})$, shown as the $1.5$~e\,\AA$^{-3}$ isosurface
 around O, the Mg atoms and the density on one face of the cell. Inside pydemi
-(centre box), the grid is held in a \texttt{VolumetricData} object; the derived
+(centre box), the grid is held in the density object; the derived
 fields (gradient, Laplacian, Hartree potential $V_\mathrm{H}$) and the atomic
 cells of the geometry pass are computed once per structure and cached on it,
-and the registered descriptors reduce them. The radial
+and the descriptors reduce them to single numbers. The radial
 bars give the percentile of each descriptor of MgO within the
 dataset, grouped by domain. The descriptors are used from Python, the command
 line or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}),
@@ -207,8 +208,8 @@ and the property models of Section~\ref{sec:properties} take them as input
 From the density grid, pydemi first computes the fields and the geometry that
 the descriptors need, and it computes each of them only once per structure. A
 derived quantity, such as the gradient, the Hartree potential or the map from
-each grid point to its nearest atom, is stored on the \texttt{VolumetricData}
-object the first time a descriptor asks for it, and every later descriptor that
+each grid point to its nearest atom, is stored on the density object
+the first time a descriptor asks for it, and every later descriptor that
 needs it reuses the stored copy. The settings it was computed with (for example
 the derivative method or the shell radii) are stored with it, so a structure
 featurized again with other settings gets new fields and never stale ones.
@@ -235,15 +236,18 @@ Many descriptors need to know, for every grid point, which nucleus is nearest,
 how far away it is and in which direction. These are computed once with a
 $k$-d tree over the atoms and their periodic images. In strongly sheared cells
 the nearest image can lie beyond the usual $3\times3\times3$ block of cells, so
-the search is widened until it is guaranteed to contain it. A grid point at
-exactly the same distance from two nuclei, which is common when atoms sit on
-high-symmetry grid points, is given to one of them by a fixed geometric rule
-that does not depend on the order in which the atoms are listed. The same point
-then belongs to the same atom in a cell, in its supercell and in a translated or
-rotated copy, which the invariance tests of Section~\ref{sec:descriptors}
-require. The distance to the nearest nucleus also divides the cell into a core,
-a bond shell and an interstitial region, with boundaries at 0.8 and 1.5\,\AA{}
-by default or at multiples of the covalent radius of each atom. The descriptors
+the search is widened until it is guaranteed to contain it. Some grid points
+lie at exactly the same distance from two or more nuclei, which is common when
+atoms sit on high-symmetry grid points. Such a point is given to one of these
+nuclei by a rule that uses only their positions relative to the point, not the
+order in which the atoms are listed in the file. The point then goes to the
+equivalent atom in a cell, in its supercell and in a translated or rotated copy,
+so the descriptors do not change between these cells
+(Section~\ref{sec:descriptors}). The distance to the nearest nucleus also
+divides the cell into three regions: the core (within 0.8\,\AA{} of a
+nucleus), the bond shell (0.8 to 1.5\,\AA) and the interstitial region (beyond
+1.5\,\AA). These boundaries can instead be set for each atom as multiples of
+its covalent radius. The descriptors
 that are resolved per atom need to know which grid points belong to which atom,
 and three ways of dividing the cell are offered: nearest-atom (Voronoi) cells,
 the default; a power diagram, which gives larger atoms larger cells; and the
@@ -252,8 +256,8 @@ neighbouring atoms with smooth weights. All three return weights that sum to one
 at every point, so every per-atom descriptor works with any of them unchanged.
 
 Each descriptor is a short Python function that takes the
-\texttt{VolumetricData} object and returns one number. When the function is
-registered, it is given a record that describes it: its name, its domain
+density object and returns one number. It is added to a single list of all
+descriptors (the registry) together with a record that describes it: its name, its domain
 (bonding, structural or heterogeneity), the cached quantities it needs, its
 units, the range of values it can take, its formula and references, and the
 cases in which it is undefined, each with the constant returned instead. A
@@ -261,17 +265,17 @@ uniform density, for instance, has no gradient, so the anisotropy of the
 gradient is zero divided by zero; the descriptor returns 0 and is flagged, and
 the output then carries a companion flag column set to 1, so a user can find and
 exclude such values. No descriptor returns a bare NaN, with one documented
-exception: the variance between sites of the same element in a structure where
-no element has two sites, where there is nothing to compare.
+exception: the within-element variances of Table~\ref{tab:families2}, when no
+element has two or more atoms in the cell (for example the two-atom cell of
+MgO), so there are no atoms of the same element to compare.
 
-This registry is the single list from which everything else is built. The
-feature vector always has the registered descriptors in the order of
-registration, so its columns never change between runs. The catalogue of names,
+This list is the source from which everything else is built. The
+feature vector always has the descriptors in the order in which they were
+added, so its columns never change between runs. The catalogue of names,
 units, ranges, formulas and undefined cases is read from it, and so are the
 invariance tests of Section~\ref{sec:descriptors}, so a descriptor added later is
-tested without writing a new test. Registration refuses a quantity that grows
-with the size of the cell, such as a total charge or a number of density maxima;
-it has to be divided by the volume, the number of atoms or the total charge
+tested without writing a new test. A quantity that grows with the size of the cell, such as a total
+charge or a number of density maxima, is refused when it is added; it has to be divided by the volume, the number of atoms or the total charge
 first, and the supercell test then checks that the result really does not
 change with the cell size.
 
@@ -300,9 +304,8 @@ $\hat{\mathbf u}_k$ the unit vector from that nucleus to the voxel.
 \begin{table}[!t]
 \centering
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
-the name used in the package and in the text. Shells around the nearest nucleus:
-core within 0.8\,\AA, bond shell 0.8--1.5\,\AA, interstitial region beyond
-1.5\,\AA{} (defaults). Formulas, ranges, references and fallback values:
+the name used in the package and in the text. Core, bond shell and interstitial region
+as defined in Section~\ref{sec:design}. Formulas, ranges, references and fallback values:
 Supporting Information, Section~S1.}
 \label{tab:families}
 \footnotesize
@@ -392,7 +395,7 @@ interactions~\cite{johnson2010}. The structural descriptors treat the density of
 the whole cell: how well it connects (percolation levels, detected by a
 union--find over periodic images), its maxima, minima and non-nuclear maxima,
 its floor, its directionality and its information content. The heterogeneity
-descriptors turn per-site values of $m_1$, $f_\mathrm{bond}$ and $\zeta$ into
+descriptors turn per-atom values of $m_1$, $f_\mathrm{bond}$ and $\zeta$ into
 statistics over the atoms, including the decomposition
 $\mathrm{Var}_iX=\sum_e x_e\mathrm{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
 into within- and between-element parts, where $x_e$ is the site fraction of
