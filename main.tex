@@ -776,10 +776,7 @@ it is written in this format, but the density and property models were trained
 on VASP densities.
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
-the browser (Fig.~\ref{fig:gui}). By default it listens on the local machine
-only, so the files never leave it; on a remote server it is reached through an
-SSH tunnel. An input panel on
-the left opens a \texttt{CHGCAR}, or a CIF or POSCAR file whose density is then
+the browser (Fig.~\ref{fig:gui}). An input panel on the left opens a \texttt{CHGCAR}, or a CIF or POSCAR file whose density is then
 predicted in the background, with its progress shown and the option to cancel.
 Below it are a summary of the structure and the grid and the choice of atomic
 partition. The main area has five views. The structure view shows the cell with
@@ -788,13 +785,11 @@ descriptors by the names of Tables~\ref{tab:families} and~\ref{tab:families2}
 in a searchable table, each with its formula and a figure of the
 quantity it is computed from, and the plot view steps through these figures one
 descriptor at a time. The property view gives the predicted properties with the
-typical error of each model, its test-set parity plot, its most important inputs
+mean absolute error of each model on the test set, its test-set parity plot, its most important inputs
 and, for structures of the dataset, the DFT values. The compare view (with the ML
 extra) takes an open \texttt{CHGCAR}, predicts the density of the same structure on the same
 grid, and shows the density error and the descriptors and properties from both
-densities side by side. It marks the descriptors that differ by more than 5\%
-and the properties that differ by more than the typical error of their model.
-Results are exported as CSV, or as JSON together with the run metadata.
+densities side by side. All results can be exported.
 
 Besides the descriptor tests of Section~\ref{sec:descriptors}, the test suite
 checks the other parts of the package: that \texttt{CHGCAR} files of every VASP
