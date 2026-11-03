@@ -817,9 +817,11 @@ boundaries and its formula.}
 \label{sec:conclusions}
 pydemi turns the one file that every VASP calculation writes, the
 \texttt{CHGCAR}, into 55 descriptors, each with a short physical meaning and a
-value set by the material rather than by the grid or the numerical method. It
-computed every descriptor for every crystal of our dataset without a failure,
-and automated tests check each descriptor against known answers. It can be used
+value largely set by the material rather than by the grid or the numerical
+method. It computed every descriptor for every crystal of our dataset without a
+failure. Automated tests compare the descriptors with exact values for model
+densities and check that every descriptor stays the same when the cell is
+enlarged, moved or rotated. It can be used
 as a Python library, from the command line or through a local graphical
 interface. The included ChargE3Net model gives most of the same descriptors from
 a crystal structure alone. The exceptions are the counts of density maxima and
@@ -834,13 +836,6 @@ ML-predicted densities are nearly as accurate as those from DFT densities, and
 the small losses come from the descriptors that transfer less well. pydemi can
 therefore predict the properties of a relaxed crystal structure without
 computing its density.
-
-The main limits point to future work. pydemi reads only VASP files. It ignores
-magnetization densities, because the density model does not predict them. The
-structures used here were relaxed with DFT, so structures from other sources
-will add their own error. Readers for other codes, a density model for spin
-densities and tests on structures relaxed with ML potentials would extend the
-path from a structure to its properties.
 
 \section*{Code and data availability}
 The source code, the tests, the descriptor reference and the scripts that
