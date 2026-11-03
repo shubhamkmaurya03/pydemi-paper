@@ -741,11 +741,14 @@ without computing its density.
 
 pydemi is written in Python ($\geq$3.10) and is installed with
 \texttt{pip install pydemi}. The core library needs only
-NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and pandas. Optional extras
-add the graphical interface (\texttt{pydemi[gui]}: Streamlit, Plotly and
-LightGBM), the density model (\texttt{pydemi[ml]}: PyTorch, e3nn and
+NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and
+pandas~\cite{mckinney2010}. Optional extras add the graphical interface
+(\texttt{pydemi[gui]}: Streamlit, Plotly and LightGBM), the density model
+(\texttt{pydemi[ml]}: PyTorch~\cite{paszke2019}, e3nn and
 ASE~\cite{larsen2017}) and the property models (\texttt{pydemi[props]}:
-LightGBM).
+LightGBM~\cite{ke2017}). A descriptor reference with the definition, formula,
+physical meaning and limits of every descriptor is included and is opened from
+the interface.
 
 In Python, a density is read with \texttt{read\_chgcar} and its descriptors are
 computed with \texttt{featurize}, or with \texttt{featurize\_batch} for many
@@ -765,11 +768,12 @@ CPU-hours; on 16 cores in parallel it finished in 37 minutes. The time depends
 mainly on the size of the density grid, not on the number of atoms, and even the
 largest \texttt{CHGCAR} in the dataset takes under a minute and 2.6\,GB of
 memory, well within the memory of an ordinary laptop. pydemi currently reads
-only VASP files.
+densities only in the VASP \texttt{CHGCAR} format.
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
-the browser. It listens on the local machine only, so the files never leave it
-(Fig.~\ref{fig:gui}). It is laid out like desktop software. An input panel on
+the browser (Fig.~\ref{fig:gui}). By default it listens on the local machine
+only, so the files never leave it; on a remote server it is reached through an
+SSH tunnel. An input panel on
 the left opens a \texttt{CHGCAR}, or a CIF or POSCAR file whose density is then
 predicted in the background, with its progress shown and the option to cancel.
 Below it are a summary of the structure and the grid and the choice of atomic
@@ -780,12 +784,12 @@ in a searchable table, each with its formula and a figure of the
 quantity it is computed from, and the plot view steps through these figures one
 descriptor at a time. The property view gives the predicted properties with the
 typical error of each model, its test-set parity plot, its most important inputs
-and, for structures of the dataset, the DFT values. The compare view takes an
-open \texttt{CHGCAR}, predicts the density of the same structure on the same
+and, for structures of the dataset, the DFT values. The compare view (with the ML
+extra) takes an open \texttt{CHGCAR}, predicts the density of the same structure on the same
 grid, and shows the density error and the descriptors and properties from both
 densities side by side. It marks the descriptors that differ by more than 5\%
 and the properties that differ by more than the typical error of their model.
-Results are exported as CSV or JSON with the run metadata.
+Results are exported as CSV, or as JSON together with the run metadata.
 
 Besides the descriptor tests of Section~\ref{sec:descriptors}, the test suite
 checks the other parts of the package: that \texttt{CHGCAR} files of every VASP
@@ -793,9 +797,10 @@ format are read correctly; that a batch run continues past a broken file; that
 the included density model gives the same predictions as the original ChargE3Net
 code; that the property models reproduce their stored predictions; and that every
 figure of the graphical interface shows data that reproduce the descriptor
-values. With all extras installed, the 350 tests run automatically on Linux,
-macOS and Windows with every supported Python version whenever the code changes;
-they are listed in Section~S6 of the Supporting Information.
+values. Whenever the code changes, the tests run automatically on Linux, macOS
+and Windows with Python 3.10 to 3.13, the tests of each optional extra in jobs
+with that extra installed; with every extra and the dataset available, all 350
+pass. They are listed in Section~S6 of the Supporting Information.
 
 \begin{figure}[htbp]
 \centering
