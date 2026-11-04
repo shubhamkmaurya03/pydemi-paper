@@ -157,7 +157,7 @@ model, so that the same descriptors are obtained from a crystal structure alone,
 and we measure which descriptors transfer from DFT to predicted densities
 (Section~\ref{sec:ml}). (iii) We train property models on the descriptors alone
 for 17 properties of a large DFT dataset, compare them with the models reported
-earlier for the same structures \rev{and with models on simple features}, and identify the descriptors that carry the
+earlier for the same structures, and identify the descriptors that carry the
 information (Section~\ref{sec:properties}). The package is used as a Python
 library, a command-line tool or a graphical interface that runs locally
 (Section~\ref{sec:software}); the code, the tests and the scripts that train the
@@ -611,15 +611,7 @@ For each property we trained three kinds of models on the 55 descriptors: a line
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
 were tuned automatically on the validation set~\cite{akiba2019}, and the test
 set was used only once, for the final scores. Each random forest and LightGBM
-model was trained five times with different random seeds, and we report the average. \rev{LightGBM
-handles the undefined within-element variances (Section~\ref{sec:descriptors}) as
-missing values: each split of a tree learns on which side to send them. To show
-how uncertain a test score is, we resampled the test materials with replacement
-(bootstrap, 2,000 samples) and give the 95\% interval of the score. To see
-what the descriptors add to simpler inputs, the same LightGBM models were also
-trained on four simple features: the volume per atom, the
-number of valence electrons per atom and per volume, and the mean
-electronegativity.} To find out which
+model was trained five times with different random seeds, and we report the average. To find out which
 descriptors the models rely on, we used SHAP values~\cite{lundberg2020}, which
 split each prediction into the contributions of the individual descriptors. We
 also retrained every model on only the ten most important descriptors of its
@@ -635,13 +627,12 @@ given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
 standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 descriptors and with the ten most important
 descriptors of each property. MAE: mean absolute error with all
-descriptors. $n$: training and test materials. \rev{Simple: the same models on four simple features (volume per atom, valence
-electrons per atom and per volume, mean electronegativity).}}
+descriptors. $n$: training and test materials.}
 \label{tab:properties}
 \begin{adjustbox}{width=\textwidth}
-\begin{tabular}{llrrccrc}
+\begin{tabular}{llrrccr}
 \toprule
-Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & all descriptors & 10 descriptors & MAE & \rev{simple} \\
+Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & all descriptors & 10 descriptors & MAE \\
 \midrule
 \csname @@input\endcsname tables/tab_properties.tex
 \bottomrule
@@ -671,11 +662,7 @@ is not the Materials Project cohesive energy of Table~\ref{tab:properties}, whic
 comes from other calculations of both, and the two differ by 0.5\,eV/atom on
 average)}, and
 the Debye temperature, which is given there for fewer materials. For the
-three moduli, the descriptors alone give the highest $R^2$ of all models\rev{,
-but only by 0.01 to 0.03. This is about the size of the uncertainty of the
-scores: resampling the test materials gives 95\% intervals of about $\pm0.02$
-for our models, and the other rows of the table come without intervals, so the
-differences between the best models for the moduli are not significant}. For
+three moduli, the descriptors alone give the highest $R^2$ of all models. For
 the Debye temperature they are above the density and composition models, level
 with MEGNet and behind CGCNN. For the energy relative to the free atoms they are
 well above the density representation alone but below MEGNet and the models
@@ -687,8 +674,7 @@ present, which the composition describes directly.
 \caption{Test $R^2$ of models trained on the same structures with the same
 split. All rows \rev{above the line} are from Ref.~\cite{kumar2026}; latent density:
 compressed representation of the full density grid. $E_\mathrm{atoms}$: energy
-relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.
-\rev{95\% interval: from 2,000 bootstrap resamples of the test materials.}}
+relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.}
 \label{tab:compare}
 \footnotesize
 \begin{tabular}{@{}lccccc@{}}
@@ -703,16 +689,9 @@ CGCNN & 0.93 & 0.88 & 0.89 & -- & 0.94 \\
 MEGNet & 0.93 & 0.87 & 0.86 & 0.94 & 0.91 \\
 \midrule
 pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & 0.86 & 0.91 \\
-\rev{\quad 95\% interval} & \rev{0.92--0.97} & \rev{0.88--0.93} & \rev{0.89--0.94} & \rev{0.83--0.89} & \rev{0.88--0.93} \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\rev{Table~\ref{tab:properties} also compares the descriptors with simpler
-inputs. The four simple features, which include the valence electron density,
-give an $R^2$ of only 0.71 for the bulk modulus and at most 0.84 for the other
-regression properties, so the descriptors carry much more than the electron
-count and the volume.}
 
 The mean interstitial density is the most important descriptor overall: it
 leads for the elastic moduli and constants and for the refractive index. The
