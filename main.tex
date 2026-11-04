@@ -47,7 +47,7 @@ interpretable descriptors of bonding, structure and site heterogeneity. Each
 descriptor is stable with respect to the grid and the numerical method and is
 documented with its formula, units and range. From the crystal structure
 alone, pydemi can also predict the density with an included ChargE3Net model;
-most descriptors of the predicted densities rank materials almost exactly as
+\rev{44 of the 55} descriptors of the predicted densities rank materials almost exactly as
 their DFT values do. \rev{pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in
 seconds per structure.} Gradient-boosted
 models on the descriptors alone predict 17 elastic, thermal, energetic,
@@ -250,7 +250,11 @@ so the descriptors do not change between these cells
 divides the cell into three regions: the core (within 0.8\,\AA{} of a
 nucleus), the bond shell (0.8 to 1.5\,\AA) and the interstitial region (beyond
 1.5\,\AA). These boundaries can instead be set for each atom as multiples of
-its covalent radius. The descriptors
+its covalent radius. \rev{All results in this work, including the property
+models, use the fixed boundaries. They put every material on the same length
+scale, so that the larger cores of heavy atoms show up in the descriptors
+instead of being scaled away; \texttt{pydemi sweep} shows how the descriptors
+change when the boundaries are moved (Section~\ref{sec:software}).} The descriptors
 that are resolved per atom need to know which grid points belong to which atom,
 and three ways of dividing the cell are offered: nearest-atom (Voronoi) cells,
 the default; a power diagram, which gives larger atoms larger cells; and the
@@ -405,7 +409,7 @@ crystal. The bounded ellipticity distinguishes
 cylindrical from flattened charge in the bond shell, and the non-covalent interaction (NCI) descriptors
 pick out the low-density, low-gradient regions of weak
 interactions~\cite{johnson2010}. The structural descriptors treat the density of
-the whole cell: how well it connects (percolation levels, detected by a
+the whole cell. \rev{They measure} how well it connects (percolation levels, detected by a
 union--find over periodic images), its maxima, minima and non-nuclear maxima,
 its lowest density, its directionality and its information content. The heterogeneity
 descriptors turn per-atom values of $m_1$, $f_\mathrm{bond}$ and $\zeta$ into
@@ -414,11 +418,11 @@ $\mathrm{Var}_iX=\sum_e x_e\mathrm{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
 into within- and between-element parts, where $x_e$ is the fraction of the atoms
 that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.
 Every descriptor is invariant under supercell expansion, rotation and
-translation of the crystal by whole grid steps\rev{, with one exception: the
-within-element variances are undefined (NaN) for a cell in which every element
-has a single atom, while a supercell of the same crystal gives zero. This
-affects 421 of the 6,059 materials of our dataset; the property models of
-Section~\ref{sec:properties} treat these values as missing}.
+translation of the crystal by whole grid steps\rev{, except the within-element
+variances of a cell in which every element has a single atom: they are undefined
+(Section~\ref{sec:design}), while a supercell of the same crystal gives zero.
+This affects 421 of the 6,059 materials of our dataset, and the property models
+of Section~\ref{sec:properties} treat these values as missing}.
 
 A descriptor should describe the material, not the way it was computed. Three
 things in a pydemi calculation are not set by the material. The first is the
@@ -441,32 +445,33 @@ Most descriptors are insensitive to both choices. On the coarser grid, the
 median change is below 1\% for 46 of the 55. Most of the few that change more
 have values close to zero for many materials, for example the percolation
 anisotropy of a cubic crystal, or the spread between atoms of an element that are all
-equivalent by symmetry; for such values, a tiny absolute change is a large
+equivalent by symmetry\rev{. For} such values, a tiny absolute change is a large
 percentage. The number of non-nuclear maxima changes for a different reason: a
 coarser grid can miss small maxima. Fourth-order finite differences give the
 same values as the default method to better than 1\%, which confirms that the
-default is accurate, whereas second-order ones change some descriptors by up to
-16\%; pydemi therefore does not use them by default.
+default is accurate. \rev{Second-order} ones change some descriptors by up to
+16\%\rev{, so} pydemi does not use them by default.
 
 \rev{The PAW potentials are a further choice that the material does not set. A
 \texttt{CHGCAR} holds the valence pseudo-density, so a potential that treats more
 electrons as valence, such as the semicore $3p$ electrons of Ti\_pv, adds charge
 near the nuclei and changes the descriptors that measure it. To see how large this
 effect is, we computed the descriptors from the densities that the Materials
-Project distributes for 80 of our test materials, which it computed with its own
-structures, cutoffs and $k$-points. For the 40 materials whose elements all have
-the same potentials as in our dataset, 44 of the 55 descriptors still rank the
-materials in the same order ($\rho_s\geq0.95$), the median change of a descriptor
-is about 1.5\%, and the property models score almost the same from both
-densities. For the 40 materials with at least one other potential, the median
-change is about 20\%, and only four descriptors keep the ranking: the mean
-interstitial density, the mean and spread of the bond-midpoint density and one
-percolation level. The bulk modulus, which rests mainly on the interstitial
-density, is predicted as well as before, but the scores for the sound
-velocities, the Debye temperature and the energies drop by 0.15 to 0.25. The
-descriptors are therefore set by the material for a given set of potentials, and
-the property models of pydemi should be used with densities computed with the
-potentials of our dataset (Table~S9 of the Supporting Information). A
+Project distributes for 80 of our test materials. The Materials Project computed
+them with its own structures, cutoffs and $k$-points. For the 40 materials whose
+elements all have the same potentials as in our dataset, the densities agree
+well: 44 of the 55 descriptors still rank the materials in the same order
+($\rho_s\geq0.95$), and the median change of a descriptor is about 1.5\%. The
+property models score almost the same from both densities. For the 40 materials
+with at least one other potential, the median change is about 20\%. Only four
+descriptors keep the ranking: the mean interstitial density, the mean and spread
+of the bond-midpoint density and one percolation level. The bulk modulus, which
+rests mainly on the interstitial density, is predicted as well as before. The
+scores for the sound velocities, the Debye temperature and the energies, however,
+drop by 0.15 to 0.25. The descriptors are therefore set by the material for a
+given set of potentials. The property models of pydemi should be used with
+densities computed with the potentials of our dataset (Table~S9 of the
+Supporting Information). A
 \texttt{CHGCAR} does not record its potentials, so pydemi cannot check this.
 Section~S8 of the Supporting Information gives the comparison for every
 descriptor and property.}
@@ -477,8 +482,8 @@ treats it as a setting and records it with every result. Section~S2 of the
 Supporting Information gives the change of every descriptor for every choice,
 including the division into atomic regions. It also explains which quantities
 of density analysis pydemi does not offer because a \texttt{CHGCAR} cannot
-support them reliably (such as the electron localization function, which needs
-more than the density~\cite{abramov1997,tsirelson2002}), and what the PAW
+support them reliably\rev{. An example is} the electron localization function, which needs
+more than the density~\cite{abramov1997,tsirelson2002}. \rev{Finally, it explains} what the PAW
 pseudo-density~\cite{blochl1994,kresse1999} stored in a \texttt{CHGCAR} means
 for the descriptors.
 
@@ -510,11 +515,11 @@ the future is checked without writing a new test.
 
 No two computer calculations agree to the last digit, so each test allows a
 small difference, chosen from what can cause it. Where only rounding can cause
-it, the allowed difference is one part in a billion or less, and one part in a
+it, the allowed difference is one part in a billion or less\rev{. It is} one part in a
 million for the symmetry tests, whose sums run over the grid in a different
-order; where the grid
+order\rev{. Where} the grid
 cannot represent a sharp atomic peak exactly, it is larger and set from the
-known size of this grid error, and the tests also check that the error shrinks
+known size of this grid error\rev{. These} tests also check that the error shrinks
 when the grid is refined. Each test, its reference and its allowed difference are listed in Section~S6 of
 the Supporting Information.
 
@@ -531,16 +536,16 @@ PAW potentials, and hence a different number of valence electrons, so its
 predictions differ strongly from our DFT densities. We therefore started from
 the released weights and continued the training on the densities of our dataset
 (fine-tuning), with 5,152 structures for training, 302 for validation and 605
-for testing; this gave a lower error than training the same network from
+for testing. \rev{This} gave a lower error than training the same network from
 scratch on our data. The fine-tuned model is the one included in pydemi, so its
 predictions stand for a \texttt{CHGCAR} computed with the settings of our
 dataset~\cite{kumar2026}. pydemi places it on the grid that VASP would use
 for these settings, scales it to the right number of valence electrons and
-records how it was obtained, and then computes every descriptor from it
+records how it was obtained. \rev{It then} computes every descriptor from it
 exactly as from a \texttt{CHGCAR}. The model covers the 87 elements of the
 dataset and refuses structures with other elements. The network code in pydemi
 is a copy of the original one that runs without its training framework, and it
-gives the same predictions; its cost grows with
+gives the same predictions. \rev{Its} cost grows with
 the number of atoms and grid points, and a GPU is used when one is available.
 Technical details are given in Section~S2 of the Supporting Information.
 
@@ -559,12 +564,11 @@ descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
-The predicted densities are close to the DFT ones: over the test
-structures, the absolute difference summed over the grid is about 0.6\% of
-the total charge (median over the test structures), somewhat larger for crystals with lanthanides or actinides. The question for
+The predicted densities are close to the DFT ones\rev{. The} absolute difference summed over the grid is about 0.6\% of
+the total charge (median over the test structures)\rev{. It is} somewhat larger for crystals with lanthanides or actinides. The question for
 pydemi is whether such small differences change the descriptors. A descriptor
-helps a property model when it puts materials in the right order, so we
-measured, for each descriptor, whether its values from the DFT and from the
+helps a property model when it puts materials in the right order. \rev{We
+therefore} measured, for each descriptor, whether its values from the DFT and from the
 predicted densities rank the test materials in the same order (Spearman
 rank correlation $\rho_s$, which is 1 for the same order). For 44 of the 55
 descriptors, $\rho_s$ is at least 0.95, and for 37
@@ -574,19 +578,23 @@ of the 18 bonding descriptors, and the percolation levels, the lowest and
 the mean interstitial density, and the information measures. The other 11 fall into three groups, each with a
 clear reason. The counts of maxima and minima of the density change because the
 prediction adds or removes tiny bumps in flat regions far from the atoms,
-without changing the density noticeably; the number and charge of non-nuclear
+without changing the density noticeably. \rev{The} number and charge of non-nuclear
 maxima are zero in both densities for most structures, so their ranking is
 decided by a few materials. The bounded bond ellipticity and the volume
 fraction of negative Laplacian use second derivatives of the density in
 low-density regions, and derivatives magnify the small errors of the
-prediction. Five anisotropy measures, the three eigenvalues and the fractional
-anisotropy of the tensor of gradient directions and the percolation anisotropy, are
-predicted accurately, but many materials share almost the same value (every
-cubic crystal, for instance, is isotropic), so tiny differences reorder them;
-because several of these values are close to zero, their relative error in
-Fig.~\ref{fig:ml}b looks large although the absolute difference is small. When
+prediction. \rev{The last group are five anisotropy measures: the three eigenvalues and the
+fractional anisotropy of the tensor of gradient directions, and the percolation
+anisotropy. They are predicted accurately, but many materials share almost the
+same value (every cubic crystal, for instance, is isotropic), so tiny
+differences reorder them. Several of these values are close to zero, so their
+relative error in Fig.~\ref{fig:ml}b looks large although the absolute
+difference is small.} When
 the density is predicted, the 44 can therefore be used as they are, and the
-other 11 with care. The Compare view of the graphical
+other 11 with care. \rev{For these 11, the value from a predicted density
+should not be used to rank or compare individual materials; where a DFT
+density exists, its value should be used instead. The property models still use
+all 55, and Section~\ref{sec:properties} measures what this costs.} The Compare view of the graphical
 interface (Section~\ref{sec:software}) shows, for a given \texttt{CHGCAR}, the
 descriptors of the DFT and of the predicted density side by side, together with
 the transfer of each descriptor. Only five of the test structures have a
@@ -660,13 +668,13 @@ Table~\ref{tab:compare} compares the descriptors with models trained on the
 same structures and the same split~\cite{kumar2026}: a compressed representation
 of the full density grid, compositional (Magpie) features, both together, and
 the graph neural networks CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}.
-For this comparison our models were also trained on the two properties whose
-data differ from ours: the energy relative to the free atoms used there \rev{(computed in
-Ref.~\cite{kumar2026} from the energies of the dataset and of the free atoms; it
-is not the Materials Project cohesive energy of Table~\ref{tab:properties}, which
-comes from other calculations of both, and the two differ by 0.5\,eV/atom on
-average)}, and
-the Debye temperature, which is given there for fewer materials. For the
+For this comparison our models were also trained on \rev{two properties whose
+data differ from ours. The first is the energy relative to the free atoms, which
+Ref.~\cite{kumar2026} computed from the DFT energies of the dataset and of the
+free atoms. It is not the Materials Project cohesive energy of
+Table~\ref{tab:properties}, which comes from separate calculations, and the two
+differ by 0.5\,eV/atom on average. The second is the Debye temperature, which
+Ref.~\cite{kumar2026} gives for fewer materials.} For the
 three moduli, the descriptors alone give the highest $R^2$ of all models. For
 the Debye temperature they are above the density and composition models, level
 with MEGNet and behind CGCNN. For the energy relative to the free atoms they are
@@ -765,9 +773,11 @@ relies on the 11 descriptors that transfer less well to predicted densities
 bulk-modulus model but about a fifth in the models of the sound velocities and
 the Debye temperature. For the regression properties other than the refractive
 index, they also cause 29 to 50\% of the difference between the two
-predictions, mostly through the bond ellipticity. Two properties are weak by either route: whether a
-gap is direct, and the refractive index, whose $R^2$ on these structures is set
-by three materials with unusually large DFT values. All values are given in
+predictions, mostly through the bond ellipticity. \rev{Whether a gap is direct is weak by either route (ROC-AUC 0.73 and 0.74). The
+refractive index has an $R^2$ of only 0.17 and 0.18, but this is set by
+three materials with DFT values of 14 to 24, while the other 128 lie between 1.4
+and 5.5. Without these three, the $R^2$ is 0.84 from the DFT density and 0.78
+from the predicted one.} All values are given in
 Section~S4 and Table~S7 of the Supporting Information.
 
 The test structures were relaxed with DFT. For a new material, the structure has
@@ -895,7 +905,7 @@ interatomic potential remains to be tested}.
 The source code, the tests, the descriptor reference and the scripts that
 train the property models are available at
 \url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, \rev{0.3.0}, is archived at
-Zenodo (\rev{\doi{10.5281/zenodo.22995680}, which resolves to every released
+Zenodo (\rev{\doi{10.5281/zenodo.22995680}, which always resolves to the latest
 version}). The fine-tuned
 ChargE3Net checkpoint and the property models are included in the package. The ChargE3Net code included in pydemi is
 taken from \url{https://github.com/AIforGreatGood/charge3net} (MIT licence). The
