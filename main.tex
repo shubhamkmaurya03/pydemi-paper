@@ -607,14 +607,7 @@ metal and whether its gap is direct; and the refractive
 index~\cite{petousis2017}. The structures were split at random into 4,847
 for training, 606 for validation and 606 for testing, the split distributed with
 the dataset~\cite{kumar2026}; a material without a
-value for a property is left out for that property only. \rev{The targets were
-computed by the Materials Project for its own structures and settings, whereas the
-descriptors come from the densities of our dataset. The two structures have the
-same volume per atom to within 0.01\% for 81\% of the materials and to within 2\%
-for 90\%. On the test set, the bulk modulus is predicted less well for the
-materials whose volumes differ by more than 0.01\% (mean absolute error 13\,GPa,
-against 8\,GPa for the others), so part of the remaining error comes from this
-mismatch and not from the descriptors.}
+value for a property is left out for that property only.
 
 For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
