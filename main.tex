@@ -595,18 +595,16 @@ the total density only, so neither path provides magnetic descriptors.
 
 \subsection{Data and protocol}
 We used the descriptors to predict 17 properties of the materials of the dataset.
-All 17 are Materials Project values~\cite{jain2013}: the bulk, shear and Young's
-moduli as distributed with the structures, and the others retrieved from
-database version 2026.04.13 for the same materials: the elastic constants $C_{11}$, $C_{12}$
-and $C_{44}$~\cite{dejong2015}; the Debye temperature, the sound velocities and
-the minimum thermal conductivities in the Clarke and Cahill
-models~\cite{clarke2003,cahill1992}, all derived by the Materials Project from
-the elastic data; the
-formation and cohesive energies; the PBE band gap, whether a material is a
-metal and whether its gap is direct; and the refractive
-index~\cite{petousis2017}. The structures were split at random into 4,847
-for training, 606 for validation and 606 for testing, the split distributed with
-the dataset~\cite{kumar2026}; a material without a
+\rev{All 17 were downloaded from the Materials Project~\cite{jain2013}
+(database version 2026.04.13). They are the bulk, shear and Young's moduli;} the
+elastic constants $C_{11}$, $C_{12}$ and $C_{44}$~\cite{dejong2015}; the Debye
+temperature, the \rev{two} sound velocities and the minimum thermal conductivities
+in the Clarke and Cahill models~\cite{clarke2003,cahill1992}; the formation and
+cohesive energies; the PBE band gap, whether a material is a metal and whether
+its gap is direct; and the refractive index~\cite{petousis2017}. \rev{The
+Materials Project derives the thermal properties from the elastic data. We used
+the random split that comes with the dataset~\cite{kumar2026}: 4,847 structures
+for training, 606 for validation and 606 for testing. A} material without a
 value for a property is left out for that property only.
 
 For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
