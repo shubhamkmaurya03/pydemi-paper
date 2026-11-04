@@ -27,6 +27,11 @@
 % --- Document Start ---
 \begin{document}
 \newcommand{\rev}[1]{{\color{blue}#1}}
+% let large floats share a page with text instead of leaving half-empty float pages
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
 
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
@@ -934,6 +939,24 @@ of the Materials Project (30), so it does not detect a change of PAW datasets.
 The groups are small, so the scores of Table~\ref{tab:si_mp_props}, and those of
 the direct gap and the refractive index in particular, are indicative only.
 
+\begin{table}[!h]
+\centering
+\caption{Test scores ($R^2$, or ROC-AUC) of the property models of pydemi for
+the 80 materials of Table~\ref{tab:si_mp}, from the descriptors of the densities
+of the dataset and of the Materials Project, against the Materials Project
+targets. $n$: materials with a target in both groups together.}
+\label{tab:si_mp_props}
+\footnotesize
+\begin{tabular}{lccccc}
+\toprule
+ & & \multicolumn{2}{c}{same PAW datasets} & \multicolumn{2}{c}{other PAW datasets} \\
+Property & $n$ & dataset & MP & dataset & MP \\
+\midrule
+\csname @@input\endcsname tables/tab_si_mp_props.tex 
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{table}[htbp]
 \centering
 \caption{Descriptors from Materials Project densities against those from the
@@ -948,24 +971,6 @@ materials and median relative change $|a-b|/\max(|a|,|b|)$ in per cent.}
 Descriptor & $\rho_s$ & change (\%) & $\rho_s$ & change (\%) \\
 \midrule
 \csname @@input\endcsname tables/tab_si_mp.tex 
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\caption{Test scores ($R^2$, or ROC-AUC) of the property models of pydemi for
-the 80 materials of Table~\ref{tab:si_mp}, from the descriptors of the densities
-of the dataset and of the Materials Project, against the Materials Project
-targets. $n$: materials with a target in both groups together.}
-\label{tab:si_mp_props}
-\footnotesize
-\begin{tabular}{lccccc}
-\toprule
- & & \multicolumn{2}{c}{same PAW datasets} & \multicolumn{2}{c}{other PAW datasets} \\
-Property & $n$ & dataset & MP & dataset & MP \\
-\midrule
-\csname @@input\endcsname tables/tab_si_mp_props.tex 
 \bottomrule
 \end{tabular}
 \end{table}
