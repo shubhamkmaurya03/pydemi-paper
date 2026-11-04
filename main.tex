@@ -1,8 +1,7 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[preprint,review,12pt]{elsarticle}
 
 % --- Packages ---
 \usepackage[utf8]{inputenc}
-\usepackage[margin=1in]{geometry}
 \usepackage[breaklinks=true,colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{epsfig, mathrsfs, latexsym, subfigure, marginnote, gensymb, amsmath}
@@ -10,21 +9,16 @@
 \usepackage{booktabs}
 \usepackage{adjustbox}
 \usepackage{doi}
+\usepackage{lineno}
+\usepackage{enumitem}
+\setlist[description]{style=unboxed}
+\usepackage{etoolbox}
+% tables and captions single-spaced; the text stays double-spaced for review
+\AtBeginEnvironment{table}{\def\baselinestretch{1}}
+\AtBeginEnvironment{figure}{\def\baselinestretch{1}}
 
-% Package to handle multiple authors and affiliations cleanly in the article class
-\usepackage{authblk}
+\journal{Computational Materials Science}
 
-% --- Metadata ---
-\title{\textbf{pydemi: A Python Package for Interpretable Charge-Density Descriptors and Materials Property Prediction}}
-
-\author[1]{Shubham K Maurya}
-\author[1]{MD Faiz Akhtar}
-\author[1]{Somnath Bhowmick\thanks{bsomnath@iitk.ac.in}}
-\affil[1]{Department of Materials Science \& Engineering, Indian Institute of Technology Kanpur, Kanpur 208016, India}
-
-\date{\today}
-
-% --- Document Start ---
 \begin{document}
 \newcommand{\rev}[1]{{\color{blue}#1}}
 % let large floats share a page with text instead of leaving half-empty float pages
@@ -32,8 +26,19 @@
 \renewcommand{\bottomfraction}{0.8}
 \renewcommand{\textfraction}{0.07}
 \renewcommand{\floatpagefraction}{0.85}
+\setlength{\emergencystretch}{3em}
 
-\maketitle
+\begin{frontmatter}
+
+\title{pydemi: A Python Package for Interpretable Charge-Density Descriptors and Materials Property Prediction}
+
+\author{Shubham K Maurya}
+\author{MD Faiz Akhtar}
+\author{Somnath Bhowmick\corref{cor1}}
+\ead{bsomnath@iitk.ac.in}
+\cortext[cor1]{Corresponding author}
+\affiliation{organization={Department of Materials Science \& Engineering, Indian Institute of Technology Kanpur},
+  city={Kanpur}, postcode={208016}, country={India}}
 
 % --- ABSTRACT -------------------------------------------------------------
 \begin{abstract}
@@ -57,8 +62,22 @@ descriptors per property are almost as good as all of them. On \rev{DFT-relaxed 
 are nearly as accurate as those from DFT densities\rev{, so the density need not be computed}. It runs from Python, the command line or a graphical interface.
 \end{abstract}
 
-\noindent\textbf{Keywords:} electron charge density; descriptors; machine
-learning; materials property prediction; interpretability; Python
+\begin{highlights}
+\item \rev{pydemi turns a VASP CHGCAR into 55 interpretable charge-density descriptors}
+\item \rev{Each descriptor is stable with respect to the grid and the numerical method}
+\item \rev{Descriptors alone predict 17 properties, mostly with test $R^2$ of 0.85--0.95}
+\item \rev{SHAP values show which descriptors drive each property prediction}
+\item \rev{ML-predicted densities give properties nearly as accurate as DFT densities}
+\end{highlights}
+
+\begin{keyword}
+electron charge density \sep descriptors \sep machine learning \sep materials property prediction
+\sep interpretability \sep Python
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
 
 \section{Introduction}
 \label{sec:intro}
@@ -317,7 +336,7 @@ package. In what follows $k$ runs over the grid points,
 $i(k)$ is the nearest nucleus of grid point $k$, $r_k$ its distance and
 $\hat{\mathbf u}_k$ the unit vector from that nucleus to the grid point.
 
-\begin{table}[!t]
+\begin{table}[!tp]
 \centering
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
 the name used in the package. Core, bond shell and interstitial region
@@ -327,6 +346,7 @@ Supporting Information, Section~S1.}
 \label{tab:families}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.7cm}l>{\raggedright\arraybackslash}p{5.4cm}l@{}}
 \toprule
 Name & Name in pydemi & Definition & Units \\
@@ -351,9 +371,10 @@ Mean bond-midpoint density & \texttt{rho\_mid\_mean} & mean density at the bond 
 Bond-midpoint density spread & \texttt{rho\_mid\_std} & standard deviation of the density at the bond midpoints & e\,\AA$^{-3}$ \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
-\begin{table}[!t]
+\begin{table}[!tp]
 \centering
 \caption{The 19 structural and 18 site-heterogeneity descriptors of pydemi,
 as in Table~\ref{tab:families}. Density shape: the density divided by the
@@ -361,6 +382,7 @@ number of electrons. The Fisher information is given in atomic units.}
 \label{tab:families2}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.7cm}l>{\raggedright\arraybackslash}p{5.4cm}l@{}}
 \toprule
 Name & Name in pydemi & Definition & Units \\
@@ -390,6 +412,7 @@ Within-element variance of \texttt{X} & \texttt{X\_within\_element\_var} & part 
 Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & part of the variance of \texttt{X} from differences between elements & \texttt{X}$^2$ \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 The bonding descriptors ask how the charge is arranged around the atoms and in
@@ -682,7 +705,7 @@ well above the density representation alone but below MEGNet and the models
 that use the composition: this energy depends strongly on which elements are
 present, which the composition describes directly.
 
-\begin{table}[!t]
+\begin{table}[!tp]
 \centering
 \caption{Test $R^2$ of models trained on the same structures with the same
 split. All rows \rev{above the line} are from Ref.~\cite{kumar2026}; latent density:
@@ -927,7 +950,7 @@ by CDAC and supported by the Ministry of Electronics and Information Technology
 India. We also thank the ICME National Hub, IIT Kanpur, and CC, IIT Kanpur, for
 providing an HPC facility.
 
-\bibliographystyle{unsrt}
+\bibliographystyle{elsarticle-num}
 \bibliography{references}
 
 \end{document}
