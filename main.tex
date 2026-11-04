@@ -43,7 +43,7 @@ descriptor is stable with respect to the grid and the numerical method and is
 documented with its formula, units and range. From the crystal structure
 alone, pydemi can also predict the density with an included ChargE3Net model;
 most descriptors of the predicted densities rank materials almost exactly as
-their DFT values do. \rev{pydemi featurized 6,059 inorganic crystals without a failure, in
+their DFT values do. \rev{pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in
 seconds per structure.} Gradient-boosted
 models on the descriptors alone predict 17 elastic, thermal, energetic,
 electronic and optical properties, mostly with a test $R^2$ between 0.85 and
@@ -175,7 +175,7 @@ magnetization blocks are ignored. No other VASP file (\texttt{POTCAR},
 \texttt{OUTCAR}, \texttt{AECCAR}, \texttt{ELFCAR}, \texttt{LOCPOT}) is needed,
 and the atomic radii used for the shells and the partitions are tabulated in the
 package. This is a deliberate choice: every VASP run writes a \texttt{CHGCAR}, so
-any collection of calculations can be featurized without going back to the
+any collection of calculations can be \rev{processed} without going back to the
 original runs, and no descriptor depends on a file that some structures have and
 others do not. The density can also come from a crystal structure through the
 included ChargE3Net model (Section~\ref{sec:ml}). Both routes give the same
@@ -210,7 +210,7 @@ each grid point to its nearest atom, is stored on the density object
 the first time a descriptor asks for it, and every later descriptor that
 needs it reuses the stored copy. The settings it was computed with (for example
 the derivative method or the shell radii) are stored with it, so a structure
-featurized again with other settings gets new fields and never stale ones.
+\rev{processed} again with other settings gets new fields and never stale ones.
 
 VASP cells are often not orthogonal, so the derivatives are taken along the axes
 of the grid and then converted to Cartesian ones. For the Laplacian this
@@ -844,7 +844,7 @@ and record the error.
 
 On our dataset, a batch run computed all descriptors of every structure without
 a failure. A typical structure takes a few seconds on one processor core, and
-the whole dataset was featurized in well under an hour on one workstation. The
+the \rev{descriptors of the} whole dataset \rev{were computed} in well under an hour on one workstation. The
 time depends mainly on the size of the density grid, not on the number of
 atoms, and even the largest \texttt{CHGCAR} of the dataset needs less than a
 minute and fits in the memory of an ordinary laptop (Section~S7 of the
