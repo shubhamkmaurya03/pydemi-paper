@@ -328,10 +328,7 @@ a gap (1,836). The structures were split once at random into 4,847 training,
 \paragraph{Training.} Inputs: the 55 descriptors of pydemi\rev{; for the
 comparisons of Table~3 of the main text also four simple features (volume per
 atom; valence electrons per atom and per volume, from the valence charges of the
-PAW datasets of Table~\ref{tab:si_paw}; mean Pauling electronegativity), 138
-composition features (the 132 Magpie element statistics and six stoichiometry
-norms, from matminer) and the descriptors together with the composition
-features}. Ridge and logistic regression: median
+PAW datasets of Table~\ref{tab:si_paw}; mean Pauling electronegativity)}. Ridge and logistic regression: median
 imputation, standardization, penalty from $10^{-3}$ to $10^{3}$ (13 values)
 chosen on the validation set. Random forests: 500 trees, $\frac13$ of the
 features per split for regression and $\sqrt{n}$ for classification, median
