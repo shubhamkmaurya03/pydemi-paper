@@ -152,46 +152,39 @@ integration method, are left to the user. Applying these programs to thousands
 of structures, in a way that gives the same answer for the same material, is
 not what they were designed for.
 
-Turning the density into fixed-length descriptors for many structures raises
-three problems. The first is the input and its numerics. {\color{red}The file that every
-VASP calculation writes, the \texttt{CHGCAR}, holds the density on a grid but
-not the wavefunctions, so it does not support every quantity of density
-analysis. The electron localization function and the energy densities, for
-example, need the kinetic energy density, which the density alone gives only
-approximately~\cite{abramov1997,tsirelson2002}.} A quantity computed on a grid
-can also depend on the grid spacing, on the numerical derivatives and on the way
-the cell is written down as much as on the material, and a descriptor of this
-kind adds noise that no model can remove. The second problem is cost. A
-descriptor that needs a DFT density needs a DFT calculation, which limits it to
-materials that have already been computed. Models that predict the density from
-the atomic structure~\cite{chandrasekaran2019,grisafi2019,jorgensen2022,koker2024}
-remove this limit in principle, provided the descriptors survive the error of
-the prediction. {\color{red}This is not guaranteed: descriptors built from derivatives of
-the density, such as the curvature of a bond, enlarge small errors of the
-density. The third problem is the question that motivates the descriptors in the
-first place: how much of a material's properties they capture, and which of
-them carry the information.} A few chosen examples cannot answer it. It has to be
-answered on a large, well-defined dataset and for many properties at once.
+\rev{Density analysis therefore gives interpretable quantities, but not in a form
+that a property model can use. A property model needs the same set of numbers
+for every material, computed in the same way, for thousands of materials and
+ideally also for materials without a DFT calculation, and it has to be shown
+that these numbers carry information about the properties. To our knowledge, no
+existing tool provides this, and pydemi was written to do so.}
 
-Here we describe pydemi, a Python package built around these three problems.
-(i) It reads one file, the VASP \texttt{CHGCAR}, and computes 55 descriptors
-{\color{red}that are defined on it and whose values are set by the material, not by the
-grid or the numerical method (for a given choice of PAW potentials)} (Sections~\ref{sec:design}
-and~\ref{sec:descriptors}). The descriptors describe how the charge is
-distributed around each nucleus and between the atoms, the shape of the density
-over the whole cell, and how much the atoms of a crystal differ from one
-another. Each has a short physical definition, and each is checked by automated
-tests against densities with known answers and against different descriptions of
-the same crystal. (ii) It includes a density
-model, so that the same descriptors are obtained from a crystal structure alone,
-and we measure which descriptors transfer from DFT to predicted densities
-(Section~\ref{sec:ml}). (iii) We train property models on the descriptors alone
-for 17 properties of a large DFT dataset, compare them with the models reported
-earlier for the same structures, and identify the descriptors that carry the
-information (Section~\ref{sec:properties}). The package is used as a Python
-library, a command-line tool or a graphical interface that runs locally
-(Section~\ref{sec:software}); the code, the tests and the scripts that train the
-property models are released under the MIT license.
+\rev{Pydemi is a Python package that turns a VASP density into 55 descriptors.
+They describe how the charge is distributed around each nucleus and between the
+atoms, the shape of the density over the whole cell, and how much the atoms of a
+crystal differ from one another. The package addresses four points. (i) It needs
+one input file. Pydemi reads only the \texttt{CHGCAR}, the one density file that
+every VASP run writes, so any existing set of calculations can be used without
+running them again. Quantities that need the wavefunctions, such as the electron
+localization function, are therefore left out, since the density alone gives
+them only approximately~\cite{abramov1997,tsirelson2002}. (ii) It gives the same
+values for the same material. The grid handling, the derivatives and the
+division of the cell into atomic regions are fixed in the package and tested, so
+the values do not depend on how the cell is written down and, for most
+descriptors, change by less than 1\% when the grid is made coarser
+(Sections~\ref{sec:design} and~\ref{sec:descriptors}). (iii) It does not need a
+DFT calculation. Several models predict the density from the crystal
+structure~\cite{chandrasekaran2019,grisafi2019,jorgensen2022,koker2024}; pydemi
+includes one of them, ChargE3Net~\cite{koker2024}, and we measure which
+descriptors stay accurate on predicted densities, since descriptors built from
+derivatives of the density enlarge small errors in it (Section~\ref{sec:ml}).
+(iv) It shows which descriptors matter. We train property models on the
+descriptors alone for 17 properties of 6,059 DFT calculations, compare them with
+earlier models for the same structures, and identify the descriptors that carry
+the information (Section~\ref{sec:properties}). The package can be used as a
+Python library, a command-line tool or a graphical interface that runs locally
+(Section~\ref{sec:software}), and the code, the tests and the scripts that train
+the property models are released under the MIT license.}
 
 % ==========================================================================
 \section{Methodology}
