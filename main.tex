@@ -416,21 +416,21 @@ non-radial gradient share
 vanishes for spherical, non-overlapping atoms and grows as charge is pulled off
 the radial direction. The Laplacian descriptors locate where charge is
 concentrated ($\nabla^2\rho<0$). The share of $|\nabla^2\rho|$ that lies where
-$\nabla^2\rho<0$ is computed only outside the cores: over the whole cell
+$\nabla^2\rho<0$ is computed only outside the cores: over {\color{red}the whole cell
 $\nabla^2\rho$ integrates to zero, so this share would be $\tfrac12$ for every
-crystal. The bounded ellipticity distinguishes
-cylindrical from flattened charge in the bond shell, and the non-covalent interaction (NCI) descriptors
+crystal.} {\color{red}The bounded ellipticity distinguishes
+cylindrical from flattened charge in the bond shell,} and the non-covalent interaction (NCI) descriptors
 pick out the low-density, low-gradient regions of weak
 interactions~\cite{johnson2010}. The structural descriptors treat the density of
-the whole cell. \rev{They measure} how well it connects (percolation levels, detected by a
-union--find over periodic images), its maxima, minima and non-nuclear maxima,
-its lowest density, its directionality and its information content. The heterogeneity descriptors turn per-atom values of $m_1$, $f_{bond}$ and $\zeta$ into
+the whole cell. \rev{They measure} how well {\color{red}it connects (percolation levels, detected by a
+union--find over periodic images)}, its maxima, minima and non-nuclear maxima,
+its lowest density, its directionality and its information content. {\color{red}The heterogeneity descriptors turn per-atom values of $m_1$, $f_{bond}$ and $\zeta$ into
 statistics over the atoms, including the decomposition
 $\text{Var}_iX=\sum_e x_e\text{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
 into within- and between-element parts, where $x_e$ is the fraction of the atoms
-that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.
+that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.}
 Every descriptor is invariant under supercell expansion, rotation and
-translation of the crystal by whole grid steps\rev{, except the within-element
+translation of the crystal by whole grid steps, {\color{red}except the within-element
 variances of a cell in which every element has a single atom: they are undefined
 (Section~\ref{sec:design}), while a supercell of the same crystal gives zero.
 This affects 421 of the 6,059 materials of our dataset, and the property models
@@ -455,14 +455,14 @@ simpler finite differences.
 
 Most descriptors are insensitive to both choices. On the coarser grid, the
 median change is below 1\% for 46 of the 55. Most of the few that change more
-have values close to zero for many materials, for example the percolation
+have values close to zero for many materials, {\color{red}for example the percolation
 anisotropy of a cubic crystal, or the spread between atoms of an element that are all
-equivalent by symmetry\rev{. For} such values, a tiny absolute change is a large
+equivalent by symmetry. For such values, a tiny absolute change is a large
 percentage. The number of non-nuclear maxima changes for a different reason: a
 coarser grid can miss small maxima. Fourth-order finite differences give the
 same values as the default method to better than 1\%, which confirms that the
-default is accurate. \rev{Second-order} ones change some descriptors by up to
-16\%\rev{, so} pydemi does not use them by default.
+default is accurate. Second-order ones change some descriptors by up to
+16\%, so pydemi does not use them by default.}
 
 \rev{The PAW potentials are a further choice that the material does not set. A
 \texttt{CHGCAR} holds the valence pseudo-density, so a potential that treats more
