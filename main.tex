@@ -197,10 +197,9 @@ e\,\AA$^{-3}$. Spin-polarized and non-collinear files are accepted, and their
 magnetization blocks are ignored. No other VASP file (\texttt{POTCAR},
 \texttt{OUTCAR}, \texttt{AECCAR}, \texttt{ELFCAR}, \texttt{LOCPOT}) is needed,
 and the atomic radii used for the shells and the partitions are tabulated in the
-package. This is a deliberate choice: every VASP run writes a \texttt{CHGCAR}, so
-any collection of calculations can be \rev{processed} without going back to the
-original runs, and no descriptor depends on a file that some structures have and
-others do not. The density can also come from a crystal structure through the
+package. \rev{Because every VASP run writes a \texttt{CHGCAR}, pydemi can be applied to
+existing calculations without running VASP again, and every descriptor can be
+computed for every structure of a dataset.} The density can also come from a crystal structure through the
 included ChargE3Net model (Section~\ref{sec:ml}). Both routes give the same
 density object (Fig.~\ref{fig:architecture}), an instance of the
 \texttt{VolumetricData} class of the package, which holds the structure, the density grid and a note of where the density came from; this note
