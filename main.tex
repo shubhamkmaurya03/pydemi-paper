@@ -236,6 +236,7 @@ needs it reuses the stored copy. The settings it was computed with (for example
 the derivative method or the shell radii) are stored with it, so a structure
 \rev{processed} again with other settings gets new fields and never stale ones.
 
+{\color{red}% unclear, to rewrite
 VASP cells are often not orthogonal, so the derivatives are taken along the axes
 of the grid and then converted to Cartesian ones. For the Laplacian this
 conversion has cross terms between the grid axes,
@@ -252,7 +253,7 @@ differences are available as an alternative and are compared in
 Section~\ref{sec:descriptors}. The Hartree potential of the electrons comes from
 the same Fourier coefficients by solving Poisson's equation, and since its
 average is undefined for a periodic system, it is measured from its cell
-average.
+average.}
 
 Many descriptors need to know, for every grid point, which nucleus is nearest,
 how far away it is and in which direction. These are computed once with a
