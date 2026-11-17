@@ -464,7 +464,7 @@ same values as the default method to better than 1\%, which confirms that the
 default is accurate. Second-order ones change some descriptors by up to
 16\%, so pydemi does not use them by default.}
 
-\rev{The PAW potentials are a further choice that the material does not set. A
+{\color{red}The PAW potentials are a further choice that the material does not set. A
 \texttt{CHGCAR} holds the valence pseudo-density, so a potential that treats more
 electrons as valence, such as the semicore $3p$ electrons of Ti\_pv, adds charge
 near the nuclei and changes the descriptors that measure it. To see how large this
@@ -488,16 +488,16 @@ Supporting Information). A
 Section~S8 of the Supporting Information gives the comparison for every
 descriptor and property.}
 
-The site descriptors also depend on the division into atomic regions. This is
+{\color{red}The site descriptors also depend on the division into atomic regions. This is
 not an error: a different division describes different regions, so pydemi
 treats it as a setting and records it with every result. Section~S2 of the
 Supporting Information gives the change of every descriptor for every choice,
 including the division into atomic regions. It also explains which quantities
 of density analysis pydemi does not offer because a \texttt{CHGCAR} cannot
-support them reliably\rev{. An example is} the electron localization function, which needs
-more than the density~\cite{abramov1997,tsirelson2002}. \rev{Finally, it explains} what the PAW
+support them reliably. An example is the electron localization function, which needs
+more than the density~\cite{abramov1997,tsirelson2002}. Finally, it explains what the PAW
 pseudo-density~\cite{blochl1994,kresse1999} stored in a \texttt{CHGCAR} means
-for the descriptors.
+for the descriptors.}
 
 A descriptor must also be computed correctly. pydemi is therefore checked by
 automated tests that run every time the code changes. Each test computes
