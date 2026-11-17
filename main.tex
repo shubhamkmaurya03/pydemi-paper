@@ -504,7 +504,7 @@ automated tests that run every time the code changes. Each test computes
 something with pydemi and compares it with an answer that is known
 independently. Two kinds of tests check the descriptors.
 
-The first kind checks that each descriptor computes what it claims. These tests
+{\color{red}The first kind checks that each descriptor computes what it claims. These tests
 run pydemi on artificial densities for which the right answer is known exactly from a
 formula. Two model atoms are used: smooth Gaussian atoms, and Slater-type atoms, which
 have the sharp peak at the nucleus that real atoms have. For example, the
@@ -514,7 +514,7 @@ pydemi computes must equal the exact ones. Other tests use rules that hold for
 any density: the charge fractions of the core, bond and interstitial regions
 must add up to one, and the parts of a variance must add up to the whole.
 Where no formula exists, pydemi is compared with a slow but simple calculation,
-such as finding the nearest atom by searching all neighbouring cells.
+such as finding the nearest atom by searching all neighbouring cells.}
 
 The second kind checks that a descriptor stays the same when the crystal is
 described differently. The same material can be written down in many ways, and
