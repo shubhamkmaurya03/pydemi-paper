@@ -1,26 +1,50 @@
 \documentclass[preprint,review,12pt]{elsarticle}
-
-% --- Packages ---
-\usepackage[utf8]{inputenc}
-\usepackage[breaklinks=true,colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
-\usepackage[table,xcdraw]{xcolor}
-\usepackage{epsfig, mathrsfs, latexsym, subfigure, marginnote, gensymb, amsmath}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{adjustbox}
-\usepackage{doi}
+\usepackage[a4paper,margin=1in]{geometry}
+\let\today\relax
+\makeatletter
+\def\ps@pprintTitle{%
+\let\@oddhead\@empty
+\let\@evenhead\@empty
+\def\@oddfoot{}%
+\let\@evenfoot\@oddfoot}
+\makeatother
+%\usepackage{graphicx}
+\usepackage{graphicx, subcaption}
+%\usepackage{subfigure}
 \usepackage{lineno}
-\usepackage{enumitem}
-\setlist[description]{style=unboxed}
+\linenumbers
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage{multirow}
+\usepackage{textcomp,gensymb}
+\usepackage{lineno}
+\usepackage{xcolor}
+\usepackage{physics}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{breqn}
+\biboptions{square,comma,sort&compress}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{adjustbox}
+%\usepackage{xr-hyper}   
+%\externaldocument{supplementary}
+\usepackage{subfiles}
+%\usepackage{credits}
 \usepackage{etoolbox}
 % tables and captions single-spaced; the text stays double-spaced for review
 \AtBeginEnvironment{table}{\def\baselinestretch{1}}
 \AtBeginEnvironment{figure}{\def\baselinestretch{1}}
-
-\journal{Computational Materials Science}
+\journal{}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}  % gap between float and body text
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{0pt}
+\newcommand{\rev}[1]{{\color{blue}#1}}
 
 \begin{document}
-\newcommand{\rev}[1]{{\color{blue}#1}}
 % let large floats share a page with text instead of leaving half-empty float pages
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.8}
@@ -30,36 +54,17 @@
 
 \begin{frontmatter}
 
-\title{pydemi: A Python Package for Interpretable Charge-Density Descriptors and Materials Property Prediction}
+\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors and Materials Property Prediction} 
 
-\author{Shubham K Maurya}
-\author{MD Faiz Akhtar}
-\author{Somnath Bhowmick\corref{cor1}}
+\author[1]{Shubham K Maurya}
+\author[1]{MD Faiz Akhtar}
+\author[1]{Somnath Bhowmick\corref{cor1}}
 \ead{bsomnath@iitk.ac.in}
 \cortext[cor1]{Corresponding author}
-\affiliation{organization={Department of Materials Science \& Engineering, Indian Institute of Technology Kanpur},
-  city={Kanpur}, postcode={208016}, country={India}}
+\affiliation[1]{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, UP 208016, India}
 
-% --- ABSTRACT -------------------------------------------------------------
 \begin{abstract}
-The electronic charge density from a density-functional theory (DFT)
-calculation describes how a material is bonded, yet it is rarely used as the
-input of machine-learning models of material properties. Learned density representations predict
-properties well but are hard to interpret, while interpretable density analysis
-treats one structure at a time. We present pydemi, an open-source Python
-package that turns a VASP \texttt{CHGCAR} file into 55
-interpretable descriptors of bonding, structure and site heterogeneity. Each
-descriptor is stable with respect to the grid and the numerical method and is
-documented with its formula, units and range. From the crystal structure
-alone, pydemi can also predict the density with an included ChargE3Net model;
-\rev{44 of the 55} descriptors of the predicted densities rank materials almost exactly as
-their DFT values do. \rev{pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in
-seconds per structure.} Gradient-boosted
-models on the descriptors alone predict 17 elastic, thermal, energetic,
-electronic and optical properties, mostly with a test $R^2$ between 0.85 and
-0.95. SHAP values show which descriptors drive each prediction, and ten
-descriptors per property are almost as good as all of them. On \rev{DFT-relaxed structures unseen by either model}, properties predicted from ML-predicted densities
-are nearly as accurate as those from DFT densities\rev{, so the density need not be computed}. It runs from Python, the command line or a graphical interface.
+The electronic charge density from a density-functional theory (DFT) calculation describes how a material is bonded, yet it is rarely used as the input of machine-learning models of material properties. Learned density representations predict properties well but are hard to interpret, while interpretable density analysis treats one structure at a time. We present pydemi, an open-source Python package that turns a VASP \texttt{CHGCAR} file into 55 interpretable descriptors of bonding, structure, and site heterogeneity. Each descriptor is stable with respect to the grid and the numerical method and is documented with its formula, units, and range. From the crystal structure alone, pydemi can also predict the density with an included ChargE3Net model; \rev{44 of the 55} descriptors of the predicted densities rank materials almost exactly as their DFT values do. \rev{pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in seconds per structure.} Gradient-boosted models on the descriptors alone predict 17 elastic, thermal, energetic, electronic and optical properties, mostly with a test $R^2$ between 0.85 and 0.95. SHAP values show which descriptors drive each prediction, and ten descriptors per property are almost as good as all of them. On \rev{DFT-relaxed structures unseen by either model}, properties predicted from ML-predicted densities are nearly as accurate as those from DFT densities\rev{, so the density need not be computed}. It runs from Python, the command line, or a graphical interface.
 \end{abstract}
 
 \begin{highlights}
@@ -71,13 +76,10 @@ are nearly as accurate as those from DFT densities\rev{, so the density need not
 \end{highlights}
 
 \begin{keyword}
-electron charge density \sep descriptors \sep machine learning \sep materials property prediction
-\sep interpretability \sep Python
+Electron charge density \sep Descriptors \sep Machine learning \sep Materials property prediction
+\sep Interpretability \sep Python
 \end{keyword}
-
 \end{frontmatter}
-
-\linenumbers
 
 \section{Introduction}
 \label{sec:intro}
@@ -185,13 +187,13 @@ earlier for the same structures, and identify the descriptors that carry the
 information (Section~\ref{sec:properties}). The package is used as a Python
 library, a command-line tool or a graphical interface that runs locally
 (Section~\ref{sec:software}); the code, the tests and the scripts that train the
-property models are released under the MIT licence.
+property models are released under the MIT license.
 
 % ==========================================================================
 \section{Methodology}
 \label{sec:design}
 
-pydemi needs one file, the VASP \texttt{CHGCAR} (or \texttt{CHG}), plain or
+Pydemi needs one file, the VASP \texttt{CHGCAR} (or \texttt{CHG}), plain or
 compressed. The structure is read from its header and the total density from
 the first data block, which is divided by the cell volume to give $\rho$ in
 e\,\AA$^{-3}$. Spin-polarized and non-collinear files are accepted, and their
@@ -210,20 +212,7 @@ is written into the metadata of every output row.
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_architecture.pdf}
-\caption{Architecture of pydemi, drawn for MgO. A DFT \texttt{CHGCAR} (left,
-top) and a crystal structure (CIF, POSCAR or any format ASE reads) whose density
-is predicted by the included ChargE3Net model (left, bottom) give the same
-density grid $\rho(\mathbf{r})$, shown as the $1.5$~e\,\AA$^{-3}$ isosurface
-around O, the Mg atoms and the density on one face of the cell. Inside pydemi
-(centre box), the grid is held in the density object; the derived
-fields (gradient, Laplacian, Hartree potential $V_\mathrm{H}$) and the atomic
-cells of the geometry pass are computed once per structure and cached on it,
-and the descriptors reduce them to single numbers. The radial
-bars give the percentile of each descriptor of MgO within the
-dataset, grouped by domain. The descriptors are used from Python, the command
-line or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}),
-and the property models of Section~\ref{sec:properties} take them as input
-(right, bottom: test predictions of the bulk modulus).}
+\caption{Architecture of pydemi, drawn for MgO. A DFT \texttt{CHGCAR} (left, top) and a crystal structure (CIF, POSCAR, or any format ASE reads) whose density is predicted by the included ChargE3Net model (left, bottom) give the same density grid $\rho(\mathbf{r})$, shown as the $1.5$~e\,\AA$^{-3}$ isosurface around O, the Mg atoms, and the density on one face of the cell. Inside pydemi (center box), the grid is held in the density object; the derived fields (gradient, Laplacian, Hartree potential $V_H$) and the atomic cells of the geometry pass are computed once per structure and cached on the structure; the descriptors then reduce them to single numbers. The radial bars show the percentiles for each MgO descriptor within the dataset, grouped by domain. The descriptors are used from Python, the command line, or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}), and the property models of Section~\ref{sec:properties} take them as input (right, bottom: test predictions of the bulk modulus).}
 \label{fig:architecture}
 \end{figure}
 
@@ -435,10 +424,9 @@ pick out the low-density, low-gradient regions of weak
 interactions~\cite{johnson2010}. The structural descriptors treat the density of
 the whole cell. \rev{They measure} how well it connects (percolation levels, detected by a
 union--find over periodic images), its maxima, minima and non-nuclear maxima,
-its lowest density, its directionality and its information content. The heterogeneity
-descriptors turn per-atom values of $m_1$, $f_\mathrm{bond}$ and $\zeta$ into
+its lowest density, its directionality and its information content. The heterogeneity descriptors turn per-atom values of $m_1$, $f_{bond}$ and $\zeta$ into
 statistics over the atoms, including the decomposition
-$\mathrm{Var}_iX=\sum_e x_e\mathrm{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
+$\text{Var}_iX=\sum_e x_e\text{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
 into within- and between-element parts, where $x_e$ is the fraction of the atoms
 that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.
 Every descriptor is invariant under supercell expansion, rotation and
@@ -669,7 +657,7 @@ descriptors. $n$: training and test materials.}
 \begin{adjustbox}{width=\textwidth}
 \begin{tabular}{llrrccr}
 \toprule
-Property & Units & $n_\mathrm{train}$ & $n_\mathrm{test}$ & all descriptors & 10 descriptors & MAE \\
+Property & Units & $n_{train}$ & $n_{test}$ & all descriptors & 10 descriptors & MAE \\
 \midrule
 \csname @@input\endcsname tables/tab_properties.tex
 \bottomrule
@@ -708,15 +696,12 @@ present, which the composition describes directly.
 
 \begin{table}[!tp]
 \centering
-\caption{Test $R^2$ of models trained on the same structures with the same
-split. All rows \rev{above the line} are from Ref.~\cite{kumar2026}; latent density:
-compressed representation of the full density grid. $E_\mathrm{atoms}$: energy
-relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.}
+\caption{Test $R^2$ of models trained on the same structures with the same split. All rows \rev{above the line} are from Ref.~\cite{kumar2026}; latent density: compressed representation of the full density grid. $E_{atoms}$: energy relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.}
 \label{tab:compare}
 \footnotesize
 \begin{tabular}{@{}lccccc@{}}
 \toprule
-Model & $K$ & $G$ & $E$ & $E_\mathrm{atoms}$ & $\Theta_D$ \\
+Model & $K$ & $G$ & $E$ & $E_{atoms}$ & $\Theta_D$ \\
 \midrule
 Latent density, CNN & 0.90 & 0.80 & 0.79 & 0.68 & 0.73 \\
 Magpie, attention CNN & 0.92 & 0.85 & 0.85 & 0.88 & 0.90 \\
@@ -926,13 +911,9 @@ computing its density\rev{; whether this holds for structures relaxed with an ML
 interatomic potential remains to be tested}.
 
 \section*{Code and data availability}
-The source code, the tests, the descriptor reference and the scripts that
-train the property models are available at
-\url{https://github.com/CMSLabIITK/pydemi} under the MIT licence; the version described here, \rev{0.3.0}, is archived at
-Zenodo (\rev{\doi{10.5281/zenodo.23952610}; all versions:
-\doi{10.5281/zenodo.22995680}}). The fine-tuned
-ChargE3Net checkpoint and the property models are included in the package. The ChargE3Net code included in pydemi is
-taken from \url{https://github.com/AIforGreatGood/charge3net} (MIT licence). The
+The source code, the tests, the descriptor reference and the scripts that train the property models are available at
+\url{https://github.com/CMSLabIITK/pydemi} under the MIT license; the version described here, \rev{0.3.0}, is archived at
+Zenodo (\rev{\href{https://doi.org/10.5281/zenodo.23952610}{10.5281/zenodo.23952610}; all versions: \href{https://doi.org/10.5281/zenodo.22995680}{10.5281/zenodo.22995680}}). The fine-tuned ChargE3Net checkpoint and the property models are included in the package. The ChargE3Net code included in pydemi is taken from \url{https://github.com/AIforGreatGood/charge3net} (MIT license). The
 DFT dataset of charge densities was generated by members of the CMS Lab,
 Department of Materials Science \& Engineering, IIT Kanpur, including the
 authors, and was introduced in Ref.~\cite{kumar2026}; the data released with
