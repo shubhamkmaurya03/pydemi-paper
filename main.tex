@@ -646,6 +646,18 @@ three models for every property except the direct gap, where the random forest
 was better by 0.001 (Supporting Information, Table~S3), and its test scores are
 given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_top10.pdf}
+\caption{The ten most important descriptors of each property, ranked by their
+mean absolute SHAP value in the LightGBM model with all descriptors on the training
+set. A dot marks a descriptor that is among the ten of a property; its area is
+the descriptor's share of the mean absolute SHAP value and its colour the
+domain. Only the 34 descriptors that are among the ten for at least one property
+are shown, ordered by the number of properties for which they are among the ten.}
+\label{fig:top10}
+\end{figure}
+
 \begin{table}[htbp]
 \centering
 \caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
@@ -734,18 +746,6 @@ properties, eight or nine of the ten are among the 44 descriptors that are
 reliably computed from a predicted density (Section~\ref{sec:ml}), so the
 property models should change little when the density is predicted; the next
 paragraph tests this.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\textwidth]{figures/fig_top10.pdf}
-\caption{The ten most important descriptors of each property, ranked by their
-mean absolute SHAP value in the LightGBM model with all descriptors on the training
-set. A dot marks a descriptor that is among the ten of a property; its area is
-the descriptor's share of the mean absolute SHAP value and its colour the
-domain. Only the 34 descriptors that are among the ten for at least one property
-are shown, ordered by the number of properties for which they are among the ten.}
-\label{fig:top10}
-\end{figure}
 
 The descriptors can also be computed from a predicted density, and we tested
 whether they still serve the property models. We trained the property models
