@@ -110,9 +110,9 @@ own features~\cite{xie2018,chen2019,choudhary2021,wen2024}. All of these start
 from the atoms, not from the electrons. The bonding that the density records is
 learned only indirectly, from the composition and the geometry, and the most
 accurate models are often the hardest to read. In materials science this
-matters. A model whose inputs have a physical meaning can be checked against
+matters. {\color{red}A model whose inputs have a physical meaning can be checked against
 what is known about a material, and it can point to the mechanism behind a
-trend, not only to the trend itself~\cite{rudin2019}. Methods such as SHAP
+trend, not only to the trend itself~\cite{rudin2019}.} Methods such as SHAP
 values~\cite{lundberg2020} explain the predictions of any model, but an
 explanation in terms of learned features or atom embeddings is still hard to
 relate to physics.
@@ -129,11 +129,11 @@ show how well a property can be predicted, but not which feature of the bonding
 sets it. They also have to process the full grid of every structure, which makes
 training and prediction costly.
 
-Density analysis itself, on the other hand, has a long tradition of
+{\color{red}Density analysis itself, on the other hand, has a long tradition of
 interpretable quantities. The quantum theory of atoms in molecules divides the
 density into atomic basins and describes each bond by the critical point between
 two atoms~\cite{bader1990}. Hirshfeld partitioning shares the density between
-atoms in proportion to the densities of the free atoms~\cite{hirshfeld1977}.
+atoms in proportion to the densities of the free atoms~\cite{hirshfeld1977}.}
 The electron localization function~\cite{becke1990} shows where electrons are
 paired, and the non-covalent interaction index~\cite{johnson2010} shows where
 weak interactions occur. Each of these quantities has a clear meaning, and
@@ -149,12 +149,12 @@ of structures, in a way that gives the same answer for the same material, is
 not what they were designed for.
 
 Turning the density into fixed-length descriptors for many structures raises
-three problems. The first is the input and its numerics. The file that every
+three problems. The first is the input and its numerics. {\color{red}The file that every
 VASP calculation writes, the \texttt{CHGCAR}, holds the density on a grid but
 not the wavefunctions, so it does not support every quantity of density
 analysis. The electron localization function and the energy densities, for
 example, need the kinetic energy density, which the density alone gives only
-approximately~\cite{abramov1997,tsirelson2002}. A quantity computed on a grid
+approximately~\cite{abramov1997,tsirelson2002}.} A quantity computed on a grid
 can also depend on the grid spacing, on the numerical derivatives and on the way
 the cell is written down as much as on the material, and a descriptor of this
 kind adds noise that no model can remove. The second problem is cost. A
@@ -162,17 +162,17 @@ descriptor that needs a DFT density needs a DFT calculation, which limits it to
 materials that have already been computed. Models that predict the density from
 the atomic structure~\cite{chandrasekaran2019,grisafi2019,jorgensen2022,koker2024}
 remove this limit in principle, provided the descriptors survive the error of
-the prediction. This is not guaranteed: descriptors built from derivatives of
+the prediction. {\color{red}This is not guaranteed: descriptors built from derivatives of
 the density, such as the curvature of a bond, enlarge small errors of the
 density. The third problem is the question that motivates the descriptors in the
 first place: how much of a material's properties they capture, and which of
-them carry the information. A few chosen examples cannot answer it. It has to be
+them carry the information.} A few chosen examples cannot answer it. It has to be
 answered on a large, well-defined dataset and for many properties at once.
 
 Here we describe pydemi, a Python package built around these three problems.
 (i) It reads one file, the VASP \texttt{CHGCAR}, and computes 55 descriptors
-that are defined on it and whose values are set by the material, not by the
-grid or the numerical method \rev{(for a given choice of PAW potentials)} (Sections~\ref{sec:design}
+{\color{red}that are defined on it and whose values are set by the material, not by the
+grid or the numerical method (for a given choice of PAW potentials)} (Sections~\ref{sec:design}
 and~\ref{sec:descriptors}). The descriptors describe how the charge is
 distributed around each nucleus and between the atoms, the shape of the density
 over the whole cell, and how much the atoms of a crystal differ from one
@@ -251,11 +251,11 @@ the nearest image can lie beyond the usual $3\times3\times3$ block of cells, so
 the search is widened until it is guaranteed to contain it. Some grid points
 lie at exactly the same distance from two or more nuclei, which is common when
 atoms sit on high-symmetry grid points. Such a point is given to one of these
-nuclei by a rule that uses only their positions relative to the point, not the
+nuclei by a rule that {\color{red}uses only their positions relative to the point, not the
 order in which the atoms are listed in the file. The point then goes to the
 equivalent atom in a cell, in its supercell and in a translated or rotated copy,
 so the descriptors do not change between these cells
-(Section~\ref{sec:descriptors}). The distance to the nearest nucleus also
+(Section~\ref{sec:descriptors}).} The distance to the nearest nucleus also
 divides the cell into three regions: the core (within 0.8\,\AA{} of a
 nucleus), the bond shell (0.8 to 1.5\,\AA) and the interstitial region (beyond
 1.5\,\AA). These boundaries can instead be set for each atom as multiples of
@@ -263,13 +263,13 @@ its covalent radius. \rev{All results in this work, including the property
 models, use the fixed boundaries. They put every material on the same length
 scale, so that the larger cores of heavy atoms show up in the descriptors
 instead of being scaled away; \texttt{pydemi sweep} shows how the descriptors
-change when the boundaries are moved (Section~\ref{sec:software}).} The descriptors
+change when the boundaries are moved (Section~\ref{sec:software}).} {\color{red}The descriptors
 that are resolved per atom need to know which grid points belong to which atom,
 and three ways of dividing the cell are offered: nearest-atom (Voronoi) cells,
 the default; a power diagram, which gives larger atoms larger cells; and the
 fuzzy cells of Becke~\cite{becke1988}, which share each point between
 neighbouring atoms with smooth weights. All three return weights that sum to one
-at every point, so every per-atom descriptor works with any of them unchanged.
+at every point, so every per-atom descriptor works with any of them unchanged.}
 
 Each descriptor is a short Python function that takes the
 density object and returns one number. It is added to a single list of all
@@ -278,12 +278,12 @@ descriptors (the registry) together with a record that describes it: its name, i
 units, the range of values it can take, its formula and references, and the
 cases in which it is undefined, each with the constant returned instead. A
 uniform density, for instance, has no gradient, so the non-radial
-gradient share is zero divided by zero; the descriptor returns 0 and is flagged, and
-the output then carries a companion flag column set to 1, so a user can find and
+gradient share is zero divided by zero; the descriptor returns 0 and is flagged, {\color{red}and
+the output then carries a companion flag column set to 1}, so a user can find and
 exclude such values. No descriptor returns a bare NaN, with one documented
-exception: the within-element variances of Table~\ref{tab:families2}, when no
+exception: {\color{red}the within-element variances of Table~\ref{tab:families2}, when no
 element has two or more atoms in the cell (for example the two-atom cell of
-MgO), so there are no atoms of the same element to compare.
+MgO), so there are no atoms of the same element to compare.}
 
 This list is the source from which everything else is built. The
 feature vector always has the descriptors in the order in which they were
