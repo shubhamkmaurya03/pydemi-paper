@@ -271,13 +271,13 @@ its covalent radius. \rev{All results in this work, including the property
 models, use the fixed boundaries. They put every material on the same length
 scale, so that the larger cores of heavy atoms show up in the descriptors
 instead of being scaled away; \texttt{pydemi sweep} shows how the descriptors
-change when the boundaries are moved (Section~\ref{sec:software}).} {\color{red}The descriptors
-that are resolved per atom need to know which grid points belong to which atom,
-and three ways of dividing the cell are offered: nearest-atom (Voronoi) cells,
-the default; a power diagram, which gives larger atoms larger cells; and the
-fuzzy cells of Becke~\cite{becke1988}, which share each point between
-neighbouring atoms with smooth weights. All three return weights that sum to one
-at every point, so every per-atom descriptor works with any of them unchanged.}
+change when the boundaries are moved (Section~\ref{sec:software}).} \rev{The 18 site descriptors, which are computed for each atom, need the cell to be
+divided into atomic regions. All results in this work use the default, which
+gives each grid point to its nearest nucleus. A power diagram, which uses the
+covalent radii to give larger atoms larger regions, and the fuzzy cells of
+Becke~\cite{becke1988}, which share the points between neighbouring atoms
+smoothly, are offered as alternatives; Section~S2 of the Supporting Information
+shows how the site descriptors change with them.}
 
 Each descriptor is a short Python function that takes the
 density object and returns one number. It is added to a single list of all
