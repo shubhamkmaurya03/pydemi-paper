@@ -130,11 +130,14 @@ show how well a property can be predicted, but not which feature of the bonding
 sets it. They also have to process the full grid of every structure, which makes
 training and prediction costly.
 
-{\color{red}Density analysis itself, on the other hand, has a long tradition of
-interpretable quantities. The quantum theory of atoms in molecules divides the
-density into atomic basins and describes each bond by the critical point between
-two atoms~\cite{bader1990}. Hirshfeld partitioning shares the density between
-atoms in proportion to the densities of the free atoms~\cite{hirshfeld1977}.}
+\rev{The density has, however, long been analysed without machine learning, and
+these analyses give quantities with a clear physical meaning. The quantum theory
+of atoms in molecules divides the density into one region per atom, which gives
+atomic charges and volumes, and describes each bond by the density at the point
+between the two atoms where it is lowest along the bond, which measures the
+strength and type of the bond~\cite{bader1990}. Hirshfeld partitioning assigns
+the density at each point to the atoms in proportion to how much each free atom
+would contribute there~\cite{hirshfeld1977}.}
 The electron localization function~\cite{becke1990} shows where electrons are
 paired, and the non-covalent interaction index~\cite{johnson2010} shows where
 weak interactions occur. Each of these quantities has a clear meaning, and
