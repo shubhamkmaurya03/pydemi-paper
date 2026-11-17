@@ -221,24 +221,32 @@ needs it reuses the stored copy. The settings it was computed with (for example
 the derivative method or the shell radii) are stored with it, so a structure
 \rev{processed} again with other settings gets new fields and never stale ones.
 
-{\color{red}% unclear, to rewrite
-VASP cells are often not orthogonal, so the derivatives are taken along the axes
-of the grid and then converted to Cartesian ones. For the Laplacian this
-conversion has cross terms between the grid axes,
+\rev{Several descriptors need the gradient and the Laplacian of the density, and
+two need the Hartree potential of the electrons. The density is stored on a grid
+that runs along the three cell vectors, so pydemi first takes derivatives along
+these grid directions, with respect to the fractional coordinates $u_a$, and
+then converts them to Cartesian ones. When the cell vectors are not at right
+angles, as in hexagonal, monoclinic and triclinic cells, a step along one grid
+direction is partly a step along another, and the Laplacian then also contains
+mixed derivatives between pairs of grid directions:
 \[
 \nabla^2 f=\sum_{a,b}G_{ab}\,\frac{\partial^2 f}{\partial u_a\,\partial u_b},
 \]
-where $u_a$ are the fractional coordinates and $G=BB^{\mathsf T}$ is built from
-the reciprocal lattice vectors (the rows of $B$). The cross terms vanish only
-for orthogonal axes; leaving them out, a common shortcut, makes the Laplacian of
-a triclinic test cell more than 5\% wrong. By default the derivatives are
-computed in Fourier space, where each one becomes a multiplication. A plane-wave
-density is a finite Fourier series, so this is exact up to round-off; finite
-differences are available as an alternative and are compared in
-Section~\ref{sec:descriptors}. The Hartree potential of the electrons comes from
-the same Fourier coefficients by solving Poisson's equation, and since its
-average is undefined for a periodic system, it is measured from its cell
-average.}
+where $G=BB^{\mathsf T}$ and the rows of $B$ are the reciprocal lattice vectors.
+The mixed terms ($a\neq b$) are zero only when the cell vectors are at right
+angles. They are needed: for kyanite (Al$_2$SiO$_5$, triclinic) in our dataset,
+leaving them out changes the Laplacian by up to 15\% of its largest value and
+the negative-Laplacian volume fraction from 0.060 to 0.072. With them, pydemi
+reproduces the exact Laplacian of a test density with a known analytic form to
+round-off. By default the derivatives are computed from the Fourier transform of
+the density. VASP writes the density as a finite sum of plane waves, and the
+derivative of each plane wave is known exactly, so this method has no error from
+the grid spacing beyond computer round-off. Finite differences, which estimate
+derivatives from neighbouring grid points, are available as an alternative and
+are compared in Section~\ref{sec:descriptors}. The Hartree potential is obtained
+from the same Fourier transform by solving Poisson's equation. For a periodic
+crystal its average value is not defined, so pydemi measures the potential from
+its average over the cell.}
 
 Many descriptors need to know, for every grid point, which nucleus is nearest,
 how far away it is and in which direction. These are computed once with a
