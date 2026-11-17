@@ -248,17 +248,21 @@ from the same Fourier transform by solving Poisson's equation. For a periodic
 crystal its average value is not defined, so pydemi measures the potential from
 its average over the cell.}
 
-Many descriptors need to know, for every grid point, which nucleus is nearest,
-how far away it is and in which direction. These are computed once with a
-$k$-d tree over the atoms and their periodic images. In strongly sheared cells
-the nearest image can lie beyond the usual $3\times3\times3$ block of cells, so
-the search is widened until it is guaranteed to contain it. Some grid points
-lie at exactly the same distance from two or more nuclei, which is common when
-atoms sit on high-symmetry grid points. Such a point is given to one of these
-nuclei by a rule that {\color{red}uses only their positions relative to the point, not the
-order in which the atoms are listed in the file. The point then goes to the
-equivalent atom in a cell, in its supercell and in a translated or rotated copy,
-so the descriptors do not change between these cells
+\rev{Many descriptors need to know, for every grid point, which nucleus is
+nearest, how far away it is and in which direction. Pydemi finds these with a
+$k$-d tree, a standard data structure that finds the nearest of many points
+quickly, built over the atoms and their periodic images. In strongly sheared
+cells the nearest image can lie beyond the usual $3\times3\times3$ block of
+cells, so the search is widened until it is guaranteed to contain it. Some grid
+points lie at exactly the same distance from two or more nuclei, which is common
+when atoms sit on grid points, as in rock-salt MgO. Such a point has to be given
+to one of these nuclei. A simple choice, the nucleus listed first in the file,
+would make the result depend on how the file is written: the same crystal with
+its atoms listed in another order, or written as a supercell, could give the
+point to a different nucleus, and the descriptors would change slightly although
+the material is the same. Pydemi instead chooses the nucleus from its position
+relative to the point, which depends only on where the atoms are, so a cell, its
+supercell and a translated or rotated copy give the same descriptors
 (Section~\ref{sec:descriptors}).} The distance to the nearest nucleus also
 divides the cell into three regions: the core (within 0.8\,\AA{} of a
 nucleus), the bond shell (0.8 to 1.5\,\AA) and the interstitial region (beyond
