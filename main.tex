@@ -109,10 +109,11 @@ positions~\cite{bartok2013}, or as graphs from which neural networks learn their
 own features~\cite{xie2018,chen2019,choudhary2021,wen2024}. All of these start
 from the atoms, not from the electrons. The bonding that the density records is
 learned only indirectly, from the composition and the geometry, and the most
-accurate models are often the hardest to read. In materials science this
-matters. {\color{red}A model whose inputs have a physical meaning can be checked against
-what is known about a material, and it can point to the mechanism behind a
-trend, not only to the trend itself~\cite{rudin2019}.} Methods such as SHAP
+accurate models are often the hardest to read. \rev{This matters because a materials scientist usually wants to know why
+a property takes its value, not only what the value is. When each input of a model
+has a physical meaning, the inputs that the model relies on can be compared with
+known physics, and they can suggest which feature of the bonding causes a
+trend~\cite{rudin2019}.} Methods such as SHAP
 values~\cite{lundberg2020} explain the predictions of any model, but an
 explanation in terms of learned features or atom embeddings is still hard to
 relate to physics.
