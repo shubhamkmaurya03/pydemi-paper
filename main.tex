@@ -545,16 +545,16 @@ density exists, its value should be used instead.
 
 \subsection{Data and protocol}
 We used the descriptors to predict 17 properties of the materials of the dataset,
-\rev{all downloaded from the Materials Project~\cite{jain2013}
-(database version 2026.04.13). They are the bulk, shear and Young's moduli;} the
+all downloaded from the Materials Project~\cite{jain2013}
+(database version 2026.04.13). They are the bulk, shear and Young's moduli; the
 elastic constants $C_{11}$, $C_{12}$ and $C_{44}$~\cite{dejong2015}; the Debye
-temperature, the \rev{two} sound velocities and the minimum thermal conductivities
+temperature, the two sound velocities and the minimum thermal conductivities
 in the Clarke and Cahill models~\cite{clarke2003,cahill1992}; the formation and
 cohesive energies; the PBE band gap, whether a material is a metal and whether
-its gap is direct; and the refractive index~\cite{petousis2017}. \rev{The
+its gap is direct; and the refractive index~\cite{petousis2017}. The
 Materials Project derives the thermal properties from the elastic data. We used
 the random split that comes with the dataset~\cite{kumar2026}: 4,847 structures
-for training, 606 for validation and 606 for testing. A} material without a
+for training, 606 for validation and 606 for testing. A material without a
 value for a property is left out for that property only.
 
 For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\cite{pedregosa2011}
@@ -566,9 +566,9 @@ descriptors the models rely on, we used SHAP values~\cite{lundberg2020}, which
 split each prediction into the contributions of the individual descriptors. We
 also retrained every model on only the ten most important descriptors of its
 property, chosen on the training set. All details are given in
-Section~S3 of the Supporting Information. \rev{LightGBM was the most accurate of the
+Section~S3 of the Supporting Information. LightGBM was the most accurate of the
 three models for 16 properties and as accurate as the random forest for the
-direct gap (Supporting Information, Table~S3). Its test scores are}
+direct gap (Supporting Information, Table~S3). Its test scores are
 given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 
 \begin{figure}[!t]
@@ -614,9 +614,9 @@ deviation.}
 
 \subsection{Results and interpretation}
 Table~\ref{tab:compare} compares the descriptors with models trained on the
-same structures, the same split and \rev{the same target values~\cite{kumar2026}.
-These models use} a compressed representation of the full density grid,
-compositional (Magpie) features, both together, and the graph neural \rev{network} MEGNet~\cite{chen2019}. \rev{We also trained MatTen,
+same structures, the same split and the same target values~\cite{kumar2026}.
+These models use a compressed representation of the full density grid,
+compositional (Magpie) features, both together, and the graph neural network MEGNet~\cite{chen2019}. We also trained MatTen,
 an equivariant graph neural network for elastic properties~\cite{wen2024}, on
 the same data (Section~S3 of the Supporting Information). For this comparison,
 our models were trained on the target values of Ref.~\cite{kumar2026}. For the
@@ -625,17 +625,17 @@ Table~\ref{tab:properties}, with the Debye temperature given for fewer
 materials. The energy of Ref.~\cite{kumar2026} is computed relative to the free
 atoms from the DFT energies of the dataset, so it differs from the cohesive
 energy of Table~\ref{tab:properties}, and our models were trained on it
-separately.} For the three moduli, the descriptors alone give the highest $R^2$
+separately. For the three moduli, the descriptors alone give the highest $R^2$
 of all models. For the Debye temperature they are above the density and
-composition models \rev{and level with MEGNet and MatTen}. For
+composition models and level with MEGNet and MatTen. For
 the energy relative to the free atoms they are well above the density
-representation alone but below \rev{MEGNet, MatTen and the models that use the
-composition. This energy} depends strongly on which elements are present, which
+representation alone but below MEGNet, MatTen and the models that use the
+composition. This energy depends strongly on which elements are present, which
 the composition describes directly.
 
 \begin{table}[!tp]
 \centering
-\caption{Test $R^2$ of models trained on the same structures with the same split. \rev{The rows above the line are from Ref.~\cite{kumar2026}, and those below it were trained by us}; latent density: compressed representation of the full density grid. $E_{atoms}$: energy relative to the free atoms; $\Theta_D$: Debye temperature.}
+\caption{Test $R^2$ of models trained on the same structures with the same split. The rows above the line are from Ref.~\cite{kumar2026}, and those below it were trained by us; latent density: compressed representation of the full density grid. $E_{atoms}$: energy relative to the free atoms; $\Theta_D$: Debye temperature.}
 \label{tab:compare}
 \footnotesize
 \begin{tabular}{@{}lccccc@{}}
@@ -648,7 +648,7 @@ Latent density + Magpie, LightGBM & 0.94 & 0.87 & 0.88 & 0.96 & 0.89 \\
 Latent density + Magpie, attention CNN & 0.94 & 0.85 & 0.87 & 0.88 & 0.86 \\
 MEGNet & 0.93 & 0.87 & 0.86 & 0.94 & 0.91 \\
 \midrule
-\rev{MatTen} & \rev{0.93} & \rev{0.84} & \rev{0.88} & \rev{0.99} & \rev{0.91} \\
+MatTen & 0.93 & 0.84 & 0.88 & 0.99 & 0.91 \\
 pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & 0.86 & 0.91 \\
 \bottomrule
 \end{tabular}
@@ -664,16 +664,16 @@ interstitial densities; only the direct-gap classification has no dominant
 descriptor (Supporting Information, Fig.~S5). The information is concentrated
 in a few descriptors. Models trained on only the ten most important descriptors
 of each property, chosen on the training set (Fig.~\ref{fig:top10};
-Supporting Information, Table~S4), \rev{are almost as accurate as those trained on
+Supporting Information, Table~S4), are almost as accurate as those trained on
 all 55. Their test score is lower by only 0.01 to 0.07
-(Table~\ref{tab:properties}).}
+(Table~\ref{tab:properties}).
 Across all properties, these lists together use 34 of the 55 descriptors, and
 a few of them appear for most properties, led by the mean interstitial density,
-the charge-distance variance and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). \rev{For most
+the charge-distance variance and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). For most
 properties, eight or nine of these ten descriptors are among the 44 that a
 predicted density reproduces well (Section~\ref{sec:ml}). The property models
 should therefore work almost as well with a predicted density, and the next
-paragraph tests this.}
+paragraph tests this.
 
 The descriptors can also be computed from a predicted density, and we tested
 whether they still serve the property models. We trained the property models
@@ -704,7 +704,7 @@ the $R^2$ between them is at least 0.94, and they place 99.3\% of the
 structures in the same metal or non-metal class. Accuracy is almost unchanged
 for most properties. The bulk modulus has a test $R^2$ of 0.95 by either route,
 and most other properties lose 0.01 to 0.03. The losses are largest, about 0.04, for the sound velocities, the Debye
-temperature and the cohesive energy. \rev{These are the models that rely most on the 11
+temperature and the cohesive energy. These are the models that rely most on the 11
 descriptors that a predicted density reproduces less well
 (Section~\ref{sec:ml}). The 11 carry 7\% of the importance in the bulk-modulus
 model, but about a fifth in the models of the sound velocities and the Debye
@@ -713,10 +713,10 @@ predicted with an ROC-AUC of 0.73 from the DFT density and 0.74 from the
 predicted one. The refractive index has a low $R^2$ (0.17 and 0.18) only because
 of three materials with very large DFT values (14 to 24), while the other 128 lie
 between 1.4 and 5.5. Without these three, the $R^2$ is 0.84 from the DFT density
-and 0.78 from the predicted one.} All values are given in
+and 0.78 from the predicted one. All values are given in
 Section~S4 and Table~S7 of the Supporting Information.
 
-\rev{The test structures were relaxed with DFT. Given such a structure, pydemi
+The test structures were relaxed with DFT. Given such a structure, pydemi
 obtains the descriptors and the properties without computing the density.
 Graph networks such as MEGNet and MatTen also predict properties from
 the structure directly, with similar accuracy (Table~\ref{tab:compare}). The
@@ -724,7 +724,7 @@ route through the predicted density adds what they lack. Its prediction rests on
 the same 55 descriptors as for a DFT density, each with a physical meaning, so a
 user can see which feature of the bonding drives it, compare the material with
 those of the dataset, and check the descriptors against a DFT density once one
-is computed.}
+is computed.
 
 % ==========================================================================
 \section{Software}
