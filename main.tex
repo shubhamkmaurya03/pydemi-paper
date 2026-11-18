@@ -284,11 +284,13 @@ density object and returns one number. It is added to a single list of all
 descriptors (the registry) together with a record that describes it: its name, its domain
 (bonding, structural or heterogeneity), the cached quantities it needs, its
 units, the range of values it can take, its formula and references, and the
-cases in which it is undefined, each with the constant returned instead. A
-uniform density, for instance, has no gradient, so the non-radial
-gradient share is zero divided by zero; the descriptor returns 0 and is flagged, {\color{red}and
-the output then carries a companion flag column set to 1}, so a user can find and
-exclude such values. No descriptor returns a bare NaN, with one documented
+cases in which it is undefined, each with the constant returned instead. \rev{For example, the non-radial gradient share is the fraction of the density
+gradient that does not point away from the nearest nucleus. For a perfectly
+uniform density the gradient is zero everywhere, and this fraction becomes zero
+divided by zero. In such a case the descriptor returns a fixed value, here 0,
+and the output gets an extra column, \texttt{zeta\_\_flag}, set to 1, which marks
+the value as a substitute rather than a measurement, so a user can find and
+exclude it.} No descriptor returns a bare NaN, with one documented
 exception: {\color{red}the within-element variances of Table~\ref{tab:families2}, when no
 element has two or more atoms in the cell (for example the two-atom cell of
 MgO), so there are no atoms of the same element to compare.}
