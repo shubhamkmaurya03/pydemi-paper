@@ -452,41 +452,13 @@ Section~S2 of the Supporting Information lists the change of every descriptor,
 and also how much the descriptors change when the derivatives are computed by
 finite differences or when the atomic regions are defined differently.}
 
-A descriptor must also be computed correctly. pydemi is therefore checked by
-automated tests that run every time the code changes. Each test computes
-something with pydemi and compares it with an answer that is known
-independently. Two kinds of tests check the descriptors.
-
-{\color{red}The first kind checks that each descriptor computes what it claims. These tests
-run pydemi on artificial densities for which the right answer is known exactly from a
-formula. Two model atoms are used: smooth Gaussian atoms, and Slater-type atoms, which
-have the sharp peak at the nucleus that real atoms have. For example, the
-average distance of the charge from its nucleus must equal the textbook value
-for a Slater atom, and the derivatives and the electrostatic potential that
-pydemi computes must equal the exact ones. Other tests use rules that hold for
-any density: the charge fractions of the core, bond and interstitial regions
-must add up to one, and the parts of a variance must add up to the whole.
-Where no formula exists, pydemi is compared with a slow but simple calculation,
-such as finding the nearest atom by searching all neighbouring cells.}
-
-The second kind checks that a descriptor stays the same when the crystal is
-described differently. The same material can be written down in many ways, and
-a descriptor must not depend on the choice. For a low-symmetry test crystal,
-every descriptor is computed four times: for the original cell, for a cell
-eight times larger, for the cell with its origin moved by a whole number of grid steps, and for the cell
-rotated in space. All four must give the same value. These symmetry tests are
-generated automatically from the list of descriptors, so a descriptor added in
-the future is checked without writing a new test.
-
-No two computer calculations agree to the last digit, so each test allows a
-small difference, chosen from what can cause it. Where only rounding can cause
-it, the allowed difference is one part in a billion or less\rev{. It is} one part in a
-million for the symmetry tests, whose sums run over the grid in a different
-order\rev{. Where} the grid
-cannot represent a sharp atomic peak exactly, it is larger and set from the
-known size of this grid error\rev{. These} tests also check that the error shrinks
-when the grid is refined. Each test, its reference and its allowed difference are listed in Section~S6 of
-the Supporting Information.
+\rev{A descriptor must also stay the same when the crystal is described
+differently. The same material can be written down in many ways, and a
+descriptor must not depend on the choice. We tested this on the density of a
+low-symmetry crystal from our dataset, triclinic CuAuF$_5$. Every descriptor
+was computed four times, for the original cell, for a cell eight times larger,
+for the cell with its origin moved by a whole number of grid steps, and for the
+cell rotated in space. All four gave the same value for all 55 descriptors.}
 
 % ==========================================================================
 \section{Descriptors from a predicted density}
@@ -812,8 +784,13 @@ extra) takes the \texttt{CHGCAR} shown in the input panel, predicts the density 
 grid, and shows the density error and the descriptors and properties from both
 densities side by side. All results can be exported.
 
-The tests of Section~\ref{sec:descriptors} check the descriptors; other tests
-check the rest of the package. The reader is tested with \texttt{CHGCAR} files in
+\rev{The package is checked by automated tests. The descriptors are tested on
+model densities built from simple functions, Gaussian and Slater-type atoms,
+for which the exact value of each descriptor is known from a formula, and
+against rules that hold for any density, for example that the charge fractions
+of the core, bond and interstitial regions add up to one. The invariance check
+of Section~\ref{sec:descriptors} is also run automatically for every
+descriptor, on a small model crystal.} The reader is tested with \texttt{CHGCAR} files in
 every layout VASP writes, including spin-polarized and non-collinear runs and the
 older VASP~4 layout. The density model is tested by comparing its prediction for
 one structure with the output of the original ChargE3Net code. The property models
