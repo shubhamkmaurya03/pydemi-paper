@@ -109,11 +109,11 @@ positions~\cite{bartok2013}, or as graphs from which neural networks learn their
 own features~\cite{xie2018,chen2019,choudhary2021,wen2024}. All of these start
 from the atoms, not from the electrons. The bonding that the density records is
 learned only indirectly, from the composition and the geometry, and the most
-accurate models are often the hardest to read. \rev{This matters because a materials scientist usually wants to know why
+accurate models are often the hardest to read. This matters because a materials scientist usually wants to know why
 a property takes its value, not only what the value is. When each input of a model
 has a physical meaning, the inputs that the model relies on can be compared with
 known physics, and they can suggest which feature of the bonding causes a
-trend~\cite{rudin2019}.} Methods such as SHAP
+trend~\cite{rudin2019}. Methods such as SHAP
 values~\cite{lundberg2020} explain the predictions of any model, but an
 explanation in terms of learned features or atom embeddings is still hard to
 relate to physics.
@@ -130,14 +130,14 @@ show how well a property can be predicted, but not which feature of the bonding
 sets it. They also have to process the full grid of every structure, which makes
 training and prediction costly.
 
-\rev{The density has, however, long been analysed without machine learning, and
+The density has, however, long been analysed without machine learning, and
 these analyses give quantities with a clear physical meaning. The quantum theory
 of atoms in molecules divides the density into one region per atom, which gives
 atomic charges and volumes, and describes each bond by the density at the point
 between the two atoms where it is lowest along the bond, which measures the
 strength and type of the bond~\cite{bader1990}. Hirshfeld partitioning assigns
 the density at each point to the atoms in proportion to how much each free atom
-would contribute there~\cite{hirshfeld1977}.}
+would contribute there~\cite{hirshfeld1977}.
 The electron localization function~\cite{becke1990} shows where electrons are
 paired, and the non-covalent interaction index~\cite{johnson2010} shows where
 weak interactions occur. Each of these quantities has a clear meaning, and
@@ -152,14 +152,14 @@ integration method, are left to the user. Applying these programs to thousands
 of structures, in a way that gives the same answer for the same material, is
 not what they were designed for.
 
-\rev{Density analysis therefore gives interpretable quantities, but not in a form
+Density analysis therefore gives interpretable quantities, but not in a form
 that a property model can use. A property model needs the same set of numbers
 for every material, computed in the same way, for thousands of materials and
 ideally also for materials without a DFT calculation, and it has to be shown
 that these numbers carry information about the properties. To our knowledge, no
-existing tool provides this, and pydemi was written to do so.}
+existing tool provides this, and pydemi was written to do so.
 
-\rev{Pydemi is a Python package that turns a VASP density into 55 descriptors.
+Pydemi is a Python package that turns a VASP density into 55 descriptors.
 They describe how the charge is distributed around each nucleus and between the
 atoms, the shape of the density over the whole cell, and how much the atoms of a
 crystal differ from one another. The package addresses four points. (i) It needs
@@ -184,7 +184,7 @@ earlier models for the same structures, and identify the descriptors that carry
 the information (Section~\ref{sec:properties}). The package can be used as a
 Python library, a command-line tool or a graphical interface that runs locally
 (Section~\ref{sec:software}), and the code, the tests and the scripts that train
-the property models are released under the MIT license.}
+the property models are released under the MIT license.
 
 % ==========================================================================
 \section{Methodology}
@@ -197,9 +197,9 @@ e\,\AA$^{-3}$. Spin-polarized and non-collinear files are accepted, and their
 magnetization blocks are ignored. No other VASP file (\texttt{POTCAR},
 \texttt{OUTCAR}, \texttt{AECCAR}, \texttt{ELFCAR}, \texttt{LOCPOT}) is needed,
 and the atomic radii used for the shells and the partitions are tabulated in the
-package. \rev{Because every VASP run writes a \texttt{CHGCAR}, pydemi can be applied to
+package. Because every VASP run writes a \texttt{CHGCAR}, pydemi can be applied to
 existing calculations without running VASP again, and every descriptor can be
-computed for every structure of a dataset.} The density can also come from a crystal structure through the
+computed for every structure of a dataset. The density can also come from a crystal structure through the
 included ChargE3Net model (Section~\ref{sec:ml}). Both routes give the same
 density object (Fig.~\ref{fig:architecture}), an instance of the
 \texttt{VolumetricData} class of the package, which holds the structure, the density grid and a note of where the density came from; this note
@@ -219,9 +219,9 @@ each grid point to its nearest atom, is stored on the density object
 the first time a descriptor asks for it, and every later descriptor that
 needs it reuses the stored copy. The settings it was computed with (for example
 the derivative method or the shell radii) are stored with it, so a structure
-\rev{processed} again with other settings gets new fields and never stale ones.
+processed again with other settings gets new fields and never stale ones.
 
-\rev{Several descriptors need the gradient and the Laplacian of the density, and
+Several descriptors need the gradient and the Laplacian of the density, and
 two need the Hartree potential of the electrons. The density is stored on a grid
 that runs along the three cell vectors, so pydemi first takes derivatives along
 these grid directions, with respect to the fractional coordinates $u_a$, and
@@ -246,9 +246,9 @@ derivatives from neighbouring grid points, are available as an alternative and
 are compared in Section~\ref{sec:descriptors}. The Hartree potential is obtained
 from the same Fourier transform by solving Poisson's equation. For a periodic
 crystal its average value is not defined, so pydemi measures the potential from
-its average over the cell.}
+its average over the cell.
 
-\rev{Many descriptors need to know, for every grid point, which nucleus is
+Many descriptors need to know, for every grid point, which nucleus is
 nearest, how far away it is and in which direction. Pydemi finds these with a
 $k$-d tree, a standard data structure that finds the nearest of many points
 quickly, built over the atoms and their periodic images. In strongly sheared
@@ -263,48 +263,40 @@ point to a different nucleus, and the descriptors would change slightly although
 the material is the same. Pydemi instead chooses the nucleus from its position
 relative to the point, which depends only on where the atoms are, so a cell, its
 supercell and a translated or rotated copy give the same descriptors
-(Section~\ref{sec:descriptors}).} The distance to the nearest nucleus also
+(Section~\ref{sec:descriptors}). The distance to the nearest nucleus also
 divides the cell into three regions: the core (within 0.8\,\AA{} of a
 nucleus), the bond shell (0.8 to 1.5\,\AA) and the interstitial region (beyond
 1.5\,\AA). These boundaries can instead be set for each atom as multiples of
-its covalent radius. \rev{All results in this work, including the property
+its covalent radius. All results in this work, including the property
 models, use the fixed boundaries. They put every material on the same length
 scale, so that the larger cores of heavy atoms show up in the descriptors
 instead of being scaled away; \texttt{pydemi sweep} shows how the descriptors
-change when the boundaries are moved (Section~\ref{sec:software}).} \rev{The 18 site descriptors, which are computed for each atom, need the cell to be
+change when the boundaries are moved (Section~\ref{sec:software}). The 18 site descriptors, which are computed for each atom, need the cell to be
 divided into atomic regions. All results in this work use the default, which
 gives each grid point to its nearest nucleus. A power diagram, which uses the
 covalent radii to give larger atoms larger regions, and the fuzzy cells of
 Becke~\cite{becke1988}, which share the points between neighbouring atoms
 smoothly, are offered as alternatives; Section~S2 of the Supporting Information
-shows how the site descriptors change with them.}
+shows how the site descriptors change with them.
 
-Each descriptor is a short Python function that takes the
-density object and returns one number. It is added to a single list of all
-descriptors (the registry) together with a record that describes it: its name, its domain
-(bonding, structural or heterogeneity), the cached quantities it needs, its
-units, the range of values it can take, its formula and references, and the
-cases in which it is undefined, each with the constant returned instead.
-
-\rev{This list is the source from which everything else is built. The
-descriptors always appear in the order in which they were added to it, so the
-columns of the output are the same in every run. The catalogue of names, units,
-ranges, formulas and undefined cases is generated from the list, and so are the
-invariance tests of Section~\ref{sec:descriptors}.}
-
-Throughout this work, pydemi is applied to the charge densities of 6,059
-inorganic crystals of 87 elements from our earlier study~\cite{kumar2026},
-computed with VASP~\cite{kresse1996} and the PBE functional~\cite{perdew1996}
-for structures taken from the Materials Project; the structures and the DFT
-settings are described there. \rev{In brief, the calculations used PAW
-potentials~\cite{blochl1994,kresse1999}, a plane-wave cutoff of 500\,eV and a
-$k$-point spacing of 0.1\,\AA$^{-1}$, and each density comes from a final
-calculation with the tetrahedron method (Section~S7 of the Supporting
-Information).} The set contains elemental solids, intermetallic
-compounds and compounds of metals with non-metals (borides, carbides, hydrides,
+Each descriptor is a short Python function that takes the density object and
+returns one number. All descriptors are kept in a single list, the registry,
+together with a record of each: its name, domain, units, range of values,
+formula and references, the cached quantities it needs, and the cases in which
+it is undefined, with the value returned instead. Everything else is built from
+this list: the columns of the output, which always appear in the same order, the
+descriptor catalogue and the invariance tests of Section~\ref{sec:descriptors}.
+In this work, the descriptors are computed for the charge densities of 6,059
+inorganic crystals of 87 elements from our earlier study~\cite{kumar2026}. The
+structures were taken from the Materials Project, and the densities were
+computed with VASP~\cite{kresse1996}, the PBE functional~\cite{perdew1996} and
+PAW potentials~\cite{blochl1994,kresse1999}, with a plane-wave cutoff of
+500\,eV, a $k$-point spacing of 0.1\,\AA$^{-1}$ and a final calculation with the
+tetrahedron method. The set contains elemental solids, intermetallic compounds
+and compounds of metals with non-metals (borides, carbides, hydrides,
 pnictides, chalcogenides, oxides and halides), so metallic, covalent and ionic
-bonding are all well represented. The number of structures in each class is
-given in Section~S7 of the Supporting Information.
+bonding are all represented. Section~S7 of the Supporting Information gives the
+DFT settings in full and the number of structures in each class.
 
 % ==========================================================================
 \section{The descriptors}
