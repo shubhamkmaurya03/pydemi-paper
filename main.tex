@@ -736,21 +736,20 @@ and check the descriptors against a DFT density once one is computed.
 \section{Software}
 \label{sec:software}
 
-pydemi is written in Python ($\geq$3.10) and is installed with
+pydemi is written in Python and is installed with
 \texttt{pip install pydemi}. This core installation reads \texttt{CHGCAR}
 files, computes the 55 descriptors of one structure or of many, and gives their
-catalogue, from Python and from the command line; it needs only
+catalogue, from Python and from the command line. \rev{It is built on}
 NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and
 pandas~\cite{mckinney2010}. \texttt{CHGCAR} is the density format of VASP; a
 density from another code, such as Quantum ESPRESSO, can be read once
 it is written in this format, but the density and property models were trained
-on VASP densities. Three optional extras add the rest: the graphical
-interface (\texttt{pydemi[gui]}: Streamlit and Plotly, with LightGBM for the property
-view), the density
+on VASP densities. Three optional extras add the graphical
+interface (\texttt{pydemi[gui]}), the density
 model that predicts a density from a crystal structure
-(\texttt{pydemi[ml]}: PyTorch~\cite{paszke2019}, e3nn~\cite{geiger2022} and
-ASE~\cite{larsen2017}) and the property models (\texttt{pydemi[props]}:
-LightGBM~\cite{ke2017}). A descriptor reference with the definition, formula,
+(\texttt{pydemi[ml]}, \rev{built on} PyTorch~\cite{paszke2019}, e3nn~\cite{geiger2022} and
+ASE~\cite{larsen2017}) and the property models (\texttt{pydemi[props]},
+\rev{with} LightGBM~\cite{ke2017}). A descriptor reference with the definition, formula,
 physical meaning and limits of every descriptor is included and is opened from
 the interface.
 
