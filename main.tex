@@ -614,26 +614,29 @@ deviation.}
 
 \subsection{Results and interpretation}
 Table~\ref{tab:compare} compares the descriptors with models trained on the
-same structures and the same split~\cite{kumar2026}: a compressed representation
-of the full density grid, compositional (Magpie) features, both together, and
-the graph neural networks CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}.
-For this comparison our models were also trained on \rev{two properties whose
-data differ from ours. The first is the energy relative to the free atoms, which
-Ref.~\cite{kumar2026} computed from the DFT energies of the dataset and of the
-free atoms. It is not the Materials Project cohesive energy of
-Table~\ref{tab:properties}, which comes from separate calculations, and the two
-differ by 0.5\,eV/atom on average. The second is the Debye temperature, which
-Ref.~\cite{kumar2026} gives for fewer materials.} For the
-three moduli, the descriptors alone give the highest $R^2$ of all models. For
-the Debye temperature they are above the density and composition models, level
-with MEGNet and behind CGCNN. For the energy relative to the free atoms they are
-well above the density representation alone but below MEGNet and the models
-that use the composition: this energy depends strongly on which elements are
-present, which the composition describes directly.
+same structures, the same split and \rev{the same target values~\cite{kumar2026}.
+These models use} a compressed representation of the full density grid,
+compositional (Magpie) features, both together, and the graph neural networks
+CGCNN~\cite{xie2018} and MEGNet~\cite{chen2019}. \rev{We also trained MatTen,
+an equivariant graph neural network for elastic properties~\cite{wen2024}, on
+the same data (Section~S3 of the Supporting Information). For this comparison,
+our models were trained on the target values of Ref.~\cite{kumar2026}. For the
+three moduli and the Debye temperature these are the Materials Project values of
+Table~\ref{tab:properties}, with the Debye temperature given for fewer
+materials. The energy of Ref.~\cite{kumar2026} is computed relative to the free
+atoms from the DFT energies of the dataset, so it differs from the cohesive
+energy of Table~\ref{tab:properties}, and our models were trained on it
+separately.} For the three moduli, the descriptors alone give the highest $R^2$
+of all models. For the Debye temperature they are above the density and
+composition models, level with MEGNet \rev{and MatTen,} and behind CGCNN. For
+the energy relative to the free atoms they are well above the density
+representation alone but below \rev{MEGNet, MatTen and the models that use the
+composition. This energy} depends strongly on which elements are present, which
+the composition describes directly.
 
 \begin{table}[!tp]
 \centering
-\caption{Test $R^2$ of models trained on the same structures with the same split. All rows \rev{above the line} are from Ref.~\cite{kumar2026}; latent density: compressed representation of the full density grid. $E_{atoms}$: energy relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported.}
+\caption{Test $R^2$ of models trained on the same structures with the same split. \rev{The rows above the line are from Ref.~\cite{kumar2026}, and those below it were trained by us}; latent density: compressed representation of the full density grid. $E_{atoms}$: energy relative to the free atoms; $\Theta_D$: Debye temperature; --: not reported \rev{in Ref.~\cite{kumar2026}}.}
 \label{tab:compare}
 \footnotesize
 \begin{tabular}{@{}lccccc@{}}
@@ -647,6 +650,7 @@ Latent density + Magpie, attention CNN & 0.94 & 0.85 & 0.87 & 0.88 & 0.86 \\
 CGCNN & 0.93 & 0.88 & 0.89 & -- & 0.94 \\
 MEGNet & 0.93 & 0.87 & 0.86 & 0.94 & 0.91 \\
 \midrule
+\rev{MatTen} & \rev{0.93} & \rev{0.84} & \rev{0.88} & \rev{0.99} & \rev{0.91} \\
 pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & 0.86 & 0.91 \\
 \bottomrule
 \end{tabular}
@@ -719,7 +723,7 @@ to come from elsewhere, for example from experiment or from an ML interatomic
 potential, and its errors add to those measured here. Within this limit, the
 descriptors and the properties of a relaxed crystal structure can be obtained
 without computing its density. \rev{We did not test structures relaxed with an ML interatomic
-potential. Graph networks such as CGCNN and MEGNet also predict properties from
+potential. Graph networks such as CGCNN, MEGNet and MatTen also predict properties from
 the structure directly, with similar accuracy (Table~\ref{tab:compare}). The
 route through the predicted density adds what they lack: the prediction rests on
 the same 55 descriptors as for a DFT density, each with a physical meaning, so a

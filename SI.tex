@@ -332,7 +332,12 @@ one distributed with the dataset (Kumar et al., J.\ Chem.\ Inf.\ Model.\ 66,
 were also trained with the same protocol on two columns of that dataset: the
 energy relative to the free atoms, and the Debye temperature of the 4,903
 materials that have one there (equal to the Materials Project value for all of
-them). Elastic data were kept only where $K$ and $G$ lie between 0 and
+them). \rev{For the same comparison we trained MatTen (Wen et al., Digital
+Discovery 3, 869, 2024) with its published code on the same split and target
+values, one model with a scalar output per target, with the Adam optimizer
+(learning rate 0.01, weight decay $10^{-5}$), batches of 32 structures, at most
+300 epochs with early stopping on the validation error (patience 150), and the
+checkpoint with the lowest validation error; it was trained once per target.} Elastic data were kept only where $K$ and $G$ lie between 0 and
 1000\,GPa and agree with these moduli (6,000 materials); $C_{11}$, $C_{12}$ and
 $C_{44}$ only where the smallest eigenvalue of the unrounded stiffness tensor
 exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
