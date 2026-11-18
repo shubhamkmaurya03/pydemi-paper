@@ -121,7 +121,7 @@ $T_{ab}=\sum_k\partial_a\rho_k\partial_b\rho_k/\sum_k|\nabla\rho_k|^2$ (trace 1;
 all $\tfrac13$ for a cubic crystal).
 \item[Gradient fractional anisotropy] (\dn{charge_FA}) [0--1] $\sqrt{3/2}\,\lVert T-\tfrac13I\rVert_F/\lVert T\rVert_F$.
 \item[Shannon entropy] (\dn{shannon_entropy}) $S=-\int\tilde\rho\ln\tilde\rho\,dV-\ln V$ with
-\rev{$\tilde\rho=\rho/Q_\mathrm{tot}$}; zero for a uniform density.
+$\tilde\rho=\rho/Q_\mathrm{tot}$; zero for a uniform density.
 \item[Disequilibrium] (\dn{disequilibrium}) $D=V\int\tilde\rho^{\,2}\,dV$; one for a uniform density.
 \item[LMC complexity] (\dn{LMC_complexity}) $C=De^{S}$.
 \item[Fisher information] (\dn{fisher_information}) [bohr$^{-2}$] $I=\int|\nabla\tilde\rho|^2/\tilde\rho\,dV$.
@@ -146,19 +146,19 @@ the site spread \dn{X_site_std} ($\mathrm{std}_iX^{(i)}$), the site range
 \dn{X_between_element_var} ($\sum_e x_e(\bar X_e-\bar X)^2$), with $x_e$ the site fraction of element $e$;
 the last two add up to $\mathrm{Var}_iX^{(i)}$. The within-element variance is NaN
 (flagged) when no element has two or more atoms in the cell, and the between-element
-variance is zero (flagged) for an elemental crystal. \rev{In 421 structures of the
+variance is zero (flagged) for an elemental crystal. In 421 structures of the
 dataset every element has a single atom in the cell, so their within-element
 variances are NaN. A supercell of such a structure has several equivalent atoms
 of each element and gives zero, so these are the only values that change under
-supercell expansion.}
+supercell expansion.
 
 % ==========================================================================
 \section{Sensitivity and transfer per descriptor}
 \label{si:stability}
 
-\rev{This section gives, for every descriptor, its sensitivity to the numerical
+This section gives, for every descriptor, its sensitivity to the numerical
 choices (Section~3 of the main text) and its transfer to predicted densities
-(Section~4 of the main text).}
+(Section~4 of the main text).
 
 \begin{figure}[htbp]
 \centering
@@ -190,7 +190,7 @@ whereas the power diagram, which gives larger atoms larger cells, reorders them
 density analysis cannot be computed reliably from a \texttt{CHGCAR}. The
 electron localization function and the kinetic, potential and total energy
 densities need the kinetic-energy density, which a \texttt{CHGCAR} does not
-contain; a gradient expansion of the kinetic energy (references in \rev{Section~1}
+contain; a gradient expansion of the kinetic energy (references in Section~1
 of the main text) gives only an approximation, whose third-derivative terms
 changed by 20--25\% with the derivative scheme or the grid. The voxel-averaged
 bond ellipticity $\varepsilon=\lambda_1/\lambda_2-1$ diverges where
@@ -239,31 +239,31 @@ Descriptor & grid 80\% & FD4 & FD2 & power & Becke & $\rho_s$ (ML) & ML error \\
 
 \paragraph{Density model.} The ChargE3Net architecture is used unchanged
 (three interaction layers, $l_{\max}=4$, 4\,\AA{} cutoff; 1.9 million
-parameters). \rev{The error of a predicted density is measured by the normalized
+parameters). The error of a predicted density is measured by the normalized
 mean absolute percentage error,
 $\mathrm{NMAPE}=100\%\times\sum_k|\rho_k^\mathrm{pred}-\rho_k^\mathrm{DFT}|/\sum_k|\rho_k^\mathrm{DFT}|$,
-over the grid points $k$.} The checkpoint shipped with pydemi (8\,MB) was
+over the grid points $k$. The checkpoint shipped with pydemi (8\,MB) was
 fine-tuned from the published Materials Project checkpoint on the densities of
-the dataset (5,152 training, 302 validation and 605 test structures). \rev{The
+the dataset (5,152 training, 302 validation and 605 test structures). The
 Adam optimizer was used with a learning rate of $5\times10^{-4}$, multiplied by
 $0.96^{s/3000}$ after $s$ steps, on batches of 8 structures with the density at
 200 random grid points of each, and the mean absolute error of these values as
 the loss. After each of the 78 passes over the training set (50,232 steps, about
 18 hours on one NVIDIA RTX A5000), the NMAPE was computed on 400 grid points of
 each validation structure, and the checkpoint with the lowest value (step
-47,656) was kept. On 1,000 random grid points of each test structure}, the
+47,656) was kept. On 1,000 random grid points of each test structure, the
 released weights used as they are give a median NMAPE of 32\%, because several
 elements have a different number of valence electrons in the Materials Project
 (Table~\ref{tab:si_paw}); the same network trained from scratch on the dataset
 (200,000 steps) gives 0.78\%, and the fine-tuned model 0.59\%, better than the
-one from scratch for 470 of the 605 structures. \rev{The prediction grid is the
+one from scratch for 470 of the 605 structures. The prediction grid is the
 one VASP chooses for a 500\,eV cutoff with accurate precision, which reproduces
-the grids of all calculations of the dataset.} The predicted density is rescaled
+the grids of all calculations of the dataset. The predicted density is rescaled
 to the valence electron count of the PAW datasets of the training data (87
 elements), and the model, the checkpoint hash and the scale factor are recorded
-with the result. \rev{The copy of the network in pydemi reproduces the
+with the result. The copy of the network in pydemi reproduces the
 predictions of the original ChargE3Net code to $6\times10^{-7}$ of the peak
-density for the structures checked.}
+density for the structures checked.
 
 \paragraph{Accuracy of the predicted densities.} On the full DFT grids of the
 605 test structures, the NMAPE of
@@ -276,7 +276,7 @@ descriptors with $\rho_s\geq0.95$ is 0.53\% (90th percentile 1.2\%) and follows 
 density error (Spearman 0.49; Fig.~\ref{fig:si_ml_structure}); it exceeds 5\%
 only for Ba$_3$N, Li, TiH$_2$, Yb$_2$MgIn and YbPrZn$_2$.
 
-\paragraph{The 11 descriptors with $\rho_s<0.95$.} \rev{They fall into the four
+\paragraph{The 11 descriptors with $\rho_s<0.95$.} They fall into the four
 groups of Section~4 of the main text. The counts of maxima and minima have
 $\rho_s=0.77$ and 0.57 and median errors of 35\% and 38\%. The number and charge
 of non-nuclear maxima have $\rho_s=0.90$ and 0.94 and are zero in both densities
@@ -285,7 +285,7 @@ negative-Laplacian volume fraction, which use second derivatives, have median
 errors of 13\% and 6\%. The five anisotropy measures, namely the three
 eigenvalues and the fractional anisotropy of the tensor of gradient directions
 and the percolation anisotropy, have $R^2\geq0.987$ between the two densities,
-and the median error of the eigenvalues is at most 0.07\%.}
+and the median error of the eigenvalues is at most 0.07\%.
 
 \begin{figure}[p]
 \centering
@@ -324,16 +324,16 @@ actinides.}
 
 \paragraph{Targets.} All targets were downloaded from the Materials Project
 (database version 2026.04.13) for the same material identifiers; the moduli are
-the Voigt--Reuss--Hill averages. \rev{Elastic data were kept only where $K$ and
+the Voigt--Reuss--Hill averages. Elastic data were kept only where $K$ and
 $G$ lie between 0 and 1000\,GPa and equal the values in the dataset of Kumar
 et~al.\ (J.\ Chem.\ Inf.\ Model.\ 66, 7113, 2026) to 0.001\,GPa (6,000
 materials), and $C_{11}$, $C_{12}$ and $C_{44}$ only where the stiffness tensor
-is mechanically stable, with its smallest eigenvalue above 1\,GPa (5,791).} The
+is mechanically stable, with its smallest eigenvalue above 1\,GPa (5,791). The
 direct-gap label is defined only for materials with a gap (1,836).
 
-\paragraph{\rev{Comparison of Table~4.}} For the comparison of Table~4 of the main text, LightGBM models
-were also trained with the same protocol on two columns of \rev{the dataset of
-Kumar et~al.}: the
+\paragraph{Comparison of Table~4.} For the comparison of Table~4 of the main text, LightGBM models
+were also trained with the same protocol on two columns of the dataset of
+Kumar et~al.: the
 energy relative to the free atoms, and the Debye temperature of the 4,903
 materials that have one there (equal to the Materials Project value for all of
 them). For the same comparison we trained MatTen (Wen et~al., Digital
@@ -377,9 +377,9 @@ materials (2,000 resamples) on the predictions averaged over the five seeds
 
 \begin{table}[htbp]
 \centering
-\caption{\rev{Test MAE and RMSE of LightGBM on the 55 descriptors for the
+\caption{Test MAE and RMSE of LightGBM on the 55 descriptors for the
 regressions, and accuracy for the classifications, mean over five seeds; the
-MAE is given with its standard deviation over the seeds.}}
+MAE is given with its standard deviation over the seeds.}
 \label{tab:si_lgbm}
 \begin{adjustbox}{width=\textwidth}
 \begin{tabular}{llccc}
@@ -486,11 +486,11 @@ Property & 55 descriptors & 37 descriptors & Change & 95\% interval \\
 The property models of Section~5 of the main text were retrained with the same
 protocol (LightGBM on the 55 descriptors, 50 Optuna trials, five seeds) after
 the 605 test structures of the density model had been removed from their
-training and validation sets\rev{, which left} 4,365 structures for training and 546 for
+training and validation sets, which left 4,365 structures for training and 546 for
 validation; the 543 structures of the original test set that are not among the
-605 were set aside. \rev{Table~\ref{tab:si_mlprops} gives the scores of both
+605 were set aside. Table~\ref{tab:si_mlprops} gives the scores of both
 routes on the 605 structures (Fig.~5 of the main text), with the predictions
-averaged over the five seeds.}
+averaged over the five seeds.
 
 The last column gives, for each property, the share of the mean absolute SHAP
 value of the model (DFT descriptors, mean over the five seeds) that falls on the
@@ -528,14 +528,14 @@ Property & $n$ & DFT desc. & ML desc. & DFT desc. & ML desc. & Agreement $R^2$ /
 \section{Automated tests}
 \label{si:tests}
 
-\rev{pydemi 0.3.0 has 353 automated tests (Table~\ref{tab:si_tests}). They run on
+pydemi 0.3.0 has 353 automated tests (Table~\ref{tab:si_tests}). They run on
 Linux, macOS and Windows each time the code changes, and on our computer all of
 them pass in 4 minutes. This section describes the tests that check the
-descriptors themselves.}
+descriptors themselves.
 
 \begin{table}[!htbp]
 \centering
-\caption{\rev{The 353 tests of pydemi 0.3.0 by group.}}
+\caption{The 353 tests of pydemi 0.3.0 by group.}
 \label{tab:si_tests}
 \small
 \begin{adjustbox}{max width=\textwidth}
@@ -543,14 +543,14 @@ descriptors themselves.}
 \toprule
 Group & Tests & What is checked & Tolerance \\
 \midrule
-\rev{Invariance} & \rev{166} & \rev{every descriptor under supercell, translation and rotation} & \rev{$10^{-6}$ rel.} \\
-\rev{Derivatives} & \rev{16} & \rev{spectral and finite-difference gradient, Laplacian and Hessian against analytic values} & \rev{$10^{-10}$--$5\times10^{-3}$} \\
-\rev{Geometry and partitions} & \rev{18} & \rev{nearest atoms against brute force; charge conservation of the partitions} & \rev{$10^{-12}$--$10^{-5}$} \\
-\rev{Closed forms} & \rev{40} & \rev{descriptors of model densities against their exact values} & \rev{$10^{-10}$--5\%} \\
-\rev{Input and batch runs} & \rev{24} & \rev{every \texttt{CHGCAR} layout VASP writes; batch runs with failing files} & \rev{$10^{-10}$} \\
-\rev{Density model} & \rev{13} & \rev{agreement with the original ChargE3Net code; rotation and permutation invariance} & \rev{$10^{-5}$ of $\rho_{\max}$} \\
-\rev{Property models} & \rev{12} & \rev{stored test-set predictions reproduced} & \rev{$10^{-9}$ rel.} \\
-\rev{Graphical interface} & \rev{64} & \rev{every figure reproduces its descriptor} & \rev{$10^{-12}$--$10^{-6}$} \\
+Invariance & 166 & every descriptor under supercell, translation and rotation & $10^{-6}$ rel. \\
+Derivatives & 16 & spectral and finite-difference gradient, Laplacian and Hessian against analytic values & $10^{-10}$--$5\times10^{-3}$ \\
+Geometry and partitions & 18 & nearest atoms against brute force; charge conservation of the partitions & $10^{-12}$--$10^{-5}$ \\
+Closed forms & 40 & descriptors of model densities against their exact values & $10^{-10}$--5\% \\
+Input and batch runs & 24 & every \texttt{CHGCAR} layout VASP writes; batch runs with failing files & $10^{-10}$ \\
+Density model & 13 & agreement with the original ChargE3Net code; rotation and permutation invariance & $10^{-5}$ of $\rho_{\max}$ \\
+Property models & 12 & stored test-set predictions reproduced & $10^{-9}$ rel. \\
+Graphical interface & 64 & every figure reproduces its descriptor & $10^{-12}$--$10^{-6}$ \\
 \midrule
 Total & 353 & & \\
 \bottomrule
@@ -558,14 +558,14 @@ Total & 353 & & \\
 \end{adjustbox}
 \end{table}
 
-\paragraph{\rev{Tolerances.}} \rev{A relative tolerance $\epsilon$ means
+\paragraph{Tolerances.} A relative tolerance $\epsilon$ means
 $|a-b|\le\epsilon\,\max(|a|,|b|)+10^{-12}$; for a field on the grid, the largest
 difference is compared with the largest value. $\epsilon$ is $10^{-9}$ to
 $10^{-12}$ where only round-off can make two results differ, $10^{-6}$ for the
 invariance tests, whose cells are summed in a different order and transformed on
 grids of different size, and $10^{-4}$ to a few per cent where a closed form for a
 continuous density is compared with its value on a grid; these tests also check
-that the error decreases when the grid is refined.}
+that the error decreases when the grid is refined.
 
 \paragraph{Reference densities.} Most library tests use densities whose exact
 values are known: superpositions of normalized Gaussians,
@@ -577,31 +577,31 @@ on fine grids; the Slater functions have the nuclear cusp of a real density.
 Most test cells are triclinic, so that terms that vanish for orthogonal axes are
 exercised.
 
-\paragraph{\rev{Invariance (166).}} \rev{A Fe$_2$O crystal in a triclinic cell
+\paragraph{Invariance (166).} A Fe$_2$O crystal in a triclinic cell
 (three Gaussians on a $20\times21\times22$ grid) is processed as it is, as its
 $2\times2\times2$ supercell, with its origin translated by $(3,7,11)$ voxels and
 rotated by 37$^\circ$ about $(1,2,0.5)$. Each of the 55 descriptors must agree
 under each transformation to $10^{-6}$ (165 tests), and one more test checks
 that the supercell has 8 times the atoms, volume and charge and that the
 rotation preserves the metric. The tests are generated from the list of
-descriptors, so a descriptor added later is tested too.}
+descriptors, so a descriptor added later is tested too.
 
-\paragraph{\rev{Derivatives (16).}} \rev{The spectral gradient, Laplacian and
+\paragraph{Derivatives (16).} The spectral gradient, Laplacian and
 Hessian of a Gaussian superposition are exact to $10^{-10}$ in an orthorhombic
 and a triclinic cell, and finite differences of order 2, 4 and 6 converge at
 their nominal order. A Laplacian built from the diagonal of the metric alone is
 exact for the orthorhombic cell but more than 5\% wrong for the triclinic one,
 which is why the full metric is used. For the Slater density, with its cusp at
 the nucleus, finite differences converge away from the nuclei, whereas the FFT
-Laplacian rings across the cell and does not converge.}
+Laplacian rings across the cell and does not converge.
 
-\paragraph{\rev{Geometry and partitions (18).}} \rev{Nearest-atom distances
+\paragraph{Geometry and partitions (18).} Nearest-atom distances
 agree with a brute-force search over $\pm5$ periodic images to
 $10^{-12}$\,\AA{}, also in an extremely sheared cell in which a fixed
 $3\times3\times3$ supercell misses the nearest image by more than 0.01\,\AA{}.
-All three partitions conserve the charge to $10^{-12}$.}
+All three partitions conserve the charge to $10^{-12}$.
 
-\paragraph{\rev{Closed forms (40).}} \rev{For a single Slater density
+\paragraph{Closed forms (40).} For a single Slater density
 ($\zeta=3$\,\AA$^{-1}$) the charge integrates to 1, $m_1=3/(2\zeta)$ holds to
 $5\times10^{-4}$ and $m_2=3/\zeta^2$ to $1.5\times10^{-3}$, and the non-radial
 gradient share is below $5\times10^{-5}$. Over the whole cell, the share of
@@ -614,16 +614,16 @@ and unit disequilibrium, and a layered density a fractional anisotropy of 1. The
 Hartree potential of a Gaussian matches its closed form to $2\times10^{-3}$, the
 within- and between-element variances add up to the total variance to
 $10^{-12}$, and the bounded ellipticity equals the value from the exact Hessian
-of an anisotropic Gaussian to $10^{-3}$.}
+of an anisotropic Gaussian to $10^{-3}$.
 
-\paragraph{\rev{Other tests.}} \rev{The remaining tests check that the reader
+\paragraph{Other tests.} The remaining tests check that the reader
 gives the same density from every \texttt{CHGCAR} layout VASP writes, including
 spin-polarized, non-collinear and VASP~4 files; that the density model
 reproduces the prediction of the original ChargE3Net code to $10^{-5}$ of the
 maximum density and is invariant to rotating the cell and permuting the atoms;
 that the property models reproduce their stored test-set predictions to
 $10^{-9}$; and that every figure of the graphical interface reproduces the value
-of its descriptor.}
+of its descriptor.
 
 % ==========================================================================
 \section{Dataset and cost of the run}
@@ -644,7 +644,7 @@ algorithm until the residual forces were below $10^{-3}$\,eV\,\AA$^{-1}$, with
 Gaussian smearing and an energy criterion of $10^{-5}$\,eV for the electronic
 self-consistency. The density was then recomputed on the relaxed structure with
 the tetrahedron method with Bl\"ochl corrections, which makes it independent of
-a smearing width \rev{(Kumar et~al.)}. Each run folder holds the \texttt{CHGCAR} of
+a smearing width (Kumar et~al.). Each run folder holds the \texttt{CHGCAR} of
 this last calculation; 4,901 also hold its \texttt{OUTCAR}, which records a
 spin-polarized single-point calculation with one PAW dataset per element and an
 energy criterion of $10^{-6}$\,eV. In 221 of these 4,901 runs (4.5\%, 133 of them
@@ -657,8 +657,8 @@ batch run without a failure, on our computer (two Intel Xeon Gold 6338N processo
 worker processes; the run took 37 minutes. The time per structure has a median of
 3.3\,s and a 95th percentile of 15\,s; added up over the structures, the run
 took 8.4 CPU-hours. The time follows the number of grid points (Spearman
-correlation 0.96) more closely than the number of atoms (0.77). \rev{The table
-below gives the time and peak memory on one core for three files of different size.}
+correlation 0.96) more closely than the number of atoms (0.77). The table
+below gives the time and peak memory on one core for three files of different size.
 
 \begin{center}
 \small
@@ -673,9 +673,9 @@ SnBi$_2$Te$_4$, 350\,MB & $216^3$ & 54\,s & 2.6\,GB \\
 \end{tabular}
 \end{center}
 
-\rev{Predicting a density with ChargE3Net takes about 0.35\,ms per pair of an atom
+Predicting a density with ChargE3Net takes about 0.35\,ms per pair of an atom
 and a grid point within the 4\,\AA{} cutoff on one CPU core; for the $40^3$ grid
-of BeCo (2 million pairs) this is 12 minutes. A GPU makes it much faster.}
+of BeCo (2 million pairs) this is 12 minutes. A GPU makes it much faster.
 
 \paragraph{PAW datasets.} The \texttt{OUTCAR} files of the 4,901 runs
 that have one name one PAW dataset per element, the same for every structure of

@@ -308,9 +308,9 @@ descriptors describe the density of the cell as a whole, and the 18 site
 heterogeneity descriptors describe how much the atoms of one crystal differ
 from each other. Tables~\ref{tab:families} and~\ref{tab:families2} list them
 with a descriptive name, their name in the package and a one-line definition;
-\rev{Section~S1 of the Supporting Information gives the full definitions and
+Section~S1 of the Supporting Information gives the full definitions and
 units, and the reference document of the package also gives the ranges and
-references.} Below, $k$
+references. Below, $k$
 runs over the grid points and $r_k$ is the distance from grid point $k$ to its
 nearest nucleus.
 
@@ -319,9 +319,9 @@ nearest nucleus.
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
 the name used in the package. Core, bond shell and interstitial region
 as defined in Section~\ref{sec:design}. The signed NCI density is given in
-atomic units, as is usual for this quantity. \rev{Formulas
+atomic units, as is usual for this quantity. Formulas
 in Section~S1 of the Supporting Information, ranges and references in the
-reference document of the package.}}
+reference document of the package.}
 \label{tab:families}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -673,10 +673,10 @@ in a few descriptors. Models trained on only the ten most important descriptors
 of each property, chosen on the training set (Fig.~\ref{fig:top10};
 Supporting Information, Table~S4), are almost as accurate as those trained on
 all 55. Their test score is lower by only 0.01 to 0.07
-(Table~\ref{tab:properties}). \rev{Removing the 18 descriptors that correlate
+(Table~\ref{tab:properties}). Removing the 18 descriptors that correlate
 strongly with another one ($|\rho_s|\geq0.90$ on the training set) changes the
 test score by at most 0.01 for every property except the band gap, which loses
-0.02 (Supporting Information, Tables~S5 and S6).}
+0.02 (Supporting Information, Tables~S5 and S6).
 Across all properties, these lists together use 34 of the 55 descriptors, and
 a few of them appear for most properties, led by the mean interstitial density,
 the charge-distance variance and the negative-Laplacian volume fraction (Fig.~\ref{fig:top10}). For most
