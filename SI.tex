@@ -194,7 +194,7 @@ recorded with every result.
 density analysis cannot be computed reliably from a \texttt{CHGCAR}. The
 electron localization function and the kinetic, potential and total energy
 densities need the kinetic-energy density, which a \texttt{CHGCAR} does not
-contain; a gradient expansion of the kinetic energy (references in Section~3
+contain; a gradient expansion of the kinetic energy (references in \rev{Section~1}
 of the main text) gives only an approximation, whose third-derivative terms
 changed by 20--25\% with the derivative scheme or the grid. The voxel-averaged
 bond ellipticity $\varepsilon=\lambda_1/\lambda_2-1$ diverges where
@@ -249,7 +249,7 @@ parameters). The checkpoint shipped with pydemi (8\,MB) was fine-tuned for
 the dataset (5,152 training, 302 validation and 605 test structures). On
 1,000 grid points of each test structure, the released weights used as they
 are give a median NMAPE (defined below) of 32\%, because several elements have
-a different number of valence electrons in the Materials Project; the same
+a different number of valence electrons in the Materials Project \rev{(Table~\ref{tab:si_paw})}; the same
 network trained from scratch on the dataset (200,000 steps) gives 0.78\%, and
 the fine-tuned model 0.59\%, better than the one from scratch for 470 of the
 605 structures. The
@@ -280,14 +280,16 @@ descriptors with $\rho_s\geq0.95$ is 0.53\% (90th percentile 1.2\%) and follows 
 density error (Spearman 0.49; Fig.~\ref{fig:si_ml_structure}); it exceeds 5\%
 only for Ba$_3$N, Li, TiH$_2$, Yb$_2$MgIn and YbPrZn$_2$.
 
-\paragraph{The 11 descriptors with $\rho_s<0.95$.} The counts of maxima and
-minima have $\rho_s=0.77$ and 0.57 and median errors of 35\% and 38\%; the
-number and charge of non-nuclear maxima have $\rho_s=0.90$ and 0.94 and are zero
-in both densities for 61\% of the structures. The bounded ellipticity and the
-negative-Laplacian volume fraction have median errors of 13\% and 6\%. The
-anisotropy-tensor eigenvalues, the fractional anisotropy and the percolation
-anisotropy have $R^2\geq0.987$ between the two densities, and the median error
-of the eigenvalues is at most 0.07\%.
+\paragraph{The 11 descriptors with $\rho_s<0.95$.} \rev{They fall into the four
+groups of Section~4 of the main text. The counts of maxima and minima have
+$\rho_s=0.77$ and 0.57 and median errors of 35\% and 38\%. The number and charge
+of non-nuclear maxima have $\rho_s=0.90$ and 0.94 and are zero in both densities
+for 61\% of the structures. The bounded bond ellipticity and the
+negative-Laplacian volume fraction, which use second derivatives, have median
+errors of 13\% and 6\%. The five anisotropy measures, namely the three
+eigenvalues and the fractional anisotropy of the tensor of gradient directions
+and the percolation anisotropy, have $R^2\geq0.987$ between the two densities,
+and the median error of the eigenvalues is at most 0.07\%.}
 
 \begin{figure}[p]
 \centering
@@ -326,23 +328,25 @@ actinides.}
 
 \paragraph{Targets.} All targets were downloaded from the Materials Project
 (database version 2026.04.13) for the same material identifiers; the moduli are
-the Voigt--Reuss--Hill averages. The training, validation and test split is the
-one distributed with the dataset (Kumar et al., J.\ Chem.\ Inf.\ Model.\ 66,
-7113, 2026). For the comparison of Table~4 of the main text, LightGBM models
+the Voigt--Reuss--Hill averages. Elastic data were kept only where $K$ and $G$ lie between 0 and
+1000\,GPa and agree with these moduli (6,000 materials); $C_{11}$, $C_{12}$ and
+$C_{44}$ only where the smallest eigenvalue of the unrounded stiffness tensor
+exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
+a gap (1,836). The training, validation and test split is the
+one distributed with the dataset (Kumar et~al., J.\ Chem.\ Inf.\ Model.\ 66,
+7113, 2026), \rev{a random split into} 4,847 training,
+606 validation and 606 test structures.
+
+\paragraph{\rev{Comparison of Table~4.}} For the comparison of Table~4 of the main text, LightGBM models
 were also trained with the same protocol on two columns of that dataset: the
 energy relative to the free atoms, and the Debye temperature of the 4,903
 materials that have one there (equal to the Materials Project value for all of
-them). For the same comparison we trained MatTen (Wen et al., Digital
+them). For the same comparison we trained MatTen (Wen et~al., Digital
 Discovery 3, 869, 2024) with its published code on the same split and target
 values, one model with a scalar output per target, with the Adam optimizer
 (learning rate 0.01, weight decay $10^{-5}$), batches of 32 structures, at most
 300 epochs with early stopping on the validation error (patience 150), and the
-checkpoint with the lowest validation error; it was trained once per target. Elastic data were kept only where $K$ and $G$ lie between 0 and
-1000\,GPa and agree with these moduli (6,000 materials); $C_{11}$, $C_{12}$ and
-$C_{44}$ only where the smallest eigenvalue of the unrounded stiffness tensor
-exceeds 1\,GPa (5,791). The direct-gap label is defined only for materials with
-a gap (1,836). The structures were split once at random into 4,847 training,
-606 validation and 606 test structures.
+checkpoint with the lowest validation error.
 
 \paragraph{Training.} Inputs: the 55 descriptors of pydemi. Ridge and logistic regression: median
 imputation, standardization, penalty from $10^{-3}$ to $10^{3}$ (13 values)
@@ -851,7 +855,7 @@ descriptors and properties side by side.
 \section{Dataset and cost of the run}
 \label{si:dataset}
 
-\paragraph{Structures.} The dataset of Kumar et al.\ (J.\ Chem.\ Inf.\ Model.\ 66, 7113, 2026)
+\paragraph{Structures.} The dataset of Kumar et~al.\ (J.\ Chem.\ Inf.\ Model.\ 66, 7113, 2026)
 contains 6,059 VASP charge densities of 87 elements, named
 \texttt{<formula>\_<space group>}. Classes are assigned by the anions present,
 first match: 86 elemental solids, 3,195 intermetallics, 354 borides and
@@ -867,7 +871,7 @@ algorithm until the residual forces were below $10^{-3}$\,eV\,\AA$^{-1}$, with
 Gaussian smearing and an energy criterion of $10^{-5}$\,eV for the electronic
 self-consistency. The density was then recomputed on the relaxed structure with
 the tetrahedron method with Bl\"ochl corrections, which makes it independent of
-a smearing width (original study). Each run folder holds the \texttt{CHGCAR} of
+a smearing width \rev{(Kumar et~al.)}. Each run folder holds the \texttt{CHGCAR} of
 this last calculation; 4,901 also hold its \texttt{OUTCAR}, which records a
 spin-polarized single-point calculation with one PAW dataset per element and an
 energy criterion of $10^{-6}$\,eV. In 221 of these 4,901 runs (4.5\%, 133 of them
@@ -922,7 +926,6 @@ with its number of valence electrons, and the dataset of the Materials Project
 input set where it differs.}
 \label{tab:si_paw}
 \footnotesize
-\color{blue}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}llllll@{}}
 \toprule
