@@ -302,7 +302,7 @@ DFT settings in full and the number of structures in each class.
 \section{The descriptors}
 \label{sec:descriptors}
 
-\rev{pydemi computes 55 descriptors in three groups. The 18 bonding descriptors
+pydemi computes 55 descriptors in three groups. The 18 bonding descriptors
 describe the charge around the atoms and in the bonds, the 19 structural
 descriptors describe the density of the cell as a whole, and the 18 site
 heterogeneity descriptors describe how much the atoms of one crystal differ
@@ -311,7 +311,7 @@ with a descriptive name, their name in the package and a one-line definition;
 Section~S1 of the Supporting Information and the reference document of the
 package give the full definitions, units, ranges and references. Below, $k$
 runs over the grid points and $r_k$ is the distance from grid point $k$ to its
-nearest nucleus.}
+nearest nucleus.
 
 \begin{table}[!tp]
 \centering
@@ -393,7 +393,7 @@ No. & Name & Name in pydemi & Definition & Units \\
 \end{adjustbox}
 \end{table}
 
-\rev{The bonding descriptors ask how the charge is arranged around the atoms and in
+The bonding descriptors ask how the charge is arranged around the atoms and in
 the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the shell
 fractions describe how far the charge sits from its nearest nucleus; a large
 interstitial fraction points to delocalized charge between the atoms. The
@@ -426,9 +426,9 @@ atoms is also split into two parts that add up to the total. The
 within-element part comes from differences between atoms of the same element,
 such as the Al atoms of kyanite (Al$_2$SiO$_5$), which sit in four different
 surroundings. The between-element part comes from differences between the
-average Al, Si and O atoms.}
+average Al, Si and O atoms.
 
-\rev{A descriptor should describe the material, not the way it was computed. The
+A descriptor should describe the material, not the way it was computed. The
 density grid is not set by the material. VASP chooses it from the plane-wave
 cutoff, so two calculations of the same compound can give grids of different
 fineness. If a descriptor changed noticeably with the grid, the same material
@@ -450,15 +450,15 @@ although their values hardly change. The last, the number of non-nuclear
 maxima, is a count, and a coarser grid can miss a small maximum.
 Section~S2 of the Supporting Information lists the change of every descriptor,
 and also how much the descriptors change when the derivatives are computed by
-finite differences or when the atomic regions are defined differently.}
+finite differences or when the atomic regions are defined differently.
 
-\rev{A descriptor must also stay the same when the crystal is described
+A descriptor must also stay the same when the crystal is described
 differently. The same material can be written down in many ways, and a
 descriptor must not depend on the choice. We tested this on the density of a
 low-symmetry crystal from our dataset, triclinic CuAuF$_5$. Every descriptor
 was computed four times, for the original cell, for a cell eight times larger,
 for the cell with its origin moved by a whole number of grid steps, and for the
-cell rotated in space. All four gave the same value for all 55 descriptors.}
+cell rotated in space. All four gave the same value for all 55 descriptors.
 
 % ==========================================================================
 \section{Descriptors from a predicted density}
