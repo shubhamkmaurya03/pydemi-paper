@@ -428,68 +428,29 @@ such as the Al atoms of kyanite (Al$_2$SiO$_5$), which sit in four different
 surroundings. The between-element part comes from differences between the
 average Al, Si and O atoms.}
 
-A descriptor should describe the material, not the way it was computed. Three
-things in a pydemi calculation are not set by the material. The first is the
-density grid: VASP chooses it from the plane-wave cutoff, so two calculations
-of the same compound can give grids of different fineness. The second is the
-way the derivatives of the density, which several descriptors need, are
-computed. The third is the division of the cell into atomic regions, which
-the site descriptors use. If a descriptor changed noticeably when the grid or
-the derivative method changed, the
-same material could get different values, and a model trained on the
-descriptor would learn this noise instead of the material.
-
-We therefore tested the first two on structures of our dataset. For the grid, we recomputed the descriptors on a
-coarser grid with about half as many points, as a calculation with a lower
-cutoff would give. For the derivatives, we replaced the default method, which
-takes exact derivatives from the Fourier transform of the density, by the
-simpler finite differences.
-
-Most descriptors are insensitive to both choices. On the coarser grid, the
-median change is below 1\% for 46 of the 55. Most of the few that change more
-have values close to zero for many materials, {\color{red}for example the percolation
-anisotropy of a cubic crystal, or the spread between atoms of an element that are all
-equivalent by symmetry. For such values, a tiny absolute change is a large
-percentage. The number of non-nuclear maxima changes for a different reason: a
-coarser grid can miss small maxima. Fourth-order finite differences give the
-same values as the default method to better than 1\%, which confirms that the
-default is accurate. Second-order ones change some descriptors by up to
-16\%, so pydemi does not use them by default.}
-
-{\color{red}The PAW potentials are a further choice that the material does not set. A
-\texttt{CHGCAR} holds the valence pseudo-density, so a potential that treats more
-electrons as valence, such as the semicore $3p$ electrons of Ti\_pv, adds charge
-near the nuclei and changes the descriptors that measure it. To see how large this
-effect is, we computed the descriptors from the densities that the Materials
-Project distributes for 80 of our test materials. The Materials Project computed
-them with its own structures, cutoffs and $k$-points. For the 40 materials whose
-elements all have the same potentials as in our dataset, the densities agree
-well: 44 of the 55 descriptors still rank the materials in the same order
-($\rho_s\geq0.95$), and the median change of a descriptor is about 1.5\%. The
-property models score almost the same from both densities. For the 40 materials
-with at least one other potential, the median change is about 20\%. Only four
-descriptors keep the ranking: the mean interstitial density, the mean and spread
-of the bond-midpoint density and one percolation level. The bulk modulus, which
-rests mainly on the interstitial density, is predicted as well as before. The
-scores for the sound velocities, the Debye temperature and the energies, however,
-drop by 0.15 to 0.25. The descriptors are therefore set by the material for a
-given set of potentials. The property models of pydemi should be used with
-densities computed with the potentials of our dataset (Table~S9 of the
-Supporting Information). A
-\texttt{CHGCAR} does not record its potentials, so pydemi cannot check this.
-Section~S8 of the Supporting Information gives the comparison for every
-descriptor and property.}
-
-{\color{red}The site descriptors also depend on the division into atomic regions. This is
-not an error: a different division describes different regions, so pydemi
-treats it as a setting and records it with every result. Section~S2 of the
-Supporting Information gives the change of every descriptor for every choice,
-including the division into atomic regions. It also explains which quantities
-of density analysis pydemi does not offer because a \texttt{CHGCAR} cannot
-support them reliably. An example is the electron localization function, which needs
-more than the density~\cite{abramov1997,tsirelson2002}. Finally, it explains what the PAW
-pseudo-density~\cite{blochl1994,kresse1999} stored in a \texttt{CHGCAR} means
-for the descriptors.}
+\rev{A descriptor should describe the material, not the way it was computed. The
+density grid is not set by the material. VASP chooses it from the plane-wave
+cutoff, so two calculations of the same compound can give grids of different
+fineness. If a descriptor changed noticeably with the grid, the same material
+could get different values, and a model trained on the descriptor would learn
+this noise instead of the material. We therefore recomputed the descriptors of
+structures of our dataset on a coarser grid with about half as many points, as
+a calculation with a lower cutoff would give. The median change is below 1\%
+for 46 of the 55 descriptors. This is expected, because the density in a
+\texttt{CHGCAR} is smooth and most descriptors are averages over the whole
+cell, which a coarser grid reproduces almost exactly. Of the nine that change
+more, four change by less than 2\%. For four others, the percolation anisotropy
+and the three within-element variances, the value of the descriptor itself is
+close to zero for many materials. In a cubic crystal the density connects
+equally well along the three cell vectors, so the percolation anisotropy is
+nearly zero, and when all atoms of an element are equivalent by symmetry, their
+within-element variance is nearly zero. A very small change in such a value is
+a large percentage of it, so these descriptors show large relative changes
+although their values hardly change. The last, the number of non-nuclear
+maxima, is a count, and a coarser grid can miss a small maximum.
+Section~S2 of the Supporting Information lists the change of every descriptor,
+and also how much the descriptors change when the derivatives are computed by
+finite differences or when the atomic regions are defined differently.}
 
 A descriptor must also be computed correctly. pydemi is therefore checked by
 automated tests that run every time the code changes. Each test computes
@@ -881,9 +842,7 @@ value largely set by the material rather than by the grid or the numerical
 method. It computed every descriptor for every crystal of our dataset without a
 failure. Automated tests compare the descriptors with exact values for model
 densities and check that every descriptor stays the same when the cell is
-enlarged, moved or rotated. \rev{The descriptors do depend
-on the PAW potentials of the calculation, so the property models should be applied
-to densities computed with the potentials of our dataset.} It can be used
+enlarged, moved or rotated. It can be used
 as a Python library, from the command line or through a local graphical
 interface. The included ChargE3Net model gives most of the same descriptors from
 a crystal structure alone. The exceptions are the counts of density maxima and
