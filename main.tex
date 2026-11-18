@@ -328,24 +328,24 @@ Supporting Information, Section~S1.}
 \toprule
 No. & Name & Name in pydemi & Definition & Units \\
 \midrule
-1 & Mean charge distance & \texttt{m1} & mean distance of the charge from its nearest nucleus & \AA \\
-2 & Mean squared charge distance & \texttt{m2} & mean squared distance of the charge from its nearest nucleus & \AA$^2$ \\
-3 & Charge-distance variance & \texttt{sigma\_r2} & variance of the distance of the charge from its nearest nucleus & \AA$^2$ \\
-4 & Core charge fraction & \texttt{f\_core} & fraction of the charge in the core & -- \\
-5 & Bond-shell charge fraction & \texttt{f\_bond} & fraction of the charge in the bond shell & -- \\
-6 & Interstitial charge fraction & \texttt{f\_int} & fraction of the charge in the interstitial region & -- \\
-7 & Non-radial gradient share & \texttt{zeta} & non-radial share of the density gradient (0 for spherical atoms) & -- \\
-8 & Negative-Laplacian volume fraction & \texttt{lnf} & volume fraction with negative Laplacian (charge concentrated) & -- \\
-9 & Negative-Laplacian charge fraction & \texttt{lnf\_charge\_weighted} & fraction of the charge where the Laplacian is negative & -- \\
-10 & Valence Laplacian concentration & \texttt{lap\_concentration\_valence} & share of the absolute Laplacian outside the cores where it is negative & -- \\
-11 & Mean bond ellipticity & \texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity in the bond shell: 0 cylindrical, 1 flat & -- \\
-12 & Non-covalent interaction (NCI) volume fraction & \texttt{f\_NCI} & volume fraction of the NCI region (low density, low gradient) & -- \\
-13 & Attractive NCI fraction & \texttt{NCI\_attractive} & fraction of the NCI region that is attractive & -- \\
-14 & Signed NCI density & \texttt{sign\_lambda2\_rho\_mean} & signed mean density of the NCI region (negative where attractive) & e\,bohr$^{-3}$ \\
-15 & Site potential spread & \texttt{V\_spread} & standard deviation of the electronic Hartree potential at the atoms & eV \\
-16 & Interstitial potential minimum & \texttt{V\_int\_min} & lowest electronic Hartree potential in the interstitial region & eV \\
-17 & Mean bond-midpoint density & \texttt{rho\_mid\_mean} & mean density at the bond midpoints & e\,\AA$^{-3}$ \\
-18 & Bond-midpoint density spread & \texttt{rho\_mid\_std} & standard deviation of the density at the bond midpoints & e\,\AA$^{-3}$ \\
+1. & Mean charge distance & \texttt{m1} & mean distance of the charge from its nearest nucleus & \AA \\
+2. & Mean squared charge distance & \texttt{m2} & mean squared distance of the charge from its nearest nucleus & \AA$^2$ \\
+3. & Charge-distance variance & \texttt{sigma\_r2} & variance of the distance of the charge from its nearest nucleus & \AA$^2$ \\
+4. & Core charge fraction & \texttt{f\_core} & fraction of the charge in the core & -- \\
+5. & Bond-shell charge fraction & \texttt{f\_bond} & fraction of the charge in the bond shell & -- \\
+6. & Interstitial charge fraction & \texttt{f\_int} & fraction of the charge in the interstitial region & -- \\
+7. & Non-radial gradient share & \texttt{zeta} & non-radial share of the density gradient (0 for spherical atoms) & -- \\
+8. & Negative-Laplacian volume fraction & \texttt{lnf} & volume fraction with negative Laplacian (charge concentrated) & -- \\
+9. & Negative-Laplacian charge fraction & \texttt{lnf\_charge\_weighted} & fraction of the charge where the Laplacian is negative & -- \\
+10. & Valence Laplacian concentration & \texttt{lap\_concentration\_valence} & share of the absolute Laplacian outside the cores where it is negative & -- \\
+11. & Mean bond ellipticity & \texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity in the bond shell: 0 cylindrical, 1 flat & -- \\
+12. & Non-covalent interaction (NCI) volume fraction & \texttt{f\_NCI} & volume fraction of the NCI region (low density, low gradient) & -- \\
+13. & Attractive NCI fraction & \texttt{NCI\_attractive} & fraction of the NCI region that is attractive & -- \\
+14. & Signed NCI density & \texttt{sign\_lambda2\_rho\_mean} & signed mean density of the NCI region (negative where attractive) & e\,bohr$^{-3}$ \\
+15. & Site potential spread & \texttt{V\_spread} & standard deviation of the electronic Hartree potential at the atoms & eV \\
+16. & Interstitial potential minimum & \texttt{V\_int\_min} & lowest electronic Hartree potential in the interstitial region & eV \\
+17. & Mean bond-midpoint density & \texttt{rho\_mid\_mean} & mean density at the bond midpoints & e\,\AA$^{-3}$ \\
+18. & Bond-midpoint density spread & \texttt{rho\_mid\_std} & standard deviation of the density at the bond midpoints & e\,\AA$^{-3}$ \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
@@ -365,29 +365,29 @@ number of electrons. The Fisher information is given in atomic units.}
 No. & Name & Name in pydemi & Definition & Units \\
 \midrule
 \multicolumn{5}{@{}l}{\emph{Structural (19)}} \\
-19--21 & Percolation densities & \texttt{rho\_perc\_a}, \texttt{\_b}, \texttt{\_c} & highest density level still connected across the cell along $\mathbf a$, $\mathbf b$, $\mathbf c$ & e\,\AA$^{-3}$ \\
-22 & Percolation anisotropy & \texttt{perc\_anisotropy} & spread of the three percolation levels relative to their mean & -- \\
-23 & Density maxima per volume & \texttt{n\_max} & number of local maxima of the density per volume & \AA$^{-3}$ \\
-24 & Density minima per volume & \texttt{n\_min} & number of local minima of the density per volume & \AA$^{-3}$ \\
-25 & Non-nuclear maxima per volume & \texttt{n\_NNM} & density maxima farther than 0.8\,\AA{} from every nucleus, per volume & \AA$^{-3}$ \\
-26 & Non-nuclear-maximum charge & \texttt{Q\_NNM} & fraction of the charge in the basins of these non-nuclear maxima & -- \\
-27 & Minimum density & \texttt{rho\_min} & lowest density in the cell & e\,\AA$^{-3}$ \\
-28 & Relative minimum density & \texttt{rho\_min\_ratio} & lowest density divided by the mean density & -- \\
-29 & Mean interstitial density & \texttt{rho\_int\_mean} & mean density in the interstitial region & e\,\AA$^{-3}$ \\
-30--32 & Gradient-direction eigenvalues & \texttt{T\_eigenvalues\_t1}, \texttt{\_t2}, \texttt{\_t3} & eigenvalues of the tensor of gradient directions; all $\tfrac13$ if isotropic & -- \\
-33 & Gradient fractional anisotropy & \texttt{charge\_FA} & fractional anisotropy of that tensor: 0 isotropic, 1 along one axis & -- \\
-34 & Shannon entropy & \texttt{shannon\_entropy} & Shannon entropy of the density shape; 0 for a uniform density & -- \\
-35 & Disequilibrium & \texttt{disequilibrium} & mean squared density shape; 1 for a uniform density & -- \\
-36 & LMC complexity & \texttt{LMC\_complexity} & statistical complexity of L\'opez-Ruiz, Mancini and Calbet~\cite{lopezruiz1995} & -- \\
-37 & Fisher information & \texttt{fisher\_information} & Fisher information of the density shape; large for steep changes & bohr$^{-2}$ \\
+19--21. & Percolation densities & \texttt{rho\_perc\_a}, \texttt{\_b}, \texttt{\_c} & highest density level still connected across the cell along $\mathbf a$, $\mathbf b$, $\mathbf c$ & e\,\AA$^{-3}$ \\
+22. & Percolation anisotropy & \texttt{perc\_anisotropy} & spread of the three percolation levels relative to their mean & -- \\
+23. & Density maxima per volume & \texttt{n\_max} & number of local maxima of the density per volume & \AA$^{-3}$ \\
+24. & Density minima per volume & \texttt{n\_min} & number of local minima of the density per volume & \AA$^{-3}$ \\
+25. & Non-nuclear maxima per volume & \texttt{n\_NNM} & density maxima farther than 0.8\,\AA{} from every nucleus, per volume & \AA$^{-3}$ \\
+26. & Non-nuclear-maximum charge & \texttt{Q\_NNM} & fraction of the charge in the basins of these non-nuclear maxima & -- \\
+27. & Minimum density & \texttt{rho\_min} & lowest density in the cell & e\,\AA$^{-3}$ \\
+28. & Relative minimum density & \texttt{rho\_min\_ratio} & lowest density divided by the mean density & -- \\
+29. & Mean interstitial density & \texttt{rho\_int\_mean} & mean density in the interstitial region & e\,\AA$^{-3}$ \\
+30--32. & Gradient-direction eigenvalues & \texttt{T\_eigenvalues\_t1}, \texttt{\_t2}, \texttt{\_t3} & eigenvalues of the tensor of gradient directions; all $\tfrac13$ if isotropic & -- \\
+33. & Gradient fractional anisotropy & \texttt{charge\_FA} & fractional anisotropy of that tensor: 0 isotropic, 1 along one axis & -- \\
+34. & Shannon entropy & \texttt{shannon\_entropy} & Shannon entropy of the density shape; 0 for a uniform density & -- \\
+35. & Disequilibrium & \texttt{disequilibrium} & mean squared density shape; 1 for a uniform density & -- \\
+36. & LMC complexity & \texttt{LMC\_complexity} & statistical complexity of L\'opez-Ruiz, Mancini and Calbet~\cite{lopezruiz1995} & -- \\
+37. & Fisher information & \texttt{fisher\_information} & Fisher information of the density shape; large for steep changes & bohr$^{-2}$ \\
 \addlinespace
 \multicolumn{5}{@{}l}{\emph{Site heterogeneity (18): \texttt{X} = \texttt{m1}, \texttt{f\_bond} or \texttt{zeta} of each atom, from its own atomic region}} \\
-38--40 & Site spread of \texttt{X} & \texttt{X\_site\_std} & standard deviation of \texttt{X} over the atoms & as \texttt{X} \\
-41--43 & Site range of \texttt{X} & \texttt{X\_site\_range} & largest minus smallest \texttt{X} over the atoms & as \texttt{X} \\
-44--46 & Site maximum of \texttt{X} & \texttt{X\_site\_max} & largest \texttt{X} over the atoms & as \texttt{X} \\
-47--49 & Site minimum of \texttt{X} & \texttt{X\_site\_min} & smallest \texttt{X} over the atoms & as \texttt{X} \\
-50--52 & Within-element variance of \texttt{X} & \texttt{X\_within\_element\_var} & part of the variance of \texttt{X} from differences within each element & \texttt{X}$^2$ \\
-53--55 & Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & part of the variance of \texttt{X} from differences between elements & \texttt{X}$^2$ \\
+38--40. & Site spread of \texttt{X} & \texttt{X\_site\_std} & standard deviation of \texttt{X} over the atoms & as \texttt{X} \\
+41--43. & Site range of \texttt{X} & \texttt{X\_site\_range} & largest minus smallest \texttt{X} over the atoms & as \texttt{X} \\
+44--46. & Site maximum of \texttt{X} & \texttt{X\_site\_max} & largest \texttt{X} over the atoms & as \texttt{X} \\
+47--49. & Site minimum of \texttt{X} & \texttt{X\_site\_min} & smallest \texttt{X} over the atoms & as \texttt{X} \\
+50--52. & Within-element variance of \texttt{X} & \texttt{X\_within\_element\_var} & part of the variance of \texttt{X} from differences within each element & \texttt{X}$^2$ \\
+53--55. & Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & part of the variance of \texttt{X} from differences between elements & \texttt{X}$^2$ \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
