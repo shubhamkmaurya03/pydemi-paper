@@ -389,32 +389,41 @@ Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & par
 \end{adjustbox}
 \end{table}
 
-The bonding descriptors ask how the charge is arranged around the atoms and in
+\rev{The bonding descriptors ask how the charge is arranged around the atoms and in
 the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the shell
 fractions describe how far the charge sits from its nearest nucleus; a large
 interstitial fraction points to delocalized charge between the atoms. The
-non-radial gradient share, the part of the density gradient that does not
-point towards or away from the nearest nucleus, vanishes for spherical, non-overlapping atoms and grows as charge is pulled off
-the radial direction. The Laplacian descriptors locate where charge is
-concentrated ($\nabla^2\rho<0$). The share of $|\nabla^2\rho|$ that lies where
-$\nabla^2\rho<0$ is computed only outside the cores: over {\color{red}the whole cell
-$\nabla^2\rho$ integrates to zero, so this share would be $\tfrac12$ for every
-crystal.} {\color{red}The bounded ellipticity distinguishes
-cylindrical from flattened charge in the bond shell,} and the non-covalent interaction (NCI) descriptors
-pick out the low-density, low-gradient regions of weak
-interactions~\cite{johnson2010}. The structural descriptors treat the density of
-the whole cell. \rev{They measure} how well {\color{red}it connects (percolation levels, detected by a
-union--find over periodic images)}, its maxima, minima and non-nuclear maxima,
-its lowest density, its directionality and its information content. {\color{red}The heterogeneity descriptors turn per-atom values of $m_1$, $f_{bond}$ and $\zeta$ into
-statistics over the atoms, including the decomposition
-$\text{Var}_iX=\sum_e x_e\text{Var}_{i\in e}X+\sum_e x_e(\bar X_e-\bar X)^2$
-into within- and between-element parts, where $x_e$ is the fraction of the atoms
-that belong to element $e$; the decomposition is exact, as in a one-way analysis of variance.}
-Every descriptor is invariant under supercell expansion, rotation and
-translation of the crystal by whole grid steps, {\color{red}except the within-element
-variances of a cell in which every element has a single atom: they are undefined, while a supercell of the same crystal gives zero.
-This affects 421 of the 6,059 materials of our dataset, and the property models
-of Section~\ref{sec:properties} treat these values as missing}.
+non-radial gradient share $\zeta$, the part of the density gradient that does
+not point towards or away from the nearest nucleus, vanishes for spherical,
+non-overlapping atoms and grows as charge is pulled off the radial direction.
+The Laplacian descriptors locate where charge is concentrated
+($\nabla^2\rho<0$). One of them is the share of $|\nabla^2\rho|$ that lies
+where $\nabla^2\rho<0$. It is computed only outside the atomic cores: because
+the cell is periodic, the positive and negative parts of $\nabla^2\rho$ cancel
+exactly over the whole cell, and the share would be $\tfrac12$ for every
+crystal. The bounded bond ellipticity describes the shape of the charge across
+a bond, from 0 when it is round (cylindrical) to close to 1 when it is
+flattened, and unlike the usual ellipticity it cannot become infinite. The
+non-covalent interaction (NCI) descriptors pick out the low-density,
+low-gradient regions of weak interactions~\cite{johnson2010}. The structural
+descriptors treat the density of the whole cell. The percolation level along
+each cell vector is the highest density at which the region of higher density
+still forms an unbroken path through the crystal in that direction; it is high
+for metals and close to zero for ionic solids. The other structural
+descriptors count the maxima, minima and non-nuclear maxima of the density and
+measure its lowest value, its directionality and its information content. The
+site heterogeneity descriptors measure how much the atoms of one crystal
+differ. Each atom is given $m_1$, $f_{bond}$ and $\zeta$ from its own atomic
+region, and their spread, range, maximum and minimum over the atoms are
+reported. The variance is also split into two parts that add up to the total:
+differences between atoms of the same element, for example two Si sites with
+different surroundings, and differences between elements, such as Si against
+O. Every descriptor is unchanged by supercell expansion, rotation and
+translation by whole grid steps, with one exception. The within-element part
+needs two atoms of the same element: in the primitive cell of MgO, with one Mg
+and one O, it is undefined, while a supercell of MgO gives zero. This applies
+to 421 of the 6,059 materials of our dataset, and the property models of
+Section~\ref{sec:properties} treat these values as missing.}
 
 A descriptor should describe the material, not the way it was computed. Three
 things in a pydemi calculation are not set by the material. The first is the
