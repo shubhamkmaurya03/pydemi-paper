@@ -467,7 +467,7 @@ cell rotated in space. All four gave the same value for all 55 descriptors.}
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
 electron density of a crystal from its atomic structure alone. Its authors
 released the network together with weights trained on the charge densities of
-the Materials Project~\cite{shen2022}. \rev{For several elements, the Materials
+the Materials Project~\cite{shen2022}. For several elements, the Materials
 Project calculations used a different PAW potential than our dataset, and
 therefore count a different number of electrons as valence electrons. With the
 released weights, the predicted densities differ strongly from our DFT
@@ -484,7 +484,7 @@ VASP itself would choose for that cell with a 500\,eV energy cutoff, and scales
 it so that it holds exactly the valence electrons of the atoms in the cell. The
 result has the same form as a \texttt{CHGCAR} written by a DFT calculation, so
 all 55 descriptors are computed from it in the same way, with no change to the
-analysis.} Its cost grows with the number of atoms and grid points, and a GPU is
+analysis. Its cost grows with the number of atoms and grid points, and a GPU is
 used when one is available. Technical details are given in Section~S2 of the Supporting Information.
 
 \begin{figure}[htbp]
@@ -494,20 +494,20 @@ used when one is available. Technical details are given in Section~S2 of the Sup
 structures of the density model, computed from the DFT and from the ChargE3Net
 density, grouped by domain. (a) Spearman rank correlation $\rho_s$ between the two
 sets of values (axis from 0.8 to 1; the three descriptors below 0.8 are marked
-with their value; dotted lines at 0.95 and 0.99). (b) \rev{Median relative difference}
-$|a-b|/\max(|a|,|b|)$ over the structures (logarithmic axis; \rev{no bar} where both values
+with their value; dotted lines at 0.95 and 0.99). (b) Median relative difference
+$|a-b|/\max(|a|,|b|)$ over the structures (logarithmic axis; no bar where both values
 are zero for most structures, as for the non-nuclear maxima). Colours: green
 $\rho_s\geq0.99$, orange $0.95\leq\rho_s<0.99$, red $\rho_s<0.95$. Parity plots of every
 descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
-The predicted densities are close to the DFT ones. \rev{For half of the 605
+The predicted densities are close to the DFT ones. For half of the 605
 test structures, the difference between the predicted and the DFT density, taken
 point by point and added up over the whole grid, is below 0.6\% of the total
-charge.} It
+charge. It
 is somewhat larger for crystals with lanthanides or actinides. The question for
-pydemi is whether such small differences change the descriptors. \rev{We
+pydemi is whether such small differences change the descriptors. We
 therefore computed each descriptor from both densities for the 605 test
 materials and compared the two sets of values in two ways. First, we checked
 whether the descriptor sorts the materials in the same order from both
@@ -516,28 +516,28 @@ orders are identical and becomes smaller as more materials change places. This
 matters because a property model learns how a property changes from one material
 to another, and a descriptor that mixes up the order of the materials would
 mislead it. Second, we measured how much the values themselves differ (median
-relative difference, Fig.~\ref{fig:ml}b).} For 44 of the 55 descriptors, $\rho_s$
+relative difference, Fig.~\ref{fig:ml}b). For 44 of the 55 descriptors, $\rho_s$
 is at least 0.95, and for 37 of them at least 0.99, and most of them change by
-less than 1\%. \rev{These 44 are all 18 heterogeneity descriptors, 16 of the 18
-bonding descriptors and 10 of the 19 structural descriptors (Fig.~\ref{fig:ml}a).} The other 11 fall into \rev{four} groups, each with a
+less than 1\%. These 44 are all 18 heterogeneity descriptors, 16 of the 18
+bonding descriptors and 10 of the 19 structural descriptors (Fig.~\ref{fig:ml}a). The other 11 fall into four groups, each with a
 clear reason. The counts of maxima and minima of the density change because the
 prediction adds or removes tiny bumps in flat regions far from the atoms,
-without changing the density noticeably. \rev{The} number and charge of non-nuclear
+without changing the density noticeably. The number and charge of non-nuclear
 maxima are zero in both densities for most structures, so their ranking is
 decided by a few materials. The bounded bond ellipticity and the volume
 fraction of negative Laplacian use second derivatives of the density in
 low-density regions, and derivatives magnify the small errors of the
-prediction. \rev{The last group are five anisotropy measures, namely the three eigenvalues and the
+prediction. The last group are five anisotropy measures, namely the three eigenvalues and the
 fractional anisotropy of the tensor of gradient directions, and the percolation
 anisotropy. They are predicted accurately, but many materials share almost the
 same value (every cubic crystal, for instance, is isotropic), so tiny
 differences reorder them. Several of these values are close to zero, so their
 relative error in Fig.~\ref{fig:ml}b looks large although the absolute
-difference is small.} When
+difference is small. When
 the density is predicted, the 44 can therefore be used as they are, and the
-other 11 with care. \rev{For these 11, the value from a predicted density
+other 11 with care. For these 11, the value from a predicted density
 should not be used to rank or compare individual materials; where a DFT
-density exists, its value should be used instead.}
+density exists, its value should be used instead.
 
 % ==========================================================================
 \section{Property prediction}
