@@ -507,19 +507,19 @@ test structures, the difference between the predicted and the DFT density, taken
 point by point and added up over the whole grid, is below 0.6\% of the total
 charge.} It
 is somewhat larger for crystals with lanthanides or actinides. The question for
-pydemi is whether such small differences change the descriptors. \rev{A property
-model does not need the exact value of a descriptor. It needs the descriptor to
-keep the materials in the same order, so that a material with a larger value from
-the DFT density also has a larger value from the predicted density. We therefore
-computed each descriptor from both densities, sorted the 605 test materials by
-each of the two sets of values, and compared the two orders with the Spearman
-rank correlation $\rho_s$. It is 1 when the two orders are identical and becomes
-smaller as more materials change places.} For 44 of the 55 descriptors, $\rho_s$
+pydemi is whether such small differences change the descriptors. \rev{We
+therefore computed each descriptor from both densities for the 605 test
+materials and compared the two sets of values in two ways. First, we checked
+whether the descriptor sorts the materials in the same order from both
+densities, using the Spearman rank correlation $\rho_s$, which is 1 when the two
+orders are identical and becomes smaller as more materials change places. This
+matters because a property model learns how a property changes from one material
+to another, and a descriptor that mixes up the order of the materials would
+mislead it. Second, we measured how much the values themselves differ (median
+relative difference, Fig.~\ref{fig:ml}b).} For 44 of the 55 descriptors, $\rho_s$
 is at least 0.95, and for 37 of them at least 0.99, and most of them change by
 less than 1\%. \rev{These 44 are all 18 heterogeneity descriptors, 16 of the 18
-bonding descriptors and 10 of the 19 structural descriptors, among them the
-percolation densities and the information measures (Fig.~\ref{fig:ml}a shows
-each descriptor).} The other 11 fall into three groups, each with a
+bonding descriptors and 10 of the 19 structural descriptors (Fig.~\ref{fig:ml}a).} The other 11 fall into three groups, each with a
 clear reason. The counts of maxima and minima of the density change because the
 prediction adds or removes tiny bumps in flat regions far from the atoms,
 without changing the density noticeably. \rev{The} number and charge of non-nuclear
@@ -537,14 +537,7 @@ difference is small.} When
 the density is predicted, the 44 can therefore be used as they are, and the
 other 11 with care. \rev{For these 11, the value from a predicted density
 should not be used to rank or compare individual materials; where a DFT
-density exists, its value should be used instead. The property models still use
-all 55, and Section~\ref{sec:properties} measures what this costs.} The Compare view of the graphical
-interface (Section~\ref{sec:software}) shows, for a given \texttt{CHGCAR}, the
-descriptors of the DFT and of the predicted density side by side, together with
-the transfer of each descriptor. Only five of the test structures have a
-median error over the 44 descriptors above 5\% (Supporting Information, Fig.~S4). Like the
-DFT path, which uses the total density of a \texttt{CHGCAR}, the model predicts
-the total density only, so neither path provides magnetic descriptors.
+density exists, its value should be used instead.}
 
 % ==========================================================================
 \section{Property prediction}
