@@ -281,8 +281,8 @@ shows how the site descriptors change with them.
 
 Each descriptor is a short Python function that takes the density object and
 returns one number. All descriptors are kept in a single list, the registry,
-together with a record of each: its name, domain, units, range of values,
-formula and references, the cached quantities it needs, and the cases in which
+together with a record of each: its name, domain, units, range of values and
+references, the cached quantities it needs, and the cases in which
 it is undefined, with the value returned instead. Everything else is built from
 this list: the columns of the output, which always appear in the same order, the
 descriptor catalogue and the invariance tests of Section~\ref{sec:descriptors}.
@@ -393,11 +393,8 @@ The bonding descriptors ask how the charge is arranged around the atoms and in
 the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the shell
 fractions describe how far the charge sits from its nearest nucleus; a large
 interstitial fraction points to delocalized charge between the atoms. The
-non-radial gradient share
-\begin{equation}
-\zeta = 1-\frac{\sum_k|\nabla\rho_k\cdot\hat{\mathbf u}_k|}{\sum_k|\nabla\rho_k|}
-\end{equation}
-vanishes for spherical, non-overlapping atoms and grows as charge is pulled off
+non-radial gradient share, the part of the density gradient that does not
+point towards or away from the nearest nucleus, vanishes for spherical, non-overlapping atoms and grows as charge is pulled off
 the radial direction. The Laplacian descriptors locate where charge is
 concentrated ($\nabla^2\rho<0$). The share of $|\nabla^2\rho|$ that lies where
 $\nabla^2\rho<0$ is computed only outside the cores: over {\color{red}the whole cell
