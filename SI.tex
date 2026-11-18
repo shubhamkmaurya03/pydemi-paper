@@ -563,8 +563,8 @@ file whose density is predicted.}
 
 The test suite of pydemi 0.3.0 consists of \rev{353} tests in 21 files under
 \texttt{tests/} of the repository (Table~\ref{tab:si_tests}). They run with
-\texttt{pytest} after \texttt{pip install "pydemi[gui,ml]"}; on a Linux
-workstation with every optional dependency and the dataset available, all \rev{353}
+\texttt{pytest} after \texttt{pip install "pydemi[gui,ml]"}; on \rev{our computer}
+with every optional dependency and the dataset available, all \rev{353}
 pass, none skipped, in 4 minutes.
 
 \begin{table}[!htbp]
@@ -876,7 +876,7 @@ iterations before reaching the energy criterion; these densities are kept. The
 1,158 runs without an \texttt{OUTCAR} are assumed to follow the same protocol.
 
 \paragraph{Cost.} The descriptors of all structures were computed in one
-batch run without a failure, on an Intel Xeon Gold 6338N workstation with 16
+batch run without a failure, on \rev{our computer (two Intel Xeon Gold 6338N processors)} with 16
 worker processes; the run took 37 minutes. The time per structure has a median of
 3.3\,s and a 95th percentile of 15\,s; added up over the structures, the run
 took 8.4 CPU-hours. The time follows the number of grid points (Spearman
