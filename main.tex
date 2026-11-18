@@ -467,21 +467,25 @@ cell rotated in space. All four gave the same value for all 55 descriptors.}
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
 electron density of a crystal from its atomic structure alone. Its authors
 released the network together with weights trained on the charge densities of
-the Materials Project~\cite{shen2022}. These weights cannot be used for our
-dataset as they are: for several elements the Materials Project used different
-PAW potentials, and hence a different number of valence electrons, so its
-predictions differ strongly from our DFT densities. We therefore started from
-the released weights and continued the training on the densities of our dataset
-(fine-tuning), with 5,152 structures for training, 302 for validation and 605
-for testing. \rev{This} gave a lower error than training the same network from
-scratch on our data. The fine-tuned model is \rev{the one} included in pydemi.
-\rev{pydemi writes its prediction on the same grid and with the same number of
-valence electrons as a VASP \texttt{CHGCAR}, so every descriptor is computed
-from it exactly as from a DFT density. The model covers 87 elements, every
-element from hydrogen to plutonium except Kr, Xe, Po, At, Rn, Fr and Ra.} Its
-cost grows with the number of atoms and grid points, and a GPU is used when one
-is available.
-Technical details are given in Section~S2 of the Supporting Information.
+the Materials Project~\cite{shen2022}. \rev{For several elements, the Materials
+Project calculations used a different PAW potential than our dataset, and
+therefore count a different number of electrons as valence electrons. With the
+released weights, the predicted densities differ strongly from our DFT
+densities. We took the released network as the starting point and trained it
+further on the densities of our dataset (fine-tuning), with 5,152 structures for
+training, 302 for validation and 605 for testing. This gave a lower error than
+the same network trained from scratch on our data alone (Section~S2 of the
+Supporting Information). The fine-tuned model is included in pydemi and covers
+87 elements, every element from hydrogen to plutonium except Kr, Xe, Po, At, Rn,
+Fr and Ra.
+
+Given only a crystal structure, pydemi predicts the density on the grid that
+VASP itself would choose for that cell with a 500\,eV energy cutoff, and scales
+it so that it holds exactly the valence electrons of the atoms in the cell. The
+result has the same form as a \texttt{CHGCAR} written by a DFT calculation, so
+all 55 descriptors are computed from it in the same way, with no change to the
+analysis.} Its cost grows with the number of atoms and grid points, and a GPU is
+used when one is available. Technical details are given in Section~S2 of the Supporting Information.
 
 \begin{figure}[htbp]
 \centering
@@ -498,9 +502,10 @@ descriptor are given in Figs.~S2 and S3 of the Supporting Information.}
 \label{fig:ml}
 \end{figure}
 
-The predicted densities are close to the DFT ones. \rev{For a typical test
-structure, the difference between the predicted and the DFT density, taken point
-by point and added up over the whole grid, is only 0.6\% of the total charge.} It
+The predicted densities are close to the DFT ones. \rev{For half of the 605
+test structures, the difference between the predicted and the DFT density, taken
+point by point and added up over the whole grid, is below 0.6\% of the total
+charge.} It
 is somewhat larger for crystals with lanthanides or actinides. The question for
 pydemi is whether such small differences change the descriptors. \rev{A property
 model does not need the exact value of a descriptor. It needs the descriptor to
