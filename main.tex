@@ -613,14 +613,14 @@ deviation.}
 \end{figure}
 
 \subsection{Results and interpretation}
-\rev{With the descriptors alone, LightGBM predicts every regression property
+With the descriptors alone, LightGBM predicts every regression property
 except the refractive index with a test $R^2$ between 0.85 and 0.95
 (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}). The refractive index,
 which has the fewest materials, reaches 0.76. Metallicity is classified with a
 ROC-AUC of 0.98 and the direct gap with 0.79.
 
 To place these scores, we compared the descriptors with the models of Kumar et~al.~\cite{kumar2026}, which were trained on the same structures with the same
-split (Table~\ref{tab:compare}). These models use} a compressed representation of the full density grid,
+split (Table~\ref{tab:compare}). These models use a compressed representation of the full density grid,
 compositional (Magpie) features, both together, and the graph neural network MEGNet~\cite{chen2019}. We also trained MatTen,
 an equivariant graph neural network for elastic properties~\cite{wen2024}, on
 the same data (Section~S3 of the Supporting Information). For this comparison,
@@ -715,19 +715,22 @@ descriptors that a predicted density reproduces less well
 model, but about a fifth in the models of the sound velocities and the Debye
 temperature. Two properties are weak by both routes. Whether a gap is direct is
 predicted with an ROC-AUC of 0.73 from the DFT density and 0.74 from the
-predicted one. The refractive index has a low $R^2$ (0.17 and 0.18) only because
-of three materials with very large DFT values (14 to 24), while the other 128 lie
-between 1.4 and 5.5. Without these three, the $R^2$ is 0.84 from the DFT density
-and 0.78 from the predicted one. All values are given in
+predicted one. For the refractive index, the $R^2$ is 0.84 from the DFT density and 0.78 from
+the predicted one for 128 of the 131 test materials. The other three,
+InAgTe$_2$, LiVRh$_2$ and NaNiN, have DFT refractive indices of 14 to 24, far
+above the 1.4 to 5.5 of the rest. Such large values are rare in the training
+data (12 of 990 materials), and both routes predict values between 2 and 6 for
+these three. With them included, the $R^2$ drops to 0.17 and 0.18
+(Fig.~\ref{fig:mlprops}). All values are given in
 Section~S4 and Table~S7 of the Supporting Information.
 
 The test structures were relaxed with DFT. Given such a structure, pydemi
 obtains the descriptors and the properties without computing the density.
-\rev{Unlike graph networks, which predict a property directly from the
+Unlike graph networks, which predict a property directly from the
 structure, this route passes through the same 55 descriptors as for a DFT
 density, each with a physical meaning. A user can therefore see which feature of
 the bonding drives a prediction, compare the material with those of the dataset,
-and check the descriptors against a DFT density once one is computed.}
+and check the descriptors against a DFT density once one is computed.
 
 % ==========================================================================
 \section{Software}
