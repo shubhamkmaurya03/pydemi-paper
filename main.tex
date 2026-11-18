@@ -295,7 +295,7 @@ PAW potentials~\cite{blochl1994,kresse1999}, with a plane-wave cutoff of
 tetrahedron method. The set contains elemental solids, intermetallic compounds
 and compounds of metals with non-metals (borides, carbides, hydrides,
 pnictides, chalcogenides, oxides and halides), so metallic, covalent and ionic
-bonding are all represented. Section~S7 of the Supporting Information gives the
+bonding are all represented. Section~S6 of the Supporting Information gives the
 DFT settings in full and the number of structures in each class.
 
 % ==========================================================================
@@ -308,8 +308,9 @@ descriptors describe the density of the cell as a whole, and the 18 site
 heterogeneity descriptors describe how much the atoms of one crystal differ
 from each other. Tables~\ref{tab:families} and~\ref{tab:families2} list them
 with a descriptive name, their name in the package and a one-line definition;
-Section~S1 of the Supporting Information and the reference document of the
-package give the full definitions, units, ranges and references. Below, $k$
+\rev{Section~S1 of the Supporting Information gives the full definitions and
+units, and the reference document of the package also gives the ranges and
+references.} Below, $k$
 runs over the grid points and $r_k$ is the distance from grid point $k$ to its
 nearest nucleus.
 
@@ -318,8 +319,9 @@ nearest nucleus.
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
 the name used in the package. Core, bond shell and interstitial region
 as defined in Section~\ref{sec:design}. The signed NCI density is given in
-atomic units, as is usual for this quantity. Formulas, ranges and references:
-Supporting Information, Section~S1.}
+atomic units, as is usual for this quantity. \rev{Formulas
+in Section~S1 of the Supporting Information, ranges and references in the
+reference document of the package.}}
 \label{tab:families}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -677,7 +679,7 @@ test score by at most 0.01 for every property except the band gap, which loses
 0.02 (Supporting Information, Tables~S5 and S6).}
 Across all properties, these lists together use 34 of the 55 descriptors, and
 a few of them appear for most properties, led by the mean interstitial density,
-the charge-distance variance and the negative-Laplacian volume fraction (Supporting Information, Fig.~S6). For most
+the charge-distance variance and the negative-Laplacian volume fraction (Fig.~\ref{fig:top10}). For most
 properties, eight or nine of these ten descriptors are among the 44 that a
 predicted density reproduces well (Section~\ref{sec:ml}). The property models
 should therefore work almost as well with a predicted density, and the next
@@ -773,7 +775,7 @@ descriptors of one structure took 3.3\,s in the median, and those of the whole
 dataset took 37 minutes with 16 structures computed in parallel. The
 time depends mainly on the size of the density grid, not on the number of
 atoms. Even the largest \texttt{CHGCAR} of the dataset (350\,MB) took 54\,s
-and 2.6\,GB of memory, so a laptop is enough (Section~S7 of the
+and 2.6\,GB of memory, so a laptop is enough (Section~S6 of the
 Supporting Information).
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
@@ -781,7 +783,7 @@ the browser (Fig.~\ref{fig:gui}). An input panel on the left opens a \texttt{CHG
 predicted in the background, with its progress shown and the option to cancel.
 Below it are a summary of the structure and the grid and the choice of how the cell is divided between the atoms
 (Section~\ref{sec:design}). The main area has five views. The structure view shows the cell with
-density slices through any lattice plane \rev{(Fig.~S7 of the Supporting Information)}. The descriptor view lists the
+density slices through any lattice plane. The descriptor view lists the
 descriptors by the names of Tables~\ref{tab:families} and~\ref{tab:families2}
 in a searchable table, each with its formula and a figure of the
 quantity it is computed from, and the plot view steps through these figures one
@@ -805,7 +807,7 @@ one structure with the output of the original ChargE3Net code. The property mode
 are tested by comparing their predictions with those saved when the models were
 trained. The interface is tested by checking that each figure is drawn from the
 same numbers that give its descriptor. The tests run automatically on Linux, macOS
-and Windows each time the code changes, and Section~S6 of the Supporting
+and Windows each time the code changes, and Section~S5 of the Supporting
 Information lists all 353 of them.
 
 \begin{figure}[htbp]
