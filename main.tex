@@ -826,20 +826,23 @@ failure. Automated tests compare the descriptors with exact values for model
 densities and check that every descriptor stays the same when the cell is
 enlarged, moved or rotated. It can be used
 as a Python library, from the command line or through a local graphical
-interface. The included ChargE3Net model gives most of the same descriptors from
-a crystal structure alone. The exceptions are the counts of density maxima and
-minima, quantities built from second derivatives in low-density regions, and
-descriptors whose values cluster.
+interface. The included ChargE3Net model gives the descriptors from a crystal
+structure alone. For 44 of the 55, the predicted density sorts the materials in
+the same order as the DFT density ($\rho_s \geq 0.95$). The other 11 are the
+counts of density maxima and minima, the non-nuclear maxima, two descriptors
+built from second derivatives in low-density regions, and five anisotropy
+measures whose values cluster.
 
 Used alone, the descriptors predict 17 elastic, thermal, energetic,
 electronic and optical properties. SHAP values show which descriptors drive
 each prediction, and ten descriptors per property are almost as good as all of
-them. On \rev{DFT-relaxed} structures that neither model had seen, properties predicted from
+them. On the same structures, they predict the three elastic moduli more
+accurately than models built on the full density, on composition or on graph
+neural networks. On DFT-relaxed structures that neither model had seen, properties predicted from
 ML-predicted densities are nearly as accurate as those from DFT densities, and
 the small losses come from the descriptors that transfer less well. pydemi can
 therefore predict the properties of a relaxed crystal structure without
-computing its density\rev{; whether this holds for structures relaxed with an ML
-interatomic potential remains to be tested}.
+computing its density.
 
 \section*{Code and data availability}
 The source code, the tests, the descriptor reference and the scripts that train the property models are available at
