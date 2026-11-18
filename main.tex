@@ -544,8 +544,8 @@ density exists, its value should be used instead.
 \label{sec:properties}
 
 \subsection{Data and protocol}
-We used the descriptors to predict 17 properties of the materials of the dataset.
-\rev{All 17 were downloaded from the Materials Project~\cite{jain2013}
+We used the descriptors to predict 17 properties of the materials of the dataset,
+\rev{all downloaded from the Materials Project~\cite{jain2013}
 (database version 2026.04.13). They are the bulk, shear and Young's moduli;} the
 elastic constants $C_{11}$, $C_{12}$ and $C_{44}$~\cite{dejong2015}; the Debye
 temperature, the \rev{two} sound velocities and the minimum thermal conductivities
@@ -566,9 +566,9 @@ descriptors the models rely on, we used SHAP values~\cite{lundberg2020}, which
 split each prediction into the contributions of the individual descriptors. We
 also retrained every model on only the ten most important descriptors of its
 property, chosen on the training set. All details are given in
-Section~S3 of the Supporting Information. LightGBM was the most accurate of the
-three models for every property except the direct gap, where the random forest
-was better by 0.001 (Supporting Information, Table~S3), and its test scores are
+Section~S3 of the Supporting Information. \rev{LightGBM was the most accurate of the
+three models for 16 properties and as accurate as the random forest for the
+direct gap (Supporting Information, Table~S3). Its test scores are}
 given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 
 \begin{figure}[!t]
