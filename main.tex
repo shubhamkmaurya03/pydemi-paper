@@ -302,20 +302,23 @@ DFT settings in full and the number of structures in each class.
 \section{The descriptors}
 \label{sec:descriptors}
 
-Tables~\ref{tab:families} and~\ref{tab:families2} give each descriptor a
-descriptive name, its name in the package and a one-line definition; the full
-definitions, units, ranges, references and fallback values are given in
-Section~S1 of the Supporting Information and in the reference document of the
-package. In what follows $k$ runs over the grid points,
-$i(k)$ is the nearest nucleus of grid point $k$, $r_k$ its distance and
-$\hat{\mathbf u}_k$ the unit vector from that nucleus to the grid point.
+\rev{pydemi computes 55 descriptors in three groups. The 18 bonding descriptors
+describe the charge around the atoms and in the bonds, the 19 structural
+descriptors describe the density of the cell as a whole, and the 18 site
+heterogeneity descriptors describe how much the atoms of one crystal differ
+from each other. Tables~\ref{tab:families} and~\ref{tab:families2} list them
+with a descriptive name, their name in the package and a one-line definition;
+Section~S1 of the Supporting Information and the reference document of the
+package give the full definitions, units, ranges and references. Below, $k$
+runs over the grid points and $r_k$ is the distance from grid point $k$ to its
+nearest nucleus.}
 
 \begin{table}[!tp]
 \centering
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
 the name used in the package. Core, bond shell and interstitial region
 as defined in Section~\ref{sec:design}. The signed NCI density is given in
-atomic units, as is usual for this quantity. Formulas, ranges, references and fallback values:
+atomic units, as is usual for this quantity. Formulas, ranges and references:
 Supporting Information, Section~S1.}
 \label{tab:families}
 \footnotesize
@@ -393,15 +396,17 @@ Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & par
 the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the shell
 fractions describe how far the charge sits from its nearest nucleus; a large
 interstitial fraction points to delocalized charge between the atoms. The
-non-radial gradient share $\zeta$, the part of the density gradient that does
-not point towards or away from the nearest nucleus, vanishes for spherical,
-non-overlapping atoms and grows as charge is pulled off the radial direction.
+non-radial gradient share $\zeta$ is zero for spherical, non-overlapping atoms
+and grows as the charge around the atoms becomes less spherical, for example
+when it is drawn into bonds.
 The Laplacian descriptors locate where charge is concentrated
-($\nabla^2\rho<0$). One of them is the share of $|\nabla^2\rho|$ that lies
-where $\nabla^2\rho<0$. It is computed only outside the atomic cores: because
-the cell is periodic, the positive and negative parts of $\nabla^2\rho$ cancel
-exactly over the whole cell, and the share would be $\tfrac12$ for every
-crystal. The bounded bond ellipticity describes the shape of the charge across
+($\nabla^2\rho<0$). One of them compares the regions where charge is
+concentrated with those where it is depleted ($\nabla^2\rho>0$). It is the
+fraction of the total $|\nabla^2\rho|$ that comes from points with
+$\nabla^2\rho<0$, and only points outside the atomic cores are counted.
+Because the cell is periodic, the two kinds of region cancel exactly over the
+whole cell, so without this restriction the fraction would be $\tfrac12$ for
+every crystal. The bounded bond ellipticity describes the shape of the charge across
 a bond, from 0 when it is round (cylindrical) to close to 1 when it is
 flattened, and unlike the usual ellipticity it cannot become infinite. The
 non-covalent interaction (NCI) descriptors pick out the low-density,
@@ -415,15 +420,12 @@ measure its lowest value, its directionality and its information content. The
 site heterogeneity descriptors measure how much the atoms of one crystal
 differ. Each atom is given $m_1$, $f_{bond}$ and $\zeta$ from its own atomic
 region, and their spread, range, maximum and minimum over the atoms are
-reported. The variance is also split into two parts that add up to the total:
-differences between atoms of the same element, for example two Si sites with
-different surroundings, and differences between elements, such as Si against
-O. Every descriptor is unchanged by supercell expansion, rotation and
-translation by whole grid steps, with one exception. The within-element part
-needs two atoms of the same element: in the primitive cell of MgO, with one Mg
-and one O, it is undefined, while a supercell of MgO gives zero. This applies
-to 421 of the 6,059 materials of our dataset, and the property models of
-Section~\ref{sec:properties} treat these values as missing.}
+reported. The variance over the
+atoms is also split into two parts that add up to the total. The
+within-element part comes from differences between atoms of the same element,
+such as the Al atoms of kyanite (Al$_2$SiO$_5$), which sit in four different
+surroundings. The between-element part comes from differences between the
+average Al, Si and O atoms.}
 
 A descriptor should describe the material, not the way it was computed. Three
 things in a pydemi calculation are not set by the material. The first is the
@@ -821,8 +823,7 @@ descriptor, \texttt{ml.predict} predicts a density from a crystal structure, and
 line offers the same steps (\texttt{pydemi featurize}, \texttt{batch},
 \texttt{catalogue}, \texttt{predict} and \texttt{gui}), and \texttt{pydemi
 sweep} shows how the descriptors change with the shell boundaries. Batch runs
-write one row per structure, with the descriptors, a flag for every value that
-took its fallback and the run metadata; they continue past structures that fail
+write one row per structure, with the descriptors and the run metadata; they continue past structures that fail
 and record the error.
 
 On our dataset, a batch run computed all descriptors of every structure without
