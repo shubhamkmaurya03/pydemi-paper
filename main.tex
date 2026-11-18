@@ -286,15 +286,14 @@ descriptors (the registry) together with a record that describes it: its name, i
 units, the range of values it can take, its formula and references, and the
 cases in which it is undefined, each with the constant returned instead.
 
-This list is the source from which everything else is built. The
-feature vector always has the descriptors in the order in which they were
-added, so its columns never change between runs. The catalogue of names,
-units, ranges, formulas and undefined cases is read from it, and so are the
-invariance tests of Section~\ref{sec:descriptors}, so a descriptor added later is
-tested without writing a new test. A quantity that grows with the size of the cell, such as a total
-charge or a number of density maxima, is refused when it is added; it has to be divided by the volume, the number of atoms or the total charge
-first, and the supercell test then checks that the result really does not
-change with the cell size.
+\rev{This list is the source from which everything else is built. The
+descriptors always appear in the order in which they were added to it, so the
+columns of the output are the same in every run. The catalogue of names, units,
+ranges, formulas and undefined cases is generated from the list, and so are the
+invariance tests of Section~\ref{sec:descriptors}. A new descriptor is therefore
+documented and tested as soon as it is added, without writing a new test. One
+rule applies to every descriptor: its value must not depend on the size of the
+cell.}
 
 Throughout this work, pydemi is applied to the charge densities of 6,059
 inorganic crystals of 87 elements from our earlier study~\cite{kumar2026},
