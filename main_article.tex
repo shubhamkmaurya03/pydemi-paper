@@ -1,0 +1,31 @@
+% Compact article-format copy of the paper, for printing and reading.
+% It contains no text of its own: it reads main.tex, so the two always stay in sync.
+% Edit main.tex only. Compile this file (in Overleaf: Menu > Main document > main_article.tex).
+\documentclass[11pt,a4paper]{article}
+\usepackage[numbers,square,comma,sort&compress]{natbib}
+\usepackage{authblk}
+\usepackage{comment}
+\usepackage{etoolbox}
+
+% the elsarticle commands that main.tex uses, mapped to the article class
+\makeatletter
+\renewcommand{\documentclass}[2][]{}           % skip the \documentclass line of main.tex
+\newcommand{\biboptions}[1]{}
+\newcommand{\journal}[1]{}
+\newenvironment{frontmatter}{}{}
+\let\affiliation\affil
+\newcommand{\pd@ead}{}
+\newcommand{\ead}[1]{\gdef\pd@ead{#1}}
+\DeclareRobustCommand{\corref}[1]{\thanks{Corresponding author. E-mail: \pd@ead}}
+\newcommand{\cortext}[2][]{}
+\excludecomment{highlights}
+\newenvironment{keyword}{\par\medskip\noindent\textbf{Keywords:} \def\sep{; }}{\par}
+\let\pd@abstract\abstract
+\let\pd@endabstract\endabstract
+\renewenvironment{abstract}{\maketitle\pd@abstract}{\pd@endabstract}
+\makeatother
+
+% compact page: single spacing, no line numbers, 2 cm margins
+\AtBeginDocument{\newgeometry{margin=2cm}\nolinenumbers\hypersetup{hidelinks}}
+
+\input{main.tex}

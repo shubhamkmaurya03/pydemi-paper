@@ -1,7 +1,10 @@
 # pydemi 0.2.0 paper
 
 `main.tex`, `SI.tex` (preamble as supplied; compile with `tectonic main.tex` or pdflatex + bibtex),
-`references.bib`, `figures/`, `tables/` (generated). The 0.1.0 paper is in `old_project/paper/`.
+`references.bib`, `figures/`, `tables/` (generated).
+`main_article.tex` is a compact article-format copy for printing (11 pt, 2 cm margins, single spacing,
+no line numbers, about 19 pages instead of 29). It has no text of its own: it reads `main.tex`, so edit
+`main.tex` only and compile `main_article.tex` (in Overleaf: Menu > Main document). The 0.1.0 paper is in `old_project/paper/`.
 
 Regenerate every number, table and figure (env `pydemi`, `PYTHONPATH=src`, from the repo root):
 
