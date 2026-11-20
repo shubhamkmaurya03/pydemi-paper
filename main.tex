@@ -553,7 +553,9 @@ elastic constants $C_{11}$, $C_{12}$ and $C_{44}$~\cite{dejong2015}; the Debye
 temperature, the two sound velocities and the minimum thermal conductivities
 in the Clarke and Cahill models~\cite{clarke2003,cahill1992}; the formation and
 cohesive energies; the PBE band gap, whether a material is a metal and whether
-its gap is direct; and the refractive index~\cite{petousis2017}. We used
+its gap is direct; and the refractive index\rev{, $n=\sqrt{\varepsilon_\infty}$ from the
+electronic dielectric constant computed with density-functional perturbation
+theory}~\cite{petousis2017}. We used
 the random split that comes with the dataset~\cite{kumar2026}: 4,847 structures
 for training, 606 for validation and 606 for testing. A material without a
 value for a property is left out for that property only.
@@ -618,7 +620,9 @@ With the descriptors alone, LightGBM predicts every regression property
 except the refractive index with a test $R^2$ between 0.85 and 0.95
 (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}). The refractive index,
 which has the fewest materials, reaches 0.76. Metallicity is classified with a
-ROC-AUC of 0.98 and the direct gap with 0.79.
+ROC-AUC of 0.98 \rev{(73\% of the 605 test materials are metals)}. \rev{The direct
+gap, defined only for materials with a gap,} is classified with \rev{a ROC-AUC of}
+0.79 \rev{(48 of the 163 test materials have a direct gap)}.
 
 To place these scores, we compared the descriptors with the models of Kumar et~al.~\cite{kumar2026}, which were trained on the same structures with the same
 split (Table~\ref{tab:compare}). These models use a compressed representation of the full density grid,
