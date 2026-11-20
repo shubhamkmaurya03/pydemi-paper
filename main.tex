@@ -54,7 +54,7 @@
 
 \begin{frontmatter}
 
-\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors and Materials Property Prediction} 
+\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors \rev{for} Materials Property Prediction} 
 
 \author[1]{Shubham K Maurya}
 \author[1]{MD Faiz Akhtar}
@@ -64,11 +64,11 @@
 \affiliation[1]{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, UP 208016, India}
 
 \begin{abstract}
-The electronic charge density from a density-functional theory (DFT) calculation describes how a material is bonded, yet it is rarely used as the input of machine-learning models of material properties. Learned density representations predict properties well but are hard to interpret, while interpretable density analysis treats one structure at a time. We present pydemi, an open-source Python package that turns a VASP \texttt{CHGCAR} file into 55 interpretable descriptors of bonding, structure, and site heterogeneity. Each descriptor is stable with respect to the grid and the numerical method and is documented with its formula, units, and range. From the crystal structure alone, pydemi can also predict the density with an included ChargE3Net model; 44 of the 55 descriptors of the predicted densities rank materials almost exactly as their DFT values do. pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in seconds per structure. Gradient-boosted models on the descriptors alone predict 17 elastic, thermal, energetic, electronic and optical properties, mostly with a test $R^2$ between 0.85 and 0.95. SHAP values show which descriptors drive each prediction, and ten descriptors per property are almost as good as all of them. On DFT-relaxed structures unseen by either model, properties predicted from ML-predicted densities are nearly as accurate as those from DFT densities, so \rev{no DFT calculation} is needed. It runs from Python, the command line, or a graphical interface.
+The electronic charge density from a density-functional theory (DFT) calculation describes how a material is bonded, yet it is rarely used as the input of machine-learning models of material properties. Learned density representations predict properties well but are hard to interpret, while interpretable density analysis treats one structure at a time. We present pydemi, an open-source Python package that turns a VASP \texttt{CHGCAR} file into \rev{54} interpretable descriptors of bonding, structure, and site heterogeneity. \rev{Most descriptors change by less than 1\% with the grid or the derivative method, and each} is documented with its formula, units, and range. From the crystal structure alone, pydemi can also predict the density with an included ChargE3Net model; \rev{42 of the 54} descriptors of the predicted densities rank materials almost exactly as their DFT values do. pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in seconds per structure. Gradient-boosted models on the descriptors alone predict 17 elastic, thermal, energetic, electronic and optical properties, mostly with a test $R^2$ between 0.85 and 0.95. SHAP values show which descriptors drive each prediction, and ten descriptors per property are almost as good as all of them. On DFT-relaxed structures unseen by either model, properties predicted from ML-predicted densities are nearly as accurate as those from DFT densities, so \rev{no DFT calculation} is needed. It runs from Python, the command line, or a graphical interface.
 \end{abstract}
 
 \begin{highlights}
-\item pydemi turns a VASP CHGCAR into 55 interpretable charge-density descriptors
+\item pydemi turns a VASP CHGCAR into \rev{54} interpretable charge-density descriptors
 \item \rev{Most descriptors change by less than 1\% with the grid or derivative method}
 \item Descriptors alone predict 17 properties, mostly with test $R^2$ of 0.85--0.95
 \item SHAP values show which descriptors drive each property prediction
@@ -159,7 +159,7 @@ ideally also for materials without a DFT calculation, and it has to be shown
 that these numbers carry information about the properties. To our knowledge, no
 existing tool provides \rev{interpretable density descriptors in this form}, and pydemi was written to do so.
 
-Pydemi is a Python package that turns a VASP density into 55 descriptors.
+Pydemi is a Python package that turns a VASP density into \rev{54} descriptors.
 They describe how the charge is distributed around each nucleus and between the
 atoms, the shape of the density over the whole cell, and how much the atoms of a
 crystal differ from one another. The package addresses four points. (i) It needs
@@ -218,7 +218,7 @@ derived quantity, such as the gradient, the Hartree potential or the map from
 each grid point to its nearest atom, is stored on the density object
 the first time a descriptor asks for it, and every later descriptor that
 needs it reuses the stored copy. The settings it was computed with (for example
-the derivative method or the shell radii) are stored with it, so a structure
+the derivative method or the \rev{region radii}) are stored with it, so a structure
 processed again with other settings gets new fields and never stale ones.
 
 Several descriptors need the gradient and the Laplacian of the density, and
@@ -263,17 +263,23 @@ point to a different nucleus, and the descriptors would change slightly although
 the material is the same. Pydemi instead chooses the nucleus from its position
 relative to the point, which depends only on where the atoms are, so a cell, its
 supercell and a translated or rotated copy give the same descriptors
-(Section~\ref{sec:descriptors}). The distance to the nearest nucleus also
-divides the cell into three regions: the core (within 0.8\,\AA{} of a
-nucleus), the bond shell (0.8 to 1.5\,\AA) and the interstitial region (beyond
-1.5\,\AA). These boundaries can instead be set for each atom as multiples of
-its covalent radius. All results in this work, including the property
-models, use the fixed boundaries. They put every material on the same length
-scale, so that the larger cores of heavy atoms show up in the descriptors
-instead of being scaled away; \texttt{pydemi sweep} shows how the descriptors
-change when the boundaries are moved (Section~\ref{sec:software}). The 18 site descriptors, which are computed for each atom, need the cell to be
+(Section~\ref{sec:descriptors}). \rev{The covalent radii $R_i$~\cite{cordero2008}
+also divide the cell into three regions. Around every nucleus $i$ lie a core
+sphere of radius $aR_i$ and an outer sphere of radius $bR_i$. A grid point
+belongs to the core if it lies inside any core sphere, to the bond region if
+it lies inside an outer sphere but in no core sphere, and to the interstitial
+region if it lies outside every outer sphere. The factors $a=0.79$ and $b=1.14$
+are the 1st and 99th percentiles of $d/(R_A+R_B)$, the distance of an atom to
+its nearest neighbour divided by the sum of their covalent radii, over all
+atoms of our dataset. The core spheres of two bonded atoms therefore almost
+never overlap, and almost no bond passes through the interstitial region. The
+regions scale with the size of the atoms and need no fixed length;
+\texttt{pydemi sweep} shows how the descriptors change with $a$ and $b$
+(Section~\ref{sec:software}).} The 18 site descriptors, which are computed for each atom, need the cell to be
 divided into atomic regions. All results in this work use the default, which
-gives each grid point to its nearest nucleus. \rev{The} fuzzy cells of
+gives each grid point to its nearest nucleus\rev{; for the bond-region charge
+of each atom, it gives the point to the nucleus with the smallest $r/R_i$, so
+that the bond regions of the atoms add up to that of the cell}. \rev{The} fuzzy cells of
 Becke~\cite{becke1988}, which share the points between neighbouring atoms
 smoothly, are offered as \rev{an alternative. The site descriptors are defined
 for the chosen partition, and} Section~S2 of the Supporting Information
@@ -302,8 +308,8 @@ DFT settings in full and the number of structures in each class.
 \section{The descriptors}
 \label{sec:descriptors}
 
-pydemi computes 55 descriptors in three groups. The 18 bonding descriptors
-describe the charge around the atoms and in the bonds, the 19 structural
+pydemi computes \rev{54} descriptors in three groups. The 18 bonding descriptors
+describe the charge around the atoms and in the bonds, the \rev{18} structural
 descriptors describe the density of the cell as a whole, and the 18 site
 heterogeneity descriptors describe how much the atoms of one crystal differ
 from each other. Tables~\ref{tab:families} and~\ref{tab:families2} list them
@@ -317,7 +323,7 @@ nearest nucleus.
 \begin{table}[!tp]
 \centering
 \caption{The 18 bonding descriptors of pydemi, with a descriptive name and
-the name used in the package. Core, bond shell and interstitial region
+the name used in the package. Core, \rev{bond region} and interstitial region
 as defined in Section~\ref{sec:design}. The signed NCI density is given in
 atomic units, as is usual for this quantity. Formulas
 in Section~S1 of the Supporting Information, ranges and references in the
@@ -334,13 +340,13 @@ No. & Name & Name in pydemi & Definition & Units \\
 2. & Mean squared charge distance & \texttt{m2} & mean squared distance of the charge from its nearest nucleus & \AA$^2$ \\
 3. & Charge-distance variance & \texttt{sigma\_r2} & variance of the distance of the charge from its nearest nucleus & \AA$^2$ \\
 4. & Core charge fraction & \texttt{f\_core} & fraction of the charge in the core & -- \\
-5. & Bond-shell charge fraction & \texttt{f\_bond} & fraction of the charge in the bond shell & -- \\
+5. & \rev{Bond-region} charge fraction & \texttt{f\_bond} & fraction of the charge in the \rev{bond region} & -- \\
 6. & Interstitial charge fraction & \texttt{f\_int} & fraction of the charge in the interstitial region & -- \\
 7. & Non-radial gradient share & \texttt{zeta} & non-radial share of the density gradient (0 for spherical atoms) & -- \\
 8. & Negative-Laplacian volume fraction & \texttt{lnf} & volume fraction with negative Laplacian (charge concentrated) & -- \\
 9. & Negative-Laplacian charge fraction & \texttt{lnf\_charge\_weighted} & fraction of the charge where the Laplacian is negative & -- \\
 10. & Valence Laplacian concentration & \texttt{lap\_concentration\_valence} & share of the absolute Laplacian outside the cores where it is negative & -- \\
-11. & Mean bond ellipticity & \texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity\rev{~\cite{bader1983}} in the bond shell: 0 cylindrical, 1 flat & -- \\
+11. & Mean bond ellipticity & \texttt{ellip\_bond\_bounded\_avg} & mean bounded bond ellipticity\rev{~\cite{bader1983}} in the \rev{bond region}: 0 cylindrical, 1 flat & -- \\
 12. & Non-covalent interaction (NCI) volume fraction & \texttt{f\_NCI} & volume fraction of the NCI region (low density, low gradient) & -- \\
 13. & Attractive NCI fraction & \texttt{NCI\_attractive} & fraction of the NCI region that is attractive & -- \\
 14. & Signed NCI density & \texttt{sign\_lambda2\_rho\_mean} & signed mean density of the NCI region (negative where attractive) & e\,bohr$^{-3}$ \\
@@ -355,9 +361,9 @@ No. & Name & Name in pydemi & Definition & Units \\
 
 \begin{table}[!tp]
 \centering
-\caption{The 19 structural and 18 site-heterogeneity descriptors of pydemi,
+\caption{The \rev{18} structural and 18 site-heterogeneity descriptors of pydemi,
 as in Table~\ref{tab:families}. Density shape: the density divided by the
-number of electrons. The Fisher information is given in atomic units.}
+number of electrons.}
 \label{tab:families2}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -366,12 +372,12 @@ number of electrons. The Fisher information is given in atomic units.}
 \toprule
 No. & Name & Name in pydemi & Definition & Units \\
 \midrule
-\multicolumn{5}{@{}l}{\emph{Structural (19)}} \\
+\multicolumn{5}{@{}l}{\emph{Structural (\rev{18})}} \\
 19--21. & Percolation densities & \texttt{rho\_perc\_a}, \texttt{\_b}, \texttt{\_c} & highest density level still connected across the cell along $\mathbf a$, $\mathbf b$, $\mathbf c$ & e\,\AA$^{-3}$ \\
 22. & Percolation anisotropy & \texttt{perc\_anisotropy} & spread of the three percolation levels relative to their mean & -- \\
 23. & Density maxima per volume & \texttt{n\_max} & number of local maxima of the density per volume & \AA$^{-3}$ \\
 24. & Density minima per volume & \texttt{n\_min} & number of local minima of the density per volume & \AA$^{-3}$ \\
-25. & Non-nuclear maxima per volume & \texttt{n\_NNM} & density maxima farther than 0.8\,\AA{} from every nucleus, per volume & \AA$^{-3}$ \\
+25. & Non-nuclear maxima per volume & \texttt{n\_NNM} & density maxima \rev{outside every core sphere}, per volume & \AA$^{-3}$ \\
 26. & Non-nuclear-maximum charge & \texttt{Q\_NNM} & fraction of the charge in the basins of these non-nuclear maxima & -- \\
 27. & Minimum density & \texttt{rho\_min} & lowest density in the cell & e\,\AA$^{-3}$ \\
 28. & Relative minimum density & \texttt{rho\_min\_ratio} & lowest density divided by the mean density & -- \\
@@ -381,22 +387,21 @@ No. & Name & Name in pydemi & Definition & Units \\
 34. & Shannon entropy & \texttt{shannon\_entropy} & Shannon entropy\rev{~\cite{shannon1948}} of the density shape; 0 for a uniform density & -- \\
 35. & Disequilibrium & \texttt{disequilibrium} & mean squared density shape; 1 for a uniform density & -- \\
 36. & LMC complexity & \texttt{LMC\_complexity} & statistical complexity of L\'opez-Ruiz, Mancini and Calbet~\cite{lopezruiz1995} & -- \\
-37. & Fisher information & \texttt{fisher\_information} & Fisher information\rev{~\cite{fisher1925}} of the density shape; large for steep changes & bohr$^{-2}$ \\
 \addlinespace
 \multicolumn{5}{@{}l}{\emph{Site heterogeneity (18): \texttt{X} = \texttt{m1}, \texttt{f\_bond} or \texttt{zeta} of each atom, from its own atomic region}} \\
-38--40. & Site spread of \texttt{X} & \texttt{X\_site\_std} & standard deviation of \texttt{X} over the atoms & as \texttt{X} \\
-41--43. & Site range of \texttt{X} & \texttt{X\_site\_range} & largest minus smallest \texttt{X} over the atoms & as \texttt{X} \\
-44--46. & Site maximum of \texttt{X} & \texttt{X\_site\_max} & largest \texttt{X} over the atoms & as \texttt{X} \\
-47--49. & Site minimum of \texttt{X} & \texttt{X\_site\_min} & smallest \texttt{X} over the atoms & as \texttt{X} \\
-50--52. & Within-element variance of \texttt{X} & \texttt{X\_within\_element\_var} & part of the variance of \texttt{X} from differences within each element & \texttt{X}$^2$ \\
-53--55. & Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & part of the variance of \texttt{X} from differences between elements & \texttt{X}$^2$ \\
+\rev{37--39}. & Site spread of \texttt{X} & \texttt{X\_site\_std} & standard deviation of \texttt{X} over the atoms & as \texttt{X} \\
+\rev{40--42}. & Site range of \texttt{X} & \texttt{X\_site\_range} & largest minus smallest \texttt{X} over the atoms & as \texttt{X} \\
+\rev{43--45}. & Site maximum of \texttt{X} & \texttt{X\_site\_max} & largest \texttt{X} over the atoms & as \texttt{X} \\
+\rev{46--48}. & Site minimum of \texttt{X} & \texttt{X\_site\_min} & smallest \texttt{X} over the atoms & as \texttt{X} \\
+\rev{49--51}. & Within-element variance of \texttt{X} & \texttt{X\_within\_element\_var} & part of the variance of \texttt{X} from differences within each element & \texttt{X}$^2$ \\
+\rev{52--54}. & Between-element variance of \texttt{X} & \texttt{X\_between\_element\_var} & part of the variance of \texttt{X} from differences between elements & \texttt{X}$^2$ \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
 The bonding descriptors ask how the charge is arranged around the atoms and in
-the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the shell
+the bonds. The radial moments $m_n=\sum_k\rho_k r_k^n/\sum_k\rho_k$ and the \rev{region}
 fractions describe how far the charge sits from its nearest nucleus; a large
 interstitial fraction points to delocalized charge between the atoms. The
 non-radial gradient share $\zeta$ is zero for spherical, non-overlapping atoms
@@ -411,7 +416,14 @@ Because the cell is periodic, the two kinds of region cancel exactly over the
 whole cell, so without this restriction the fraction would be $\tfrac12$ for
 every crystal. The bounded bond ellipticity describes the shape of the charge across
 a bond, from 0 when it is round (cylindrical) to close to 1 when it is
-flattened, and unlike the usual ellipticity\rev{~\cite{bader1983}} it cannot become infinite. The
+flattened, and unlike the usual ellipticity\rev{~\cite{bader1983}} it cannot become infinite.
+\rev{With $\lambda_1\le\lambda_2<0$ the two negative curvatures of the density, the usual
+ellipticity $\varepsilon=\lambda_1/\lambda_2-1$ diverges where $\lambda_2$ approaches zero;
+the bounded form $1-\lambda_2/\lambda_1=\varepsilon/(1+\varepsilon)$ is a one-to-one function
+of $\varepsilon$ at each point and differs from it only by compressing large values. It is
+averaged over the bond region rather than taken at the bond critical points, so it measures
+the anisotropy of the density across the bond region as a whole, not the ellipticity of
+individual bonds.} The
 non-covalent interaction (NCI) descriptors pick out the low-density,
 low-gradient regions of weak interactions~\cite{johnson2010}. The structural
 descriptors treat the density of the whole cell. The percolation level along
@@ -438,21 +450,31 @@ could get different values, and a model trained on the descriptor would learn
 this noise instead of the material. We therefore recomputed the descriptors of
 structures of our dataset on a coarser grid with about half as many points, as
 a calculation with a lower cutoff would give. The median change is below 1\%
-for 46 of the 55 descriptors. This is expected, because the density in a
+for \rev{45 of the 54} descriptors. This is expected, because the density in a
 \texttt{CHGCAR} is smooth and most descriptors are averages over the whole
 cell, which a coarser grid reproduces almost exactly. Of the nine that change
-more, four change by less than 2\%. For four others, the percolation anisotropy
+more, four change by less than 2\%\rev{: the valence Laplacian concentration, the
+signed NCI density and the between-element variances of $f_{bond}$ and $\zeta$}. For four others, the percolation anisotropy
 and the three within-element variances, the value of the descriptor itself is
 close to zero for many materials. In a cubic crystal the density connects
 equally well along the three cell vectors, so the percolation anisotropy is
 nearly zero, and when all atoms of an element are equivalent by symmetry, their
 within-element variance is nearly zero. A very small change in such a value is
 a large percentage of it, so these descriptors show large relative changes
-although their values hardly change. The last, the number of non-nuclear
-maxima, is a count, and a coarser grid can miss a small maximum.
-Section~S2 of the Supporting Information lists the change of every descriptor,
+although their values hardly change. The last, \rev{the charge of the non-nuclear
+maxima, rests on a count of maxima}, and a coarser grid can miss a small maximum.
+\rev{Measured in absolute terms, in units of the standard deviation of each
+descriptor over the dataset, 46 of the 54 change by less than 0.1 in 95\% of the
+structures and keep the order of the structures ($\rho_s\geq0.95$). The other
+eight are sensitive to the grid: the counts of density maxima, minima and
+non-nuclear maxima and the charge of the non-nuclear maxima, the three
+within-element variances, whose values are near zero for most structures but
+whose order changes ($\rho_s=0.82$), and the site range of $f_{bond}$. These
+eight should be compared only between densities computed with the same
+plane-wave cutoff.}
+Section~S2 of the Supporting Information lists the \rev{relative and absolute} change of every descriptor,
 and also how much the descriptors change when the derivatives are computed by
-finite differences or when the atomic regions are defined differently.
+finite differences \rev{(with fourth-order differences, all 54 stay within the limits above)} or when the atomic regions are defined differently.
 
 A descriptor must also stay the same when the crystal is described
 differently. The same material can be written down in many ways, and a
@@ -460,8 +482,8 @@ descriptor must not depend on the choice. We tested this on the density of a
 low-symmetry crystal from our dataset, triclinic CuAuF$_5$. Every descriptor
 was computed four times, for the original cell, for a cell eight times larger,
 for the cell with its origin moved by a whole number of grid steps, and for the
-cell rotated in space. All four gave the same value for all 55 descriptors.
-\rev{With the cell vectors relabelled, 53 of the 55 were unchanged. Only the
+cell rotated in space. All four gave the same value for all \rev{54} descriptors.
+\rev{With the cell vectors relabelled, 52 of the 54 were unchanged. Only the
 percolation levels depend on the choice of cell vectors, because each is defined
 along one of them: exchanging two vectors exchanges their values, while the
 percolation anisotropy stays the same.}
@@ -489,7 +511,7 @@ Given only a crystal structure, pydemi predicts the density on the grid that
 VASP itself would choose for that cell with a 500\,eV energy cutoff, and scales
 it so that it holds exactly the valence electrons of the atoms in the cell. The
 result has the same form as a \texttt{CHGCAR} written by a DFT calculation, so
-all 55 descriptors are computed from it in the same way, with no change to the
+all \rev{54} descriptors are computed from it in the same way, with no change to the
 analysis. Its cost grows with the number of atoms and grid points, and a GPU is
 used when one is available. Technical details are given in Section~S2 of the Supporting Information.
 
@@ -499,7 +521,7 @@ used when one is available. Technical details are given in Section~S2 of the Sup
 \caption{Descriptors from predicted densities: the descriptors of the test
 structures of the density model, computed from the DFT and from the ChargE3Net
 density, grouped by domain. (a) Spearman rank correlation $\rho_s$ between the two
-sets of values (axis from 0.8 to 1; the three descriptors below 0.8 are marked
+sets of values (axis from 0.8 to 1; the \rev{five} descriptors below 0.8 are marked
 with their value; dotted lines at 0.95 and 0.99). (b) Median relative difference
 $|a-b|/\max(|a|,|b|)$ over the structures (logarithmic axis; no bar where both values
 are zero for most structures, as for the non-nuclear maxima). Colours: green
@@ -522,15 +544,15 @@ orders are identical and becomes smaller as more materials change places. This
 matters because a property model learns how a property changes from one material
 to another, and a descriptor that mixes up the order of the materials would
 mislead it. Second, we measured how much the values themselves differ (median
-relative difference, Fig.~\ref{fig:ml}b). For 44 of the 55 descriptors, $\rho_s$
+relative difference, Fig.~\ref{fig:ml}b). For \rev{42 of the 54} descriptors, $\rho_s$
 is at least 0.95, and for 37 of them at least 0.99, and most of them change by
-less than 1\%. These 44 are all 18 heterogeneity descriptors, 16 of the 18
-bonding descriptors and 10 of the 19 structural descriptors (Fig.~\ref{fig:ml}a). The other 11 fall into four groups, each with a
+less than 1\%. These \rev{42} are all 18 heterogeneity descriptors, \rev{15} of the 18
+bonding descriptors and \rev{9} of the \rev{18} structural descriptors (Fig.~\ref{fig:ml}a). The other \rev{12} fall into four groups, each with a
 clear reason. The counts of maxima and minima of the density change because the
 prediction adds or removes tiny bumps in flat regions far from the atoms,
 without changing the density noticeably. The number and charge of non-nuclear
 maxima are zero in both densities for most structures, so their ranking is
-decided by a few materials. The bounded bond ellipticity and the volume
+decided by a few materials. The bounded bond ellipticity\rev{, the valence Laplacian concentration} and the volume
 fraction of negative Laplacian use second derivatives of the density in
 low-density regions, and derivatives magnify the small errors of the
 prediction. The last group are five anisotropy measures, namely the three eigenvalues and the
@@ -540,8 +562,8 @@ same value (every cubic crystal, for instance, is isotropic), so tiny
 differences reorder them. Several of these values are close to zero, so their
 relative error in Fig.~\ref{fig:ml}b looks large although the absolute
 difference is small. When
-the density is predicted, the 44 can therefore be used as they are, and the
-other 11 with care. For these 11, the value from a predicted density
+the density is predicted, the \rev{42} can therefore be used as they are, and the
+other \rev{12} with care. For these \rev{12}, the value from a predicted density
 should not be used to rank or compare individual materials; where a DFT
 density exists, its value should be used instead.
 
@@ -564,7 +586,7 @@ the random split that comes with the dataset~\cite{kumar2026}: 4,847 structures
 for training, 606 for validation and 606 for testing. A material without a
 value for a property is left out for that property only.
 
-For each property we trained three kinds of models on the 55 descriptors: a linear model, a random forest~\rev{\cite{breiman2001,pedregosa2011}}
+For each property we trained three kinds of models on the \rev{54} descriptors: a linear model, a random forest~\rev{\cite{breiman2001,pedregosa2011}}
 and gradient-boosted trees (LightGBM~\cite{ke2017}). The settings of LightGBM
 were tuned automatically on the validation set~\cite{akiba2019}, and the test
 set was used only once, for the final scores. Each random forest and LightGBM
@@ -585,7 +607,7 @@ given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 mean absolute SHAP value in the LightGBM model with all descriptors on the training
 set. A dot marks a descriptor that is among the ten of a property; its area is
 the descriptor's share of the mean absolute SHAP value and its colour the
-domain. Only the 34 descriptors that are among the ten for at least one property
+domain. Only the \rev{32} descriptors that are among the ten for at least one property
 are shown, ordered by the number of properties for which they are among the ten.}
 \label{fig:top10}
 \end{figure}
@@ -594,7 +616,7 @@ are shown, ordered by the number of properties for which they are among the ten.
 \centering
 \caption{Test scores of tuned LightGBM models on the pydemi descriptors: $R^2$,
 or ROC-AUC for the two classifications, mean over five seeds (the seed-to-seed
-standard deviations are shown in Fig.~\ref{fig:properties}), with all 55 descriptors and with the ten most important
+standard deviations are shown in Fig.~\ref{fig:properties}), with all \rev{54} descriptors and with the ten most important
 descriptors of each property. MAE: mean absolute error with all
 descriptors. $n$: training and test materials.}
 \label{tab:properties}
@@ -621,10 +643,10 @@ deviation.}
 
 \subsection{Results and interpretation}
 With the descriptors alone, LightGBM predicts every regression property
-except the refractive index with a test $R^2$ between 0.85 and 0.95
+except the refractive index with a test $R^2$ between \rev{0.86} and 0.95
 (Table~\ref{tab:properties}, Fig.~\ref{fig:properties}). The refractive index,
 which has the fewest materials, reaches 0.76. Metallicity is classified with a
-ROC-AUC of 0.98 \rev{(73\% of the 605 test materials are metals)}. \rev{The direct
+ROC-AUC of \rev{0.99} \rev{(73\% of the 605 test materials are metals)}. \rev{The direct
 gap, defined only for materials with a gap,} is classified with \rev{a ROC-AUC of}
 0.79 \rev{(48 of the 163 test materials have a direct gap)}.
 
@@ -643,8 +665,8 @@ separately. For the three moduli, the descriptors alone give the highest $R^2$
 of all models. For the Debye temperature they are above the density and
 composition models and level with MEGNet and MatTen. For
 the energy relative to the free atoms they are well above the density
-representation alone but below MEGNet, MatTen and the models that use the
-composition. This energy depends strongly on which elements are present, which
+representation alone \rev{and above the attention networks, but below MEGNet,
+MatTen and LightGBM on the density representation and the composition together}. This energy depends strongly on which elements are present, which
 the composition describes directly.
 
 \begin{table}[!tp]
@@ -663,31 +685,30 @@ Latent density + Magpie, attention CNN & 0.94 & 0.85 & 0.87 & 0.88 & 0.86 \\
 MEGNet & 0.93 & 0.87 & 0.86 & 0.94 & 0.91 \\
 \midrule
 MatTen & 0.93 & 0.84 & 0.88 & 0.99 & 0.91 \\
-pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & 0.86 & 0.91 \\
+pydemi descriptors, LightGBM & 0.95 & 0.91 & 0.92 & \rev{0.91} & 0.91 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The mean interstitial density is the most important descriptor overall: it
-leads for the elastic moduli and constants and for the refractive index. The
-volume fraction of the NCI region plays the same role for the band gap,
-metallicity and the formation energy. The thermal properties rely mainly on the
-charge-distance variance, the interstitial charge fraction and the valence
-Laplacian concentration, and the cohesive energy on the bond-midpoint and
-interstitial densities; only the direct-gap classification has no dominant
+\rev{The volume fraction of the NCI region is the most important descriptor
+overall: it leads for the band gap, metallicity, the formation energy and the
+refractive index. The elastic moduli and constants rely mainly on the mean
+interstitial, bond-midpoint and percolation densities, the} thermal properties \rev{on the
+charge-distance variance and the valence Laplacian concentration, and the
+cohesive energy on the interstitial charge fraction and the bond-midpoint density}; only the direct-gap classification has no dominant
 descriptor (Supporting Information, Fig.~S5). The information is concentrated
 in a few descriptors. Models trained on only the ten most important descriptors
 of each property, chosen on the training set (Fig.~\ref{fig:top10};
 Supporting Information, Table~S4), are almost as accurate as those trained on
-all 55. Their test score is lower by only 0.01 to 0.07
-(Table~\ref{tab:properties}). Removing the 18 descriptors that correlate
+all \rev{54}. Their test score is lower by only 0.01 to \rev{0.08}
+(Table~\ref{tab:properties}). Removing the \rev{16} descriptors that correlate
 strongly with another one ($|\rho_s|\geq0.90$ on the training set) changes the
-test score by at most 0.01 for every property except the band gap, which loses
-0.02 (Supporting Information, Tables~S5 and S6).
-Across all properties, these lists together use 34 of the 55 descriptors, and
-a few of them appear for most properties, led by the mean interstitial density,
-the charge-distance variance and the negative-Laplacian volume fraction (Fig.~\ref{fig:top10}). For most
-properties, eight or nine of these ten descriptors are among the 44 that a
+test score by at most \rev{0.012 for every property} (Supporting Information, Tables~S5 and S6).
+Across all properties, these lists together use \rev{32 of the 54} descriptors, and
+a few of them appear for most properties, led by \rev{the interstitial charge
+fraction and the NCI volume fraction (13 of the 17 lists each) and the mean
+interstitial density} (Fig.~\ref{fig:top10}). For most
+properties, eight or nine of these ten descriptors are among the \rev{42} that a
 predicted density reproduces well (Section~\ref{sec:ml}). The property models
 should therefore work almost as well with a predicted density, and the next
 paragraph tests this.
@@ -717,29 +738,32 @@ against the DFT values. The refractive index is shown on logarithmic axes.}
 \end{figure}
 
 The two routes give nearly the same predictions. For every regression property
-the $R^2$ between them is at least 0.94, and they place 99.3\% of the
+the $R^2$ between them is at least \rev{0.95, except for the formation energy
+and the refractive index (0.91)}, and they place \rev{97.2\%} of the
 structures in the same metal or non-metal class. Accuracy is almost unchanged
-for most properties. The bulk modulus has a test $R^2$ of 0.95 by either route,
-and most other properties lose 0.01 to 0.03. The losses are largest, about 0.04, for the sound velocities, the Debye
-temperature and the cohesive energy. These are the models that rely most on the 11
-descriptors that a predicted density reproduces less well
-(Section~\ref{sec:ml}). The 11 carry 7\% of the importance in the bulk-modulus
-model, but about a fifth in the models of the sound velocities and the Debye
-temperature. Two properties are weak by both routes. Whether a gap is direct is
-predicted with an ROC-AUC of 0.73 from the DFT density and 0.74 from the
-predicted one. For the refractive index, the $R^2$ is 0.84 from the DFT density and 0.78 from
+for most properties. The bulk modulus has a test $R^2$ of \rev{0.96 from the DFT
+density and 0.95 from the predicted one}, and most other properties lose
+\rev{less than 0.03}. The losses are largest for \rev{the formation energy (0.07)
+and the band gap (0.04). Among the regression models, the formation energy
+relies most on the 12 descriptors that a predicted density reproduces less well
+(Section~\ref{sec:ml}), together with the refractive index: the 12 carry 26\% of
+the importance in its model, against 12\% in the bulk-modulus model, and the
+bounded bond ellipticity alone causes 36\% of the difference between the two
+routes.} Two properties are weak by both routes. Whether a gap is direct is
+predicted with an ROC-AUC of \rev{0.75 from both densities}. For the refractive
+index, the $R^2$ is \rev{0.79} from the DFT density and \rev{0.58} from
 the predicted one for 128 of the 131 test materials. The other three,
 InAgTe$_2$, LiVRh$_2$ and NaNiN, have DFT refractive indices of 14 to 24, far
 above the 1.4 to 5.5 of the rest. Such large values are rare in the training
-data (12 of 990 materials), and both routes predict values between 2 and 6 for
-these three. With them included, the $R^2$ drops to 0.17 and 0.18
+data (12 of 990 materials), and both routes predict values between \rev{3 and 7} for
+these three. With them included, the $R^2$ drops to \rev{0.23 by both routes}
 (Fig.~\ref{fig:mlprops}). All values are given in
 Section~S4 and Table~S7 of the Supporting Information.
 
 The test structures were relaxed with DFT. Given such a structure, pydemi
 obtains the descriptors and the properties without \rev{a DFT calculation of} the density.
 Unlike graph networks, which predict a property directly from the
-structure, this route passes through the same 55 descriptors as for a DFT
+structure, this route passes through the same \rev{54} descriptors as for a DFT
 density, each with a physical meaning. A user can therefore see which feature of
 the bonding drives a prediction, compare the material with those of the dataset,
 and check the descriptors against a DFT density once one is computed.
@@ -750,7 +774,7 @@ and check the descriptors against a DFT density once one is computed.
 
 pydemi is written in Python and is installed with
 \texttt{pip install pydemi}. This core installation reads \texttt{CHGCAR}
-files, computes the 55 descriptors of one structure or of many, and gives their
+files, computes the \rev{54} descriptors of one structure or of many, and gives their
 catalogue, from Python and from the command line. It is built on
 NumPy~\cite{harris2020}, SciPy~\cite{virtanen2020} and
 pandas~\cite{mckinney2010}. \texttt{CHGCAR} is the density format of VASP; a
@@ -773,7 +797,7 @@ descriptor, \texttt{ml.predict} predicts a density from a crystal structure, and
 \texttt{props.predict} predicts properties from the descriptors. The command
 line offers the same steps (\texttt{pydemi featurize}, \texttt{batch},
 \texttt{catalogue}, \texttt{predict} and \texttt{gui}), and \texttt{pydemi
-sweep} shows how the descriptors change with the shell boundaries. Batch runs
+sweep} shows how the descriptors change with the \rev{sphere factors $a$ and $b$}. Batch runs
 write one row per structure, with the descriptors and the run metadata; they continue past structures that fail
 and record the error.
 
@@ -816,12 +840,12 @@ are tested by comparing their predictions with those saved when the models were
 trained. The interface is tested by checking that each figure is drawn from the
 same numbers that give its descriptor. The tests run automatically on Linux, macOS
 and Windows each time the code changes, and Section~S5 of the Supporting
-Information lists all 353 of them.
+Information lists all \rev{346} of them.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_gui.pdf}
-\caption{The graphical interface with the DFT \texttt{CHGCAR} of MgO (a test-set structure), descriptor view: the descriptors with the interstitial charge fraction selected, its radial charge distribution with the shell boundaries and its formula.}
+\caption{The graphical interface with the DFT \texttt{CHGCAR} of MgO (a test-set structure), descriptor view: the descriptors with the interstitial charge fraction selected, its charge distribution \rev{over the distance to the nuclei in units of their covalent radii, with the region boundaries,} and its formula.}
 \label{fig:gui}
 \end{figure}
 
@@ -829,7 +853,7 @@ Information lists all 353 of them.
 \section{Conclusions}
 \label{sec:conclusions}
 pydemi turns the one file that every VASP calculation writes, the
-\texttt{CHGCAR}, into 55 descriptors, each with a short physical meaning and a
+\texttt{CHGCAR}, into \rev{54} descriptors, each with a short physical meaning and a
 value largely set by the material rather than by the grid or the numerical
 method. It computed every descriptor for every crystal of our dataset without a
 failure. Automated tests compare the descriptors with exact values for model
@@ -837,10 +861,10 @@ densities and check that every descriptor stays the same when the cell is
 enlarged, moved or rotated. It can be used
 as a Python library, from the command line or through a local graphical
 interface. The included ChargE3Net model gives the descriptors from a crystal
-structure alone. For 44 of the 55, the predicted density sorts the materials in
-the same order as the DFT density ($\rho_s \geq 0.95$). The other 11 are the
-counts of density maxima and minima, the non-nuclear maxima, two descriptors
-built from second derivatives in low-density regions, and five anisotropy
+structure alone. For \rev{42 of the 54}, the predicted density sorts the materials in
+the same order as the DFT density ($\rho_s \geq 0.95$). The other \rev{12} are the
+counts of density maxima and minima, the non-nuclear maxima, \rev{three} descriptors
+built from second derivatives \rev{of the density}, and five anisotropy
 measures whose values cluster.
 
 Used alone, the descriptors predict 17 elastic, thermal, energetic,
