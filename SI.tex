@@ -129,7 +129,7 @@ $\tilde\rho=\rho/Q_\mathrm{tot}$; zero for a uniform density.
 
 \subsection{Site heterogeneity (18)}
 Each voxel is assigned to an atom with weight $w_i(k)$ (nearest atom by default;
-power diagram or Becke cells optionally), and three per-atom quantities are
+\rev{Becke cells} optionally), and three per-atom quantities are
 computed:
 \begin{equation}
 \begin{gathered}
@@ -144,13 +144,10 @@ the site spread \dn{X_site_std} ($\mathrm{std}_iX^{(i)}$), the site range
 \dn{X_site_min}, the within-element variance \dn{X_within_element_var}
 ($\sum_e x_e\mathrm{Var}_{i\in e}X^{(i)}$) and the between-element variance
 \dn{X_between_element_var} ($\sum_e x_e(\bar X_e-\bar X)^2$), with $x_e$ the site fraction of element $e$;
-the last two add up to $\mathrm{Var}_iX^{(i)}$. The within-element variance is NaN
-(flagged) when no element has two or more atoms in the cell, and the between-element
-variance is zero (flagged) for an elemental crystal. In 421 structures of the
-dataset every element has a single atom in the cell, so their within-element
-variances are NaN. A supercell of such a structure has several equivalent atoms
-of each element and gives zero, so these are the only values that change under
-supercell expansion.
+the last two add up to $\mathrm{Var}_iX^{(i)}$. The within-element variance is \rev{zero}
+(flagged) when no element has two or more atoms in the cell\rev{ (421 structures of
+the dataset), the value every supercell of such a structure gives}, and the between-element
+variance is zero (flagged) for an elemental crystal.
 
 % ==========================================================================
 \section{Sensitivity and transfer per descriptor}
@@ -168,13 +165,13 @@ domain): median relative change $|a-b|/\max(|a|,|b|)$ when the grid is
 Fourier-coarsened to 80\% of its points per axis (30 structures), when the FFT
 derivatives are replaced by fourth- or second-order central differences (200
 structures; 60 for the site statistics of $\zeta$; 48 for the bounded
-ellipticity), when the nearest-atom partition is replaced by the power diagram
-or Becke cells (300 structures), and when the descriptors are computed from the
+ellipticity), when the nearest-atom partition is replaced by \rev{Becke cells}
+(300 structures), and when the descriptors are computed from the
 ChargE3Net prediction instead of the DFT density (605 test structures, Section~4
 of the main text). Dots mark choices a descriptor does not depend on. The large values of the
 within-element variances on the coarsened grid and of the percolation
 anisotropy reflect a near-zero reference value; those of the heterogeneity
-descriptors under other partitions reflect a change of definition.}
+descriptors under \rev{Becke cells} reflect a change of definition.}
 \label{fig:si_stability}
 \end{figure}
 
@@ -182,9 +179,7 @@ descriptors under other partitions reflect a change of definition.}
 partition. The 18 site descriptors do, by definition, because each partition
 defines different per-atom regions (300 structures). Becke cells, which like
 the nearest-atom partition ignore atomic size, preserve the ranking of the
-structures by the site standard deviations (Spearman $\rho_s=0.97$--0.99),
-whereas the power diagram, which gives larger atoms larger cells, reorders them
-($\rho_s$ down to 0.34).
+structures by the site standard deviations (Spearman $\rho_s=0.97$--0.99\rev{).} % rho_s: update from sensitivity/results/partitions_summary.csv (v2)
 
 \paragraph{Quantities pydemi does not offer.} Some standard quantities of
 density analysis cannot be computed reliably from a \texttt{CHGCAR}. The
@@ -219,17 +214,17 @@ agree, are not affected.
 \centering
 \caption{Median relative change (\%) of each descriptor when the grid is
 coarsened to 80\% per axis, the FFT derivatives are replaced by fourth- or
-second-order differences, and the nearest-atom partition by the power diagram
-or Becke cells (sample sizes as in Fig.~\ref{fig:si_stability}; -- = does not depend
+second-order differences, and the nearest-atom partition by \rev{Becke cells}
+(sample sizes as in Fig.~\ref{fig:si_stability}; -- = does not depend
 on the choice), and the Spearman correlation $\rho_s$ and median relative error
 (\%) between the descriptors of the DFT and ChargE3Net-predicted densities of the
 605 test structures. Relative change: $|a-b|/\max(|a|,|b|)$.}
 \label{tab:si_stability}
 \footnotesize
 \begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{lccccccc}
+\begin{tabular}{lcccccc}
 \toprule
-Descriptor & grid 80\% & FD4 & FD2 & power & Becke & $\rho_s$ (ML) & ML error \\
+Descriptor & grid 80\% & FD4 & FD2 & Becke & $\rho_s$ (ML) & ML error \\
 \midrule
 \csname @@input\endcsname tables/tab_si_descriptors.tex 
 \bottomrule
@@ -252,15 +247,15 @@ the loss. After each of the 78 passes over the training set (50,232 steps, about
 18 hours on one NVIDIA RTX A5000), the NMAPE was computed on 400 grid points of
 each validation structure, and the checkpoint with the lowest value (step
 47,656) was kept. On 1,000 random grid points of each test structure, the
-released weights used as they are give a median NMAPE of 32\%, because several
-elements have a different number of valence electrons in the Materials Project
-(Table~\ref{tab:si_paw}); the same network trained from scratch on the dataset
+released weights used as they are give a median NMAPE of 32\%, because \rev{they
+stand for the PAW potentials of the Materials Project, in which some elements
+have a different number of valence electrons}; the same network trained from scratch on the dataset
 (200,000 steps) gives 0.78\%, and the fine-tuned model 0.59\%, better than the
 one from scratch for 470 of the 605 structures. The prediction grid is the
 one VASP chooses for a 500\,eV cutoff with accurate precision, which reproduces
 the grids of all calculations of the dataset. The predicted density is rescaled
-to the valence electron count of the PAW datasets of the training data (87
-elements), and the model, the checkpoint hash and the scale factor are recorded
+to the valence electron count \rev{the structure has in the calculations of the
+dataset}, and the model, the checkpoint hash and the scale factor are recorded
 with the result. The copy of the network in pydemi reproduces the
 predictions of the original ChargE3Net code to $6\times10^{-7}$ of the peak
 density for the structures checked.
@@ -599,7 +594,7 @@ Laplacian rings across the cell and does not converge.
 agree with a brute-force search over $\pm5$ periodic images to
 $10^{-12}$\,\AA{}, also in an extremely sheared cell in which a fixed
 $3\times3\times3$ supercell misses the nearest image by more than 0.01\,\AA{}.
-All three partitions conserve the charge to $10^{-12}$.
+\rev{Both} partitions conserve the charge to $10^{-12}$. % test counts: update from the v2 pytest run
 
 \paragraph{Closed forms (40).} For a single Slater density
 ($\zeta=3$\,\AA$^{-1}$) the charge integrates to 1, $m_1=3/(2\zeta)$ holds to
@@ -679,29 +674,7 @@ of BeCo (2 million pairs) this is 12 minutes. A GPU makes it much faster.
 
 \paragraph{PAW datasets.} The \texttt{OUTCAR} files of the 4,901 runs
 that have one name one PAW dataset per element, the same for every structure of
-the element (Table~\ref{tab:si_paw}). For 41 of the 87 elements the dataset
-differs from the one in the Materials Project input set (\texttt{MPRelaxSet} of
-pymatgen): 30 have fewer semicore electrons in the valence, and 11 lanthanides
-keep their $f$ electrons in the valence where the Materials Project freezes them
-in the core. 4,912 of the 6,059 structures contain at least one of these
-elements.
-
-\begin{table}[htbp]
-\centering
-\caption{PAW dataset of each element in the calculations of the dataset,
-with its number of valence electrons, and the dataset of the Materials Project
-input set where it differs.}
-\label{tab:si_paw}
-\footnotesize
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{@{}llllll@{}}
-\toprule
-Dataset & Materials Project & Dataset & Materials Project & Dataset & Materials Project \\
-\midrule
-\csname @@input\endcsname tables/tab_si_paw.tex 
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-\end{table}
+the element. \rev{The name and valence charge of the dataset of every
+calculation are deposited with the data.}
 
 \end{document}

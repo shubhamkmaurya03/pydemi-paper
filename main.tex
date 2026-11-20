@@ -196,7 +196,7 @@ the first data block, which is divided by the cell volume to give $\rho$ in
 e\,\AA$^{-3}$. Spin-polarized and non-collinear files are accepted, and their
 magnetization blocks are ignored. No other VASP file (\texttt{POTCAR},
 \texttt{OUTCAR}, \texttt{AECCAR}, \texttt{ELFCAR}, \texttt{LOCPOT}) is needed,
-and the atomic radii used for the shells and the partitions are tabulated in the
+and the \rev{covalent radii used for the core, bond and interstitial regions} are tabulated in the
 package. Because every VASP run writes a \texttt{CHGCAR}, pydemi can be applied to
 existing calculations without running VASP again, and every descriptor can be
 computed for every structure of a dataset. The density can also come from a crystal structure through the
@@ -273,11 +273,11 @@ scale, so that the larger cores of heavy atoms show up in the descriptors
 instead of being scaled away; \texttt{pydemi sweep} shows how the descriptors
 change when the boundaries are moved (Section~\ref{sec:software}). The 18 site descriptors, which are computed for each atom, need the cell to be
 divided into atomic regions. All results in this work use the default, which
-gives each grid point to its nearest nucleus. A power diagram\rev{~\cite{aurenhammer1987}}, which uses the
-covalent radii to give larger atoms larger regions, and the fuzzy cells of
+gives each grid point to its nearest nucleus. \rev{The} fuzzy cells of
 Becke~\cite{becke1988}, which share the points between neighbouring atoms
-smoothly, are offered as alternatives; Section~S2 of the Supporting Information
-shows how the site descriptors change with them.
+smoothly, are offered as \rev{an alternative. The site descriptors are defined
+for the chosen partition, and} Section~S2 of the Supporting Information
+shows how \rev{they change with it}.
 
 Each descriptor is a short Python function that takes the density object and
 returns one number. All descriptors are kept in a single list, the registry,
@@ -469,11 +469,11 @@ cell rotated in space. All four gave the same value for all 55 descriptors.
 pydemi includes ChargE3Net~\cite{koker2024}, a neural network that predicts the
 electron density of a crystal from its atomic structure alone. Its authors
 released the network together with weights trained on the charge densities of
-the Materials Project~\cite{shen2022}. For several elements, the Materials
-Project calculations used a different PAW potential than our dataset, and
-therefore count a different number of electrons as valence electrons. With the
-released weights, the predicted densities differ strongly from our DFT
-densities. We took the released network as the starting point and trained it
+the Materials Project~\cite{shen2022}. \rev{A predicted density can be compared
+with a DFT density, or used in its place, only if both stand for the same
+calculation settings, the PAW potentials included. For some elements the
+Materials Project used other PAW potentials than our dataset, with a different
+number of valence electrons. We therefore} took the released network as the starting point and trained it
 further on the densities of our dataset (fine-tuning), with 5,152 structures for
 training, 302 for validation and 605 for testing. This gave a lower error than
 the same network trained from scratch on our data alone (Section~S2 of the
@@ -553,8 +553,7 @@ elastic constants $C_{11}$, $C_{12}$ and $C_{44}$~\cite{dejong2015}; the Debye
 temperature, the two sound velocities and the minimum thermal conductivities
 in the Clarke and Cahill models~\cite{clarke2003,cahill1992}; the formation and
 cohesive energies; the PBE band gap, whether a material is a metal and whether
-its gap is direct; and the refractive index~\cite{petousis2017}. The
-Materials Project derives the thermal properties from the elastic data. We used
+its gap is direct; and the refractive index~\cite{petousis2017}. We used
 the random split that comes with the dataset~\cite{kumar2026}: 4,847 structures
 for training, 606 for validation and 606 for testing. A material without a
 value for a property is left out for that property only.
