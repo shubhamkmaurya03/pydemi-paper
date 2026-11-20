@@ -69,7 +69,7 @@ The electronic charge density from a density-functional theory (DFT) calculation
 
 \begin{highlights}
 \item pydemi turns a VASP CHGCAR into 55 interpretable charge-density descriptors
-\item Each descriptor is stable with respect to the grid and the numerical method
+\item \rev{Most descriptors change by less than 1\% with the grid or derivative method}
 \item Descriptors alone predict 17 properties, mostly with test $R^2$ of 0.85--0.95
 \item SHAP values show which descriptors drive each property prediction
 \item ML-predicted densities give properties nearly as accurate as DFT densities
@@ -170,7 +170,7 @@ localization function, are therefore left out, since the density alone gives
 them only approximately~\cite{abramov1997,tsirelson2002}. (ii) It gives the same
 values for the same material. The grid handling, the derivatives and the
 division of the cell into atomic regions are fixed in the package and tested, so
-the values do not depend on how the cell is written down and, for most
+the values \rev{are the same for a cell, its supercell and a shifted or rotated copy} and, for most
 descriptors, change by less than 1\% when the grid is made coarser
 (Sections~\ref{sec:design} and~\ref{sec:descriptors}). (iii) It does not need a
 DFT calculation. Several models predict the density from the \rev{atomic}
@@ -461,6 +461,10 @@ low-symmetry crystal from our dataset, triclinic CuAuF$_5$. Every descriptor
 was computed four times, for the original cell, for a cell eight times larger,
 for the cell with its origin moved by a whole number of grid steps, and for the
 cell rotated in space. All four gave the same value for all 55 descriptors.
+\rev{With the cell vectors relabelled, 53 of the 55 were unchanged. Only the
+percolation levels depend on the choice of cell vectors, because each is defined
+along one of them: exchanging two vectors exchanges their values, while the
+percolation anisotropy stays the same.}
 
 % ==========================================================================
 \section{Descriptors from a predicted density}
@@ -779,7 +783,7 @@ descriptors of one structure took 3.3\,s in the median, and those of the whole
 dataset took 37 minutes with 16 structures computed in parallel. The
 time depends mainly on the size of the density grid, not on the number of
 atoms. Even the largest \texttt{CHGCAR} of the dataset (350\,MB) took 54\,s
-and 2.6\,GB of memory, so a laptop is enough (Section~S6 of the
+and \rev{at most} 2.6\,GB of memory (Section~S6 of the
 Supporting Information).
 
 The graphical interface (\texttt{pydemi gui}) starts a local server and opens in
@@ -885,7 +889,7 @@ providing an HPC facility.
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 During the preparation of this work, the authors used Claude (Anthropic),
 through Claude Code, in order to help write the code of pydemi and the scripts
-that make the figures, including the infographic of Fig.~\ref{fig:architecture}.
+that \rev{draw the figures from the data; no image-generation tool was used}.
 After using this tool, the authors reviewed and edited the content as needed and
 take full responsibility for the content of the published article.
 
