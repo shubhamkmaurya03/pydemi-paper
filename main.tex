@@ -276,13 +276,14 @@ never overlap, and almost no bond passes through the interstitial region. The
 regions scale with the size of the atoms and need no fixed length;
 \texttt{pydemi sweep} shows how the descriptors change with $a$ and $b$
 (Section~\ref{sec:software}).} The 18 site descriptors, which are computed for each atom, need the cell to be
-divided into atomic regions. All results in this work use the default, which
-gives each grid point to its nearest nucleus\rev{; for the bond-region charge
-of each atom, it gives the point to the nucleus with the smallest $r/R_i$, so
-that the bond regions of the atoms add up to that of the cell}. \rev{The} fuzzy cells of
+divided into atomic regions. \rev{For the bond-region charge of each atom, the
+spheres decide: a point of the bond region belongs to the atom with the
+smallest $r/R_i$, so that the bond regions of the atoms add up to that of the
+cell. For $m_1$ and $\zeta$, a}ll results in this work use the default, which
+gives each grid point to its nearest nucleus. \rev{The} fuzzy cells of
 Becke~\cite{becke1988}, which share the points between neighbouring atoms
-smoothly, are offered as \rev{an alternative. The site descriptors are defined
-for the chosen partition, and} Section~S2 of the Supporting Information
+smoothly, are offered as \rev{an alternative. The 12 site descriptors of $m_1$
+and $\zeta$ are defined for the chosen partition, and} Section~S2 of the Supporting Information
 shows how \rev{they change with it}.
 
 Each descriptor is a short Python function that takes the density object and

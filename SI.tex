@@ -145,9 +145,11 @@ f_\mathrm{bond}^{(i)}=\frac{\sum_{\rev{a<s_k\le b}}w_i(k)\rho_k}{\sum_k w_i(k)\r
 \zeta^{(i)}=1-\frac{\sum_k w_i(k)|\nabla\rho_k\cdot\hat{\mathbf u}_{ik}|}{\sum_k w_i(k)|\nabla\rho_k|}.
 \end{gathered}
 \end{equation}
-\rev{With the nearest-atom partition, $f_\mathrm{bond}^{(i)}$ gives each voxel to the
-nucleus with the smallest $r_{ik}/R_i$ instead, so that the bond regions of the
-atoms add up to that of the cell.} For each $X\in\{m_1,f_\mathrm{bond},\zeta\}$ the descriptors are
+\rev{Under every partition, $f_\mathrm{bond}^{(i)}$ gives each voxel to the
+nucleus with the smallest $r_{ik}/R_i$ instead: the sphere that puts a voxel in
+the bond region also names its atom. The bond regions of the atoms then add up
+to that of the cell, and the six site descriptors of $f_\mathrm{bond}$ do not
+depend on the partition.} For each $X\in\{m_1,f_\mathrm{bond},\zeta\}$ the descriptors are
 the site spread \dn{X_site_std} ($\mathrm{std}_iX^{(i)}$), the site range
 \dn{X_site_range}, the site maximum and minimum \dn{X_site_max} and
 \dn{X_site_min}, the within-element variance \dn{X_within_element_var}
@@ -200,12 +202,13 @@ The fractional anisotropy changes by 20\% with second-order differences in
 relative terms but by less than 0.05\,SD in 95\% of the structures.}
 
 \paragraph{Atomic partition.} The whole-cell descriptors do not depend on the
-partition. The 18 site descriptors do, by definition, because each partition
+partition\rev{, and neither do the six site descriptors of $f_\mathrm{bond}$, whose
+per-atom regions follow the spheres under every partition
+(Section~\ref{si:defs}). The 12 site descriptors of $m_1$ and $\zeta$} do, by definition, because each partition
 defines different per-atom regions (300 structures). Becke cells, which like
 the nearest-atom partition ignore atomic size, preserve the ranking of the
 structures by the site standard deviations \rev{of $m_1$ and $\zeta$ (Spearman
-$\rho_s=0.99$ and 0.98). For $f_\mathrm{bond}$, whose per-atom regions under the
-default partition follow the covalent radii (Section~\ref{si:defs}), $\rho_s$ is 0.74.}
+$\rho_s=0.99$ and 0.98).}
 
 \paragraph{Quantities pydemi does not offer.} Some standard quantities of
 density analysis cannot be computed reliably from a \texttt{CHGCAR}. The
