@@ -128,7 +128,8 @@ $T_{ab}=\sum_k\partial_a\rho_k\partial_b\rho_k/\sum_k|\nabla\rho_k|^2$ (trace 1;
 all $\tfrac13$ for a cubic crystal).
 \item[Gradient fractional anisotropy] (\dn{charge_FA}) [0--1] $\sqrt{3/2}\,\lVert T-\tfrac13I\rVert_F/\lVert T\rVert_F$.
 \item[Shannon entropy] (\dn{shannon_entropy}) $S=-\int\tilde\rho\ln\tilde\rho\,dV-\ln V$ with
-$\tilde\rho=\rho/Q_\mathrm{tot}$; zero for a uniform density.
+\rev{$\tilde\rho=\rho_+/\int\rho_+\,dV$, where $\rho_+=\max(\rho,0)$, so that points with
+$\rho\le0$ contribute nothing (Section~\ref{si:stability}, PAW pseudo-densities)}; zero for a uniform density.
 \item[Disequilibrium] (\dn{disequilibrium}) $D=V\int\tilde\rho^{\,2}\,dV$; one for a uniform density.
 \item[LMC complexity] (\dn{LMC_complexity}) $C=De^{S}$.
 \end{description}
@@ -233,7 +234,11 @@ core sphere: 11\% of the structures have such maxima, against 6\% when all
 maxima inside the augmentation spheres are excluded, which would need the
 augmentation radii, not part of a \texttt{CHGCAR}}. The interstitial density and the percolation levels, whose bottlenecks
 lie near the sphere radius where pseudo and all-electron densities nearly
-agree, are not affected.
+agree, are not affected. \rev{The Shannon entropy and the disequilibrium use only
+the positive part of the density (Section~\ref{si:defs}). All other descriptors, including
+the moments $m_n$ and the region fractions, use $\rho$ as it is, negative values included.
+These values hold a median of $3.1\times10^{-4}$ of the valence charge and, in all but three
+structures, lie within 0.5\,\AA{} of a nucleus.}
 
 \begin{table}[htbp]
 \centering
