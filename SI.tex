@@ -323,7 +323,7 @@ and the median error of the eigenvalues is at most 0.07\%.
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth]{figures/fig_si_ml_parity_1.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/fig_si_ml_parity_1.pdf}
 \caption{Descriptors of the predicted (ChargE3Net) against the DFT densities for
 the 605 test structures of the density model, first 28 of the \rev{54}
 descriptors in the order of the pydemi catalogue (title colour: blue bonding, green
@@ -337,7 +337,7 @@ values span two to six decades.}
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth]{figures/fig_si_ml_parity_2.pdf}
+\includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{figures/fig_si_ml_parity_2.pdf}
 \caption{As Fig.~\ref{fig:si_ml_parity_1}, for the remaining \rev{26} descriptors.}
 \label{fig:si_ml_parity_2}
 \end{figure}
@@ -462,9 +462,9 @@ Each bar adds up to 100\%; shares of at least 5\% are written in the bars.}
 SHAP value on the training set, in decreasing order, and their share of the
 total (\%).}
 \label{tab:si_top10}
-\footnotesize
+\scriptsize
 \begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{lr>{\raggedright\arraybackslash}p{0.55\textwidth}}
+\begin{tabular}{@{}lr>{\raggedright\arraybackslash}p{0.70\textwidth}@{}}
 \toprule
 Property & Share & Descriptors \\
 \midrule

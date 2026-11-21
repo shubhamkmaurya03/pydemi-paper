@@ -17,7 +17,6 @@
 \usepackage{color}
 \usepackage{multirow}
 \usepackage{textcomp,gensymb}
-\usepackage{lineno}
 \usepackage{xcolor}
 \usepackage{physics}
 \usepackage{epsfig}
@@ -54,7 +53,7 @@
 
 \begin{frontmatter}
 
-\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors \rev{for} Materials Property Prediction} 
+\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors \texorpdfstring{\rev{for}}{for} Materials Property Prediction} 
 
 \author[1]{Shubham K Maurya}
 \author[1]{MD Faiz Akhtar}
@@ -229,9 +228,11 @@ then converts them to Cartesian ones. When the cell vectors are not at right
 angles, as in hexagonal, monoclinic and triclinic cells, a step along one grid
 direction is partly a step along another, and the Laplacian then also contains
 mixed derivatives between pairs of grid directions:
+\begin{linenomath*}
 \[
 \nabla^2 f=\sum_{a,b}G_{ab}\,\frac{\partial^2 f}{\partial u_a\,\partial u_b},
 \]
+\end{linenomath*}
 where $G=BB^{\mathsf T}$ and the rows of $B$ are the reciprocal lattice vectors.
 The mixed terms ($a\neq b$) are zero only when the cell vectors are at right
 angles. They are needed: for kyanite (Al$_2$SiO$_5$, triclinic) in our dataset,
