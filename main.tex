@@ -1,49 +1,22 @@
-\documentclass[preprint,review,12pt]{elsarticle}
-\usepackage[a4paper,margin=1in]{geometry}
-\let\today\relax
-\makeatletter
-\def\ps@pprintTitle{%
-\let\@oddhead\@empty
-\let\@evenhead\@empty
-\def\@oddfoot{}%
-\let\@evenfoot\@oddfoot}
-\makeatother
-%\usepackage{graphicx}
-\usepackage{graphicx, subcaption}
-%\usepackage{subfigure}
+\documentclass[journal=jctcce,manuscript=article,email=true]{achemso}
+\usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{lineno}
-\linenumbers
-\usepackage{epstopdf}
-\usepackage{color}
-\usepackage{multirow}
-\usepackage{textcomp,gensymb}
 \usepackage{xcolor}
-\usepackage{physics}
-\usepackage{epsfig}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{textcomp,gensymb}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{booktabs}
-\usepackage{siunitx}
-\usepackage{breqn}
-\biboptions{square,comma,sort&compress}
-\usepackage{hyperref}
 \usepackage{float}
 \usepackage{adjustbox}
-%\usepackage{xr-hyper}   
-%\externaldocument{supplementary}
-\usepackage{subfiles}
-%\usepackage{credits}
 \usepackage{etoolbox}
+\usepackage[breaklinks=true,colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
 % tables and captions single-spaced; the text stays double-spaced for review
 \AtBeginEnvironment{table}{\def\baselinestretch{1}}
 \AtBeginEnvironment{figure}{\def\baselinestretch{1}}
-\journal{}
-\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}  % gap between float and body text
-\setlength{\abovecaptionskip}{6pt}
-\setlength{\belowcaptionskip}{0pt}
 \newcommand{\rev}[1]{{\color{blue}#1}}
-
-\begin{document}
 % let large floats share a page with text instead of leaving half-empty float pages
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.8}
@@ -51,34 +24,27 @@
 \renewcommand{\floatpagefraction}{0.85}
 \setlength{\emergencystretch}{3em}
 
-\begin{frontmatter}
+\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors \texorpdfstring{\rev{for}}{for} Materials Property Prediction}
+\author{Shubham K Maurya}
+\affiliation{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, Kanpur, Uttar Pradesh 208016, India}
+\author{MD Faiz Akhtar}
+\affiliation{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, Kanpur, Uttar Pradesh 208016, India}
+\author{Somnath Bhowmick}
+\email{bsomnath@iitk.ac.in}
+\affiliation{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, Kanpur, Uttar Pradesh 208016, India}
+\keywords{Electron charge density, Descriptors, Machine learning, Materials property prediction, Interpretability, Python}
 
-\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors \texorpdfstring{\rev{for}}{for} Materials Property Prediction} 
+\begin{document}
+\linenumbers
 
-\author[1]{Shubham K Maurya}
-\author[1]{MD Faiz Akhtar}
-\author[1]{Somnath Bhowmick\corref{cor1}}
-\ead{bsomnath@iitk.ac.in}
-\cortext[cor1]{Corresponding author}
-\affiliation[1]{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, UP 208016, India}
+\begin{tocentry}
+\centering
+\includegraphics[width=3.25in,height=1.75in,keepaspectratio]{figures/graphical_abstract}
+\end{tocentry}
 
 \begin{abstract}
 The electronic charge density from a density-functional theory (DFT) calculation describes how a material is bonded, yet it is rarely used as the input of machine-learning models of material properties. Learned density representations predict properties well but are hard to interpret, while interpretable density analysis treats one structure at a time. We present pydemi, an open-source Python package that turns a VASP \texttt{CHGCAR} file into \rev{54} interpretable descriptors of bonding, structure, and site heterogeneity. \rev{Most descriptors change by less than 1\% with the grid or the derivative method, and each} is documented with its formula, units, and range. From the crystal structure alone, pydemi can also predict the density with an included ChargE3Net model; \rev{42 of the 54} descriptors of the predicted densities rank materials almost exactly as their DFT values do. pydemi computed the descriptors of 6,059 inorganic crystals without a failure, in seconds per structure. Gradient-boosted models on the descriptors alone predict 17 elastic, thermal, energetic, electronic and optical properties, mostly with a test $R^2$ between 0.85 and 0.95. SHAP values show which descriptors drive each prediction, and ten descriptors per property are almost as good as all of them. On DFT-relaxed structures unseen by either model, properties predicted from ML-predicted densities are nearly as accurate as those from DFT densities, so \rev{no DFT calculation} is needed. It runs from Python, the command line, or a graphical interface.
 \end{abstract}
-
-\begin{highlights}
-\item pydemi turns a VASP CHGCAR into \rev{54} interpretable charge-density descriptors
-\item \rev{Most descriptors change by less than 1\% with the grid or derivative method}
-\item Descriptors alone predict 17 properties, mostly with test $R^2$ of 0.85--0.95
-\item SHAP values show which descriptors drive each property prediction
-\item ML-predicted densities give properties nearly as accurate as DFT densities
-\end{highlights}
-
-\begin{keyword}
-Electron charge density \sep Descriptors \sep Machine learning \sep Materials property prediction
-\sep Interpretability \sep Python
-\end{keyword}
-\end{frontmatter}
 
 \section{Introduction}
 \label{sec:intro}
@@ -204,7 +170,7 @@ density object (Fig.~\ref{fig:architecture}), an instance of the
 \texttt{VolumetricData} class of the package, which holds the structure, the density grid and a note of where the density came from; this note
 is written into the metadata of every output row.
 
-\begin{figure}[!t]
+\begin{figure}[!tp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_architecture.pdf}
 \caption{Architecture of pydemi, drawn for MgO. A DFT \texttt{CHGCAR} (left, top) and a crystal structure (CIF, POSCAR, or any format ASE reads) whose density is predicted by the included ChargE3Net model (left, bottom) give the same density grid $\rho(\mathbf{r})$, shown as the $1.5$~e\,\AA$^{-3}$ isosurface around O, the Mg atoms, and the density on one face of the cell. Inside pydemi (center box), the grid is held in the density object; the derived fields (gradient, Laplacian, Hartree potential $V_H$) and the atomic cells of the geometry pass are computed once per structure and cached on the structure; the descriptors then reduce them to single numbers. The radial bars show the percentiles for each MgO descriptor within the dataset, grouped by domain. The descriptors are used from Python, the command line, or the graphical interface (right, top: a screenshot, Fig.~\ref{fig:gui}), and the property models of Section~\ref{sec:properties} take them as input (right, bottom: test predictions of the bulk modulus).}
@@ -602,7 +568,7 @@ three models for 16 properties and as accurate as the random forest for the
 direct gap (Supporting Information, Table~S3). Its test scores are
 given in Table~\ref{tab:properties} and Fig.~\ref{fig:properties}.
 
-\begin{figure}[!t]
+\begin{figure}[!tp]
 \centering
 \includegraphics[width=\linewidth]{figures/fig_top10.pdf}
 \caption{The ten most important descriptors of each property, ranked by their
@@ -728,7 +694,7 @@ and tested on other structures, their scores differ from those of
 Table~\ref{tab:properties}, most for the shear-related properties and the
 refractive index.
 
-\begin{figure}[!t]
+\begin{figure}[!tp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_ml_properties.pdf}
 \caption{Properties of the 605 test structures of the density model, predicted
@@ -880,7 +846,7 @@ the small losses come from the descriptors that transfer less well. pydemi can
 therefore predict the properties of a relaxed crystal structure without
 \rev{a DFT calculation of} its density.
 
-\section*{Code and data availability}
+\section*{Data and Software Availability}
 The source code, the tests, the descriptor reference and the scripts that train
 the property models are available at \url{https://github.com/CMSLabIITK/pydemi}
 under the MIT license. The version described here, \rev{0.4.0}, is archived at Zenodo
@@ -899,12 +865,18 @@ and valence charge of the PAW dataset of every calculation \rev{are, together
 with the DFT calculations themselves (about 180\,GB), available from the
 corresponding author upon reasonable request.}
 
-\section*{Declaration of competing interest}
-The authors declare that they have no known competing financial interests or
-personal relationships that could have appeared to influence the work reported
-in this paper.
+\begin{suppinfo}
+The Supporting Information is available free of charge.
+\begin{itemize}
+\item Definitions of all 54 descriptors; sensitivity of every descriptor to the grid, the
+derivative method, the precision and the partition, and its transfer to predicted densities;
+details, errors, SHAP shares, top-ten lists and correlated-descriptor tests of the property
+models; property predictions from predicted densities; the automated tests; the dataset
+and the cost of the run (PDF)
+\end{itemize}
+\end{suppinfo}
 
-\section*{Acknowledgements}
+\begin{acknowledgement}
 We acknowledge the National Supercomputing Mission (NSM) for providing
 computing resources of ``PARAM Sanganak'' at IIT Kanpur, which is implemented
 by CDAC and supported by the Ministry of Electronics and Information Technology
@@ -912,14 +884,16 @@ by CDAC and supported by the Ministry of Electronics and Information Technology
 India. We also thank the ICME National Hub, IIT Kanpur, and CC, IIT Kanpur, for
 providing an HPC facility.
 
-\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 During the preparation of this work, the authors used Claude (Anthropic),
 through Claude Code, in order to help write the code of pydemi and the scripts
 that \rev{draw the figures from the data; no image-generation tool was used}.
 After using this tool, the authors reviewed and edited the content as needed and
-take full responsibility for the content of the published article.
+take full responsibility for the content of the published work.
+\end{acknowledgement}
 
-\bibliographystyle{elsarticle-num}
+\section*{Notes}
+The authors declare no competing financial interest.
+
 \bibliography{references}
 
 \end{document}

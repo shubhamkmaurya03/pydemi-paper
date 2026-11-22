@@ -1,26 +1,42 @@
-\documentclass[preprint,review,12pt]{elsarticle}
-
-% --- Packages ---
-\usepackage[utf8]{inputenc}
-\usepackage[breaklinks=true,colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
-\usepackage[table,xcdraw]{xcolor}
-\usepackage{epsfig, mathrsfs, latexsym, subfigure, marginnote, gensymb, amsmath}
+\documentclass[journal=jctcce,manuscript=suppinfo,email=true]{achemso}
 \usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{adjustbox}
-\usepackage{doi}
+\usepackage{subcaption}
 \usepackage{lineno}
-\usepackage{enumitem}
-\setlist[description]{style=unboxed}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{textcomp,gensymb}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{adjustbox}
 \usepackage{etoolbox}
+\usepackage[breaklinks=true,colorlinks,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
 % tables and captions single-spaced; the text stays double-spaced for review
 \AtBeginEnvironment{table}{\def\baselinestretch{1}}
 \AtBeginEnvironment{figure}{\def\baselinestretch{1}}
+\newcommand{\rev}[1]{{\color{blue}#1}}
+% let large floats share a page with text instead of leaving half-empty float pages
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setlength{\emergencystretch}{3em}
+\usepackage{doi}
+\usepackage{enumitem}
+\setlist[description]{style=unboxed}
 
-\journal{Computational Materials Science}
+\title{Pydemi: A Python Package for Interpretable Charge-Density Descriptors \texorpdfstring{\rev{for}}{for} Materials Property Prediction}
+\author{Shubham K Maurya}
+\affiliation{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, Kanpur, Uttar Pradesh 208016, India}
+\author{MD Faiz Akhtar}
+\affiliation{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, Kanpur, Uttar Pradesh 208016, India}
+\author{Somnath Bhowmick}
+\email{bsomnath@iitk.ac.in}
+\affiliation{Department of Materials Science and Engineering, Indian Institute of Technology Kanpur, Kanpur, Uttar Pradesh 208016, India}
 
 \begin{document}
-\newcommand{\rev}[1]{{\color{blue}#1}}
 % let large floats share a page with text instead of leaving half-empty float pages
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.8}
@@ -33,17 +49,6 @@
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\theequation}{S\arabic{equation}}
 \newcommand{\dn}[1]{\texttt{\detokenize{#1}}}
-
-\begin{frontmatter}
-\title{Supplementary Material\\ Pydemi: A Python Package for Interpretable Charge-Density Descriptors \rev{for} Materials Property Prediction}
-\author{Shubham K Maurya}
-\author{MD Faiz Akhtar}
-\author{Somnath Bhowmick\corref{cor1}}
-\ead{bsomnath@iitk.ac.in}
-\cortext[cor1]{Corresponding author}
-\affiliation{organization={Department of Materials Science \& Engineering, Indian Institute of Technology Kanpur},
-  city={Kanpur}, postcode={208016}, country={India}}
-\end{frontmatter}
 
 %\linenumbers
 
