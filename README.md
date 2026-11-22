@@ -5,6 +5,9 @@
 `main_article.tex` is a compact article-format copy for printing (11 pt, 2 cm margins, single spacing,
 no line numbers, about 19 pages instead of 29). It has no text of its own: it reads `main.tex`, so edit
 `main.tex` only and compile `main_article.tex` (in Overleaf: Menu > Main document).
+`main_jctc.tex`, `SI_jctc.tex` and `references_jctc.bib` are the JCTC (ACS `achemso`) versions, written by
+`python analysis/make_jctc.py` from `main.tex`, `SI.tex` and `references.bib`: edit those and run the
+script again, then `tectonic main_jctc.tex` and `tectonic SI_jctc.tex`.
 
 Regenerate every number, table and figure (env `pydemi`, `PYTHONPATH=src`, from the repo root):
 
